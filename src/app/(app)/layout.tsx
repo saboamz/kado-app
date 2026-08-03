@@ -1,3 +1,5 @@
+import { AppShell } from '@/components/AppShell';
+import { db } from '@/lib/db';
 import { requireUser } from '@/lib/session';
 
 /**
@@ -11,6 +13,10 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireUser();
-  return <>{children}</>;
+  const user = await requireUser();
+  const unreadCount = await db.notification.count({
+    where: { userId: user.id, read: false },
+  });
+
+  return <AppShell unreadCount={unreadCount}>{children}</AppShell>;
 }

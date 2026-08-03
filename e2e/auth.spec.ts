@@ -85,6 +85,8 @@ test('signing out ends the session', async ({ page }) => {
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await expect(page).toHaveURL(/\/app$/);
 
+  // Signing out lives on the profile, where account actions belong.
+  await page.goto('/profile');
   await page.getByRole('button', { name: 'Se déconnecter' }).click();
   await expect(page).toHaveURL(/\/login$/);
 
