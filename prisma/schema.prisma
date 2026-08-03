@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  bio           String?
+  birthday      DateTime?
+  avatarColor   String    @default("#FF6A55")
+  theme         Theme     @default(SYSTEM)
+  profilePublic Boolean   @default(false)
+  currency      String    @default("EUR")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions         Session[]
+  lists            GiftList[]
+  interests        Interest[]
+  reservations     Reservation[]
+  contributions    PotContribution[]
+  sentRequests     Friendship[]      @relation("Requester")
+  receivedRequests Friendship[]      @relation("Addressee")
+  notifications    Notification[]
+  messages         ChatMessage[]
+
+  @@index([email])
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Interest {
+  id     String @id @default(cuid())
+  label  String
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, label])
+}
+
+model GiftList {
+  id         String     @id @default(cuid())
+  name       String
+  occasion   String?
+  visibility Visibility @default(FRIENDS)
+  isDefault  Boolean    @default(false)
+  allowPots  Boolean    @default(true)
+  ownerId    String
+  owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  gifts Gift[]
+
+  @@index([ownerId])
+}
+
+enum Visibility {
+  PRIVATE
+  FRIENDS
+  PUBLIC
+}
+
+model Gift {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  priceCents  Int?
+  currency    String   @default("EUR")
+  url         String?
+  merchant    String?
+  imageUrl    String?
+  category    String?
+  /// 1 = would be nice, 3 = really wants it.
+  priority    Int      @default(2)
+  /// Collaborative: friends chip in rather than one person buying it.
+  isPot       Boolean  @default(false)
+  listId      String
+  list        GiftList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reservation   Reservation?
+  contributions PotContribution[]
+  messages      ChatMessage[]
+
+  @@index([listId])
+}
+
+/// A gift claimed by one friend.
+///
+/// This row must never reach the gift's owner. Queries that can run for an
+/// owner go through the selectors in src/lib/secrecy.ts, which strip it.
+model Reservation {
+  id         String   @id @default(cuid())
+  giftId     String   @unique
+  gift       Gift     @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  reserverId String
+  reserver   User     @relation(fields: [reserverId], references: [id], onDelete: Cascade)
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([reserverId])
+}
+
+/// Money a friend put toward a collaborative gift. Same secrecy rule.
+model PotContribution {
+  id            String   @id @default(cuid())
+  giftId        String
+  gift          Gift     @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  contributorId String
+  contributor   User     @relation(fields: [contributorId], references: [id], onDelete: Cascade)
+  amountCents   Int
+  createdAt     DateTime @default(now())
+
+  @@index([giftId])
+  @@index([contributorId])
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String
+  requester   User             @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User             @relation("Addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  /// Rendered message. Never contains reserver identity for an owner.
+  body      String
+  href      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+}
+
+enum NotificationType {
+  FRIEND_REQUEST
+  FRIEND_ACCEPTED
+  NEW_LIST
+  NEW_GIFTS
+  BIRTHDAY_SOON
+  POT_PROGRESS
+  CHAT_MESSAGE
+}
+
+/// Secret chat between friends about one gift.
+///
+/// The gift's owner is never a participant and must never read these rows,
+/// which is the point: it is where friends coordinate the surprise.
+model ChatMessage {
+  id        String   @id @default(cuid())
+  giftId    String
+  gift      Gift     @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([giftId, createdAt])
+}
