@@ -87,9 +87,12 @@ test.describe('the app frame adapts to the viewport', () => {
 
   test('reads real data from the database', async ({ page }) => {
     await signIn(page);
-    // Seeded lists, not fixtures baked into the page.
+    // Seeded lists and friends, not fixtures baked into the page.
+    // The count is matched by shape rather than value: other specs add and
+    // remove wishes against the same database, so pinning "5 envies" would
+    // make this fail for reasons that have nothing to do with the frame.
     await expect(page.getByText('Anniversaire').first()).toBeVisible();
-    await expect(page.getByText('5 envies')).toBeVisible();
+    await expect(page.getByText(/\d+ envies?/).first()).toBeVisible();
     await expect(page.getByText(/Thomas Bel/).first()).toBeVisible();
   });
 });
