@@ -1,0 +1,203 @@
+/*
+ * One layout, two shapes.
+ *
+ * Phone: content fills the screen with a fixed bottom tab bar, the way a
+ * native app behaves. Desktop: the same navigation becomes a sidebar and the
+ * content column is capped so lines stay readable.
+ *
+ * The breakpoint is 900px — below that a sidebar would eat too much of the
+ * viewport to leave a usable content column.
+ */
+.shell {
+  min-height: 100dvh;
+  background: var(--bg-page);
+}
+
+.body {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.nav {
+  /* Phone: a fixed bottom bar. */
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 6px 6px max(6px, env(safe-area-inset-bottom));
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--line);
+}
+
+.navItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  color: var(--fg-subtle);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    color 0.16s,
+    background 0.16s;
+}
+
+.navItem[aria-current='page'] {
+  color: var(--fg);
+}
+
+.navIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.navBadge {
+  position: absolute;
+  top: -6px;
+  left: 12px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  /* Room for the fixed tab bar plus the home indicator. */
+  padding-bottom: calc(var(--tabbar-height) + 24px);
+}
+
+.container {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: var(--gutter);
+}
+
+.desktopOnly {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .nav {
+    position: sticky;
+    inset: 0 auto 0 0;
+    top: 0;
+    align-self: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    width: 236px;
+    height: 100dvh;
+    padding: 20px 12px;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+    backdrop-filter: none;
+  }
+
+  .navItem {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+  }
+
+  /* The badge leaves the icon's stacking context and sits inline instead. */
+  .navIcon {
+    position: static;
+    overflow: visible;
+  }
+
+  .navItem:hover {
+    background: var(--surface);
+    color: var(--fg);
+  }
+
+  .navItem[aria-current='page'] {
+    background: var(--surface);
+  }
+
+  .navBadge {
+    position: static;
+    transform: none;
+    margin-left: auto;
+    align-self: center;
+  }
+
+  .main {
+    padding-bottom: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    padding: 32px var(--gutter) 64px;
+    /* Cap the column so long lines stay readable on a wide monitor. */
+    max-width: 920px;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+}
+
+.brand {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px 18px;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--fg);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  .brandMark {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+  }
+
+  .navFooter {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+}
