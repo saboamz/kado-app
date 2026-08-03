@@ -1,0 +1,86 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { db } from './db';
+import { relationTo } from './relations';
+import { requireUser } from './session';
+
+export type ReservationResult = { error?: string };
+
+/**
+ * Loads a gift a friend is allowed to act on.
+ *
+ * Refuses three cases, each for its own reason:
+ *  - the owner, because reserving your own gift would defeat the point and
+ *    would put a row in a table their own queries must never touch;
+ *  - a stranger, because reservations are a thing friends do;
+ *  - a list whose visibility does not admit this viewer.
+ */
+async function requireReservableGift(giftId: string) {
+  const user = await requireUser();
+
+  const gift = await db.gift.findUnique({
+    where: { id: giftId },
+    select: {
+      id: true,
+      name: true,
+      isPot: true,
+      listId: true,
+      list: { select: { ownerId: true, visibility: true } },
+    },
+  });
+  if (!gift) return { error: 'Cadeau introuvable' } as const;
+
+  const relation = await relationTo(user.id, gift.list.ownerId);
+  if (relation === 'owner') {
+    return { error: 'Vous ne pouvez pas réserver un cadeau de votre liste.' } as const;
+  }
+  if (relation === 'stranger') {
+    return { error: "Vous n'avez pas accès à cette liste." } as const;
+  }
+  if (gift.isPot) {
+    return {
+      error: 'Ce cadeau est collaboratif : participez à la cagnotte.',
+    } as const;
+  }
+
+  return { user, gift } as const;
+}
+
+export async function reserveGift(giftId: string): Promise<ReservationResult> {
+  const found = await requireReservableGift(giftId);
+  if ('error' in found) return { error: found.error };
+  const { user, gift } = found;
+
+  try {
+    // giftId is unique on Reservation, so a second reservation loses the race
+    // at the database rather than in a check-then-write window.
+    await db.reservation.create({
+      data: { giftId, reserverId: user.id },
+    });
+  } catch {
+    return { error: "Quelqu'un vient de réserver ce cadeau." };
+  }
+
+  revalidatePath(`/gifts/${giftId}`);
+  revalidatePath(`/lists/${gift.listId}`);
+  return {};
+}
+
+export async function releaseGift(giftId: string): Promise<ReservationResult> {
+  const found = await requireReservableGift(giftId);
+  if ('error' in found) return { error: found.error };
+  const { user, gift } = found;
+
+  // Scoped to this reserver: you can only release what you hold.
+  const { count } = await db.reservation.deleteMany({
+    where: { giftId, reserverId: user.id },
+  });
+  if (count === 0) {
+    return { error: "Vous n'aviez pas réservé ce cadeau." };
+  }
+
+  revalidatePath(`/gifts/${giftId}`);
+  revalidatePath(`/lists/${gift.listId}`);
+  return {};
+}

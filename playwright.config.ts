@@ -16,7 +16,9 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
   ],
   webServer: {
-    command: 'npm run build && npm run start',
+    // Clear .next first: editing source while a build is cached leaves the
+    // directory inconsistent, and next start then dies on a missing chunk.
+    command: 'rm -rf .next && npm run build && npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
