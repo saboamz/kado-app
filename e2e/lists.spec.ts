@@ -18,6 +18,7 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   page,
 }) => {
   const listName = `Test ${Date.now()}`;
+  const wish = `Théière ${Date.now()}`;
   await signIn(page, 'sophie@kado.app');
 
   // Create.
@@ -32,16 +33,16 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
 
   // Add a wish.
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
-  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Une théière');
+  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(wish);
   await page.getByLabel('Lien').fill('boutique.fr/theiere');
   await page.getByLabel('Prix').fill('42,50');
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
 
-  await expect(page.getByText('Une théière')).toBeVisible();
+  await expect(page.getByText(wish)).toBeVisible();
   await expect(page.getByText('42,50 €')).toBeVisible();
 
   // The bare domain became a real link and the shop was derived from it.
-  await page.getByText('Une théière').click();
+  await page.getByText(wish).click();
   await expect(page.getByText('boutique.fr', { exact: false })).toBeVisible();
   await expect(
     page.getByRole('link', { name: /boutique\.fr/ }),
@@ -49,10 +50,10 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
 
   // Edit the wish.
   await page.getByRole('link', { name: 'Modifier' }).click();
-  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Une théière en fonte');
+  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(`${wish} en fonte`);
   await page.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(
-    page.getByRole('heading', { name: 'Une théière en fonte' }),
+    page.getByRole('heading', { name: `${wish} en fonte` }),
   ).toBeVisible();
 
   // Delete the list, and with it the wish.
@@ -66,21 +67,29 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
 });
 
 test('a wish needs only a name', async ({ page }) => {
+  // Unique per run: the same spec runs on two viewports against one database,
+  // and a shared name would make the second run match two elements.
+  const wish = `Idée libre ${Date.now()}`;
+
   await signIn(page, 'sophie@kado.app');
   await page.goto('/lists');
   await page.getByText('Anniversaire').first().click();
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
 
-  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Une idée libre');
+  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(wish);
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
 
-  await expect(page.getByText('Une idée libre')).toBeVisible();
+  // Saved with no price, no link and no shop.
+  await expect(page.getByText(wish)).toBeVisible();
+  await page.getByText(wish).click();
+  await expect(page.getByRole('heading', { name: wish })).toBeVisible();
+  await expect(page.getByText('—')).toBeVisible();
 
-  // Clean up so the run is repeatable.
+  // Remove it so the seeded list stays as the seed left it.
   page.once('dialog', (d) => d.accept());
-  await page.getByText('Une idée libre').click();
   await page.getByRole('link', { name: 'Modifier' }).click();
   await page.getByRole('button', { name: 'Supprimer cette envie' }).click();
+  await expect(page.getByText(wish)).toHaveCount(0);
 });
 
 test('an empty name is refused', async ({ page }) => {
@@ -99,7 +108,7 @@ test('an unreadable price is reported rather than silently dropped', async ({
   await page.getByText('Anniversaire').first().click();
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
 
-  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Prix douteux');
+  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(`Prix douteux ${Date.now()}`);
   await page.getByLabel('Prix').fill('beaucoup');
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
 
