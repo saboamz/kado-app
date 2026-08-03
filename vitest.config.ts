@@ -9,5 +9,9 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    // Integration tests share one database; running files in parallel would
+    // have them delete each other's fixtures mid-run.
+    fileParallelism: false,
+    setupFiles: ['./src/test/setup.ts'],
   },
 });
