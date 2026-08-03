@@ -76,6 +76,10 @@ jobs:
       - run: npm run db:seed
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      # CI gets a fresh database each run, so this is belt and braces — but it
+      # keeps the script honest and exercised.
+      - run: npm run db:clean-tests
+        if: always()
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
