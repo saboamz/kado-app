@@ -1,3 +1,79 @@
+/*
+ * Design tokens.
+ *
+ * Light and dark are both defined here; the app follows the system setting by
+ * default and honours an explicit choice via data-theme on <html>.
+ */
+:root {
+  --accent: #ff6a55;
+  --accent-hover: #e5543f;
+  --accent-soft: rgba(255, 106, 85, 0.1);
+  --accent-ink: #b3391f;
+  --accent-glow: rgba(255, 106, 85, 0.5);
+
+  --bg: #ffffff;
+  --bg-page: #eceae7;
+  --surface: #f4f4f6;
+  --surface-hover: #ececf0;
+  --chip: #eaeaee;
+  --fg: #0b0b0c;
+  --fg-muted: #6b6b73;
+  --fg-subtle: #a1a1aa;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+  --glass: rgba(255, 255, 255, 0.85);
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.25);
+
+  --font-sans: var(--font-figtree), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+
+  /* Fluid page gutter: tight on a phone, generous on a desktop. */
+  --gutter: clamp(16px, 4vw, 32px);
+  --tabbar-height: 64px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --accent-soft: rgba(255, 122, 102, 0.16);
+    --accent-ink: #ff9d8b;
+
+    --bg: #0b0b0d;
+    --bg-page: #08080a;
+    --surface: #17171a;
+    --surface-hover: #1e1e22;
+    --chip: #232328;
+    --fg: #f4f4f7;
+    --fg-muted: #9a9aa4;
+    --fg-subtle: #66666f;
+    --line: rgba(255, 255, 255, 0.1);
+    --line-strong: rgba(255, 255, 255, 0.18);
+    --glass: rgba(16, 16, 19, 0.82);
+    --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  }
+}
+
+:root[data-theme='dark'] {
+  --accent-soft: rgba(255, 122, 102, 0.16);
+  --accent-ink: #ff9d8b;
+
+  --bg: #0b0b0d;
+  --bg-page: #08080a;
+  --surface: #17171a;
+  --surface-hover: #1e1e22;
+  --chip: #232328;
+  --fg: #f4f4f7;
+  --fg-muted: #9a9aa4;
+  --fg-subtle: #66666f;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --glass: rgba(16, 16, 19, 0.82);
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+
 *,
 *::before,
 *::after {
@@ -10,12 +86,13 @@ html {
 
 body {
   margin: 0;
-  font-family:
-    'Figtree',
-    system-ui,
-    -apple-system,
-    sans-serif;
+  background: var(--bg-page);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  /* Never let a wide child scroll the whole page sideways on a phone. */
+  overflow-x: hidden;
 }
 
 button {
@@ -31,9 +108,79 @@ input,
 textarea,
 select {
   font: inherit;
+  color: inherit;
 }
 
 img {
   max-width: 100%;
   display: block;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respect the system preference for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes kFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes kPop {
+  0% {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes kShimmer {
+  from {
+    background-position: -300px 0;
+  }
+  to {
+    background-position: 300px 0;
+  }
+}
+
+/* Visually hidden but available to assistive technology. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

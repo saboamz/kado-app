@@ -1,0 +1,97 @@
+.shell {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px
+    max(16px, env(safe-area-inset-bottom));
+  background: var(--bg-page);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--fg);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(24px, 6vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer {
+  font-size: 14px;
+  color: var(--fg-muted);
+  text-align: center;
+}
+
+.footer a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.formError {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.demo {
+  padding: 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+.demo code {
+  font-family: var(--font-mono);
+  color: var(--fg);
+}
