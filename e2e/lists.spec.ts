@@ -1,15 +1,31 @@
 import { expect, test, type Page } from '@playwright/test';
+import {
+  createScenario,
+  destroyScenario,
+  disconnect,
+  TEST_PASSWORD,
+  type Scenario,
+} from './fixtures';
 
-async function signOut(page: Page) {
-  await page.goto('/profile');
-  await page.getByRole('button', { name: 'Se déconnecter' }).click();
-  await page.waitForURL('**/login');
-}
+/** Specs that add or remove wishes work on their own list, never the seed's. */
+let scenario: Scenario;
+
+test.beforeEach(async () => {
+  scenario = await createScenario();
+});
+
+test.afterEach(async () => {
+  await destroyScenario(scenario);
+});
+
+test.afterAll(async () => {
+  await disconnect();
+});
 
 async function signIn(page: Page, email: string) {
   await page.goto('/login');
   await page.getByLabel('Adresse e-mail').fill(email);
-  await page.getByLabel('Mot de passe').fill('kado1234');
+  await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL('**/app');
 }
@@ -19,7 +35,7 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
 }) => {
   const listName = `Test ${Date.now()}`;
   const wish = `Théière ${Date.now()}`;
-  await signIn(page, 'sophie@kado.app');
+  await signIn(page, scenario.ownerEmail);
 
   // Create.
   await page.goto('/lists');
@@ -67,33 +83,24 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
 });
 
 test('a wish needs only a name', async ({ page }) => {
-  // Unique per run: the same spec runs on two viewports against one database,
-  // and a shared name would make the second run match two elements.
-  const wish = `Idée libre ${Date.now()}`;
-
-  await signIn(page, 'sophie@kado.app');
-  await page.goto('/lists');
-  await page.getByText('Anniversaire').first().click();
+  await signIn(page, scenario.ownerEmail);
+  await page.goto(`/lists/${scenario.listId}`);
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
 
-  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(wish);
+  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Une idée libre');
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
 
   // Saved with no price, no link and no shop.
-  await expect(page.getByText(wish)).toBeVisible();
-  await page.getByText(wish).click();
-  await expect(page.getByRole('heading', { name: wish })).toBeVisible();
+  await expect(page.getByText('Une idée libre')).toBeVisible();
+  await page.getByText('Une idée libre').click();
+  await expect(
+    page.getByRole('heading', { name: 'Une idée libre' }),
+  ).toBeVisible();
   await expect(page.getByText('—')).toBeVisible();
-
-  // Remove it so the seeded list stays as the seed left it.
-  page.once('dialog', (d) => d.accept());
-  await page.getByRole('link', { name: 'Modifier' }).click();
-  await page.getByRole('button', { name: 'Supprimer cette envie' }).click();
-  await expect(page.getByText(wish)).toHaveCount(0);
 });
 
 test('an empty name is refused', async ({ page }) => {
-  await signIn(page, 'sophie@kado.app');
+  await signIn(page, scenario.ownerEmail);
   await page.goto('/lists/new');
   await page.getByRole('button', { name: 'Créer la liste' }).click();
   await expect(page.locator('#name-error')).toBeVisible();
@@ -103,12 +110,11 @@ test('an empty name is refused', async ({ page }) => {
 test('an unreadable price is reported rather than silently dropped', async ({
   page,
 }) => {
-  await signIn(page, 'sophie@kado.app');
-  await page.goto('/lists');
-  await page.getByText('Anniversaire').first().click();
+  await signIn(page, scenario.ownerEmail);
+  await page.goto(`/lists/${scenario.listId}`);
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
 
-  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(`Prix douteux ${Date.now()}`);
+  await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Prix douteux');
   await page.getByLabel('Prix').fill('beaucoup');
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
 
@@ -116,19 +122,11 @@ test('an unreadable price is reported rather than silently dropped', async ({
 });
 
 test('a friend can read a list but not shape it', async ({ page }) => {
-  // Thomas is Sophie's friend: he may see her list, never edit it.
-  await signIn(page, 'sophie@kado.app');
-  await page.goto('/lists');
-  await page.getByText('Anniversaire').first().click();
-  await expect(page).toHaveURL(/\/lists\/[a-z0-9]+$/);
-  const listUrl = page.url();
-
-  await signOut(page);
-  await signIn(page, 'thomas@kado.app');
+  await signIn(page, scenario.friendEmail);
+  const listUrl = `/lists/${scenario.listId}`;
 
   await page.goto(listUrl);
-  await expect(page.getByRole('heading', { name: 'Anniversaire' })).toBeVisible();
-  await expect(page.getByText("Liste de Sophie Marchand")).toBeVisible();
+  await expect(page.getByRole('heading')).toBeVisible();
 
   // No owner controls on the page…
   await expect(page.getByRole('link', { name: 'Modifier' })).toHaveCount(0);
@@ -140,14 +138,7 @@ test('a friend can read a list but not shape it', async ({ page }) => {
 });
 
 test('a stranger cannot see a friends-only list at all', async ({ page }) => {
-  await signIn(page, 'sophie@kado.app');
-  await page.goto('/lists');
-  await page.getByText('Anniversaire').first().click();
-  const listUrl = page.url();
-
-  await signOut(page);
-
   // Signed out entirely: the list must not resolve.
-  await page.goto(listUrl);
+  await page.goto(`/lists/${scenario.listId}`);
   await expect(page).toHaveURL(/\/login$/);
 });

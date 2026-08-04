@@ -1,4 +1,40 @@
 import { expect, test, type Page } from '@playwright/test';
+import {
+  createScenario,
+  destroyScenario,
+  disconnect,
+  TEST_PASSWORD,
+  type Scenario,
+} from './fixtures';
+
+/**
+ * Each spec builds its own owner, friends, list and gifts, then removes them.
+ *
+ * Reserving gifts from the seed coupled these tests to its exact state: one
+ * aborted run left a reservation behind and the next failed for reasons that
+ * had nothing to do with reservations.
+ */
+let scenario: Scenario;
+
+test.beforeEach(async () => {
+  scenario = await createScenario();
+});
+
+test.afterEach(async () => {
+  await destroyScenario(scenario);
+});
+
+test.afterAll(async () => {
+  await disconnect();
+});
+
+async function signIn(page: Page, email: string) {
+  await page.goto('/login');
+  await page.getByLabel('Adresse e-mail').fill(email);
+  await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+  await page.waitForURL('**/app');
+}
 
 async function signOut(page: Page) {
   await page.goto('/profile');
@@ -6,130 +42,83 @@ async function signOut(page: Page) {
   await page.waitForURL('**/login');
 }
 
-/**
- * Opens Sophie's Anniversaire list from a friend's home feed.
- *
- * The feed renders one card per list, labelled "Owner · List", so there is no
- * intermediate profile step to click through.
- */
-async function openSophiesBirthdayList(page: Page) {
-  await page
-    .getByRole('link')
-    .filter({ hasText: 'Sophie Marchand · Anniversaire' })
-    .first()
-    .click();
-  await expect(page).toHaveURL(/\/lists\/[a-z0-9]+$/);
-  await expect(page.getByRole('heading', { name: 'Anniversaire' })).toBeVisible();
-}
-
-async function signIn(page: Page, email: string) {
-  await page.goto('/login');
-  await page.getByLabel('Adresse e-mail').fill(email);
-  await page.getByLabel('Mot de passe').fill('kado1234');
-  await page.getByRole('button', { name: 'Se connecter' }).click();
-  await page.waitForURL('**/app');
-}
-
-/**
- * The promise the whole product rests on, exercised through the interface:
- * a friend reserves, and the owner learns nothing.
- */
+/** The promise the product rests on, exercised through the interface. */
 test('a reservation is invisible to the owner', async ({ page }) => {
-  // Emma reserves the vase on Sophie's list.
-  await signIn(page, 'emma@kado.app');
-  await page.goto('/app');
-  await openSophiesBirthdayList(page);
-  const listUrl = page.url();
+  await signIn(page, scenario.friendEmail);
+  await page.goto(`/gifts/${scenario.freeGiftId}`);
 
-  await page.getByText('Vase en grès émaillé').click();
   await page.getByRole('button', { name: 'Je réserve ce cadeau' }).click();
-
   await expect(
     page.getByRole('button', { name: 'Annuler ma réservation' }),
   ).toBeVisible();
-  const giftUrl = page.url();
 
   // The friend sees their own reservation on the list.
-  await page.goto(listUrl);
+  await page.goto(`/lists/${scenario.listId}`);
   await expect(page.getByText('Réservé par vous')).toBeVisible();
-  await expect(page.getByText(/déjà réservée/)).toBeVisible();
+  await expect(page.getByText(/déjà réservées/)).toBeVisible();
 
-  // Sophie, the owner, sees none of it.
+  // The owner sees none of it.
   await signOut(page);
-  await signIn(page, 'sophie@kado.app');
-  await page.goto(listUrl);
+  await signIn(page, scenario.ownerEmail);
 
-  await expect(page.getByRole('heading', { name: 'Anniversaire' })).toBeVisible();
+  await page.goto(`/lists/${scenario.listId}`);
   await expect(page.getByText('Réservé par vous')).toHaveCount(0);
   await expect(page.getByText('Déjà réservé')).toHaveCount(0);
-  await expect(page.getByText(/déjà réservée/)).toHaveCount(0);
+  await expect(page.getByText(/réservée/)).toHaveCount(0);
 
-  // Not on the gift's own page either — and no reserve control exists for her.
-  await page.goto(giftUrl);
+  // Nor on the gift itself, where no reserve control exists for them at all.
+  await page.goto(`/gifts/${scenario.freeGiftId}`);
   await expect(page.getByRole('button', { name: /réserve/i })).toHaveCount(0);
   await expect(
     page.getByText(/aucune information de réservation n'existe/),
   ).toBeVisible();
-
-  // Clean up: Emma releases it so the seed is left as found.
-  await signOut(page);
-  await signIn(page, 'emma@kado.app');
-  await page.goto(giftUrl);
-  await page.getByRole('button', { name: 'Annuler ma réservation' }).click();
-  await expect(
-    page.getByRole('button', { name: 'Je réserve ce cadeau' }),
-  ).toBeVisible();
 });
 
-test('another friend sees a gift is taken but not by whom', async ({ page }) => {
-  // Thomas reserved the AirPods in the seed.
-  await signIn(page, 'emma@kado.app');
-  await page.goto('/app');
-  await openSophiesBirthdayList(page);
+test('another friend sees a gift is taken but never by whom', async ({
+  page,
+}) => {
+  await signIn(page, scenario.friendEmail);
+  await page.goto(`/gifts/${scenario.takenGiftId}`);
 
-  await page.getByText('AirPods Pro 3').click();
   await expect(
     page.getByRole('button', { name: 'Déjà réservé par un proche' }),
   ).toBeDisabled();
   await expect(page.getByText(/Vous ne saurez pas qui/)).toBeVisible();
 
-  // Thomas's name appears nowhere on the page.
-  await expect(page.getByText('Thomas')).toHaveCount(0);
+  // The holder's name appears nowhere on the page.
+  const body = await page.locator('body').innerText();
+  expect(body).not.toContain('Autre ');
 });
 
 test('the owner cannot reserve from their own list', async ({ page }) => {
-  await signIn(page, 'sophie@kado.app');
-  await page.goto('/lists');
-  await page.getByText('Anniversaire').first().click();
-  await page.getByText('Vase en grès émaillé').click();
+  await signIn(page, scenario.ownerEmail);
+  await page.goto(`/gifts/${scenario.freeGiftId}`);
 
   await expect(page.getByRole('button', { name: /réserve/i })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Modifier' })).toBeVisible();
 });
 
 test('releasing frees the gift for someone else', async ({ page }) => {
-  await signIn(page, 'emma@kado.app');
-  await page.goto('/app');
-  await openSophiesBirthdayList(page);
-  await page.getByText('Sac de randonnée 30 L').click();
-  const giftUrl = page.url();
+  const giftUrl = `/gifts/${scenario.freeGiftId}`;
 
+  await signIn(page, scenario.friendEmail);
+  await page.goto(giftUrl);
   await page.getByRole('button', { name: 'Je réserve ce cadeau' }).click();
   await expect(
     page.getByRole('button', { name: 'Annuler ma réservation' }),
   ).toBeVisible();
 
-  // Lucas sees it taken.
+  // The other friend now finds it taken.
   await signOut(page);
-  await signIn(page, 'lucas@kado.app');
+  await signIn(page, scenario.otherFriendEmail);
   await page.goto(giftUrl);
   await expect(
     page.getByRole('button', { name: 'Déjà réservé par un proche' }),
   ).toBeDisabled();
 
-  // Emma releases it; Lucas can now take it.
+  // Released, it becomes available to them.
   await signOut(page);
-  await signIn(page, 'emma@kado.app');
+  await signIn(page, scenario.friendEmail);
   await page.goto(giftUrl);
   await page.getByRole('button', { name: 'Annuler ma réservation' }).click();
   await expect(
@@ -137,9 +126,23 @@ test('releasing frees the gift for someone else', async ({ page }) => {
   ).toBeVisible();
 
   await signOut(page);
-  await signIn(page, 'lucas@kado.app');
+  await signIn(page, scenario.otherFriendEmail);
   await page.goto(giftUrl);
   await expect(
     page.getByRole('button', { name: 'Je réserve ce cadeau' }),
   ).toBeVisible();
+});
+
+test('a stranger cannot reserve from a list they cannot see', async ({
+  page,
+}) => {
+  // A second scenario's owner is a stranger to the first scenario's list.
+  const outsider = await createScenario();
+  try {
+    await signIn(page, outsider.ownerEmail);
+    await page.goto(`/gifts/${scenario.freeGiftId}`);
+    await expect(page.getByText('404')).toBeVisible();
+  } finally {
+    await destroyScenario(outsider);
+  }
 });
