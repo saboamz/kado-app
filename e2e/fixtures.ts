@@ -31,6 +31,8 @@ export type Scenario = {
   listId: string;
   freeGiftId: string;
   takenGiftId: string;
+  /** Collaborative gift with a 500 € target and nothing collected yet. */
+  potGiftId: string;
   userIds: string[];
 };
 
@@ -82,6 +84,7 @@ export async function createScenario(): Promise<Scenario> {
         create: [
           { name: `Libre ${tag}`, priceCents: 4200 },
           { name: `Pris ${tag}`, priceCents: 6800 },
+          { name: `Cagnotte ${tag}`, priceCents: 50000, isPot: true },
         ],
       },
     },
@@ -90,6 +93,7 @@ export async function createScenario(): Promise<Scenario> {
 
   const free = list.gifts.find((g) => g.name.startsWith('Libre'))!;
   const taken = list.gifts.find((g) => g.name.startsWith('Pris'))!;
+  const pot = list.gifts.find((g) => g.name.startsWith('Cagnotte'))!;
 
   await db.reservation.create({
     data: { giftId: taken.id, reserverId: other.id },
@@ -102,6 +106,7 @@ export async function createScenario(): Promise<Scenario> {
     listId: list.id,
     freeGiftId: free.id,
     takenGiftId: taken.id,
+    potGiftId: pot.id,
     userIds: [owner.id, friend.id, other.id],
   };
 }
