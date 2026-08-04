@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { Badge, Card, PriorityStars } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
+import { ReserveButton } from '@/components/ReserveButton';
 import { db } from '@/lib/db';
 import { formatMoney, priorityLabel } from '@/lib/format';
 import { canViewList, relationTo } from '@/lib/relations';
@@ -100,6 +101,14 @@ export default async function GiftPage({
             <span className={styles.linkUrl}>{gift.url}</span>
           </a>
         </Card>
+      )}
+
+      {/*
+        Rendered only when gift.reservation exists, which it never does for
+        an owner: there is no branch here that could leak to them.
+      */}
+      {gift.reservation && !gift.isPot && (
+        <ReserveButton giftId={id} reservation={gift.reservation} />
       )}
 
       {/*
