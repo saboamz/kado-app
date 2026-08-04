@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { db } from './db';
 import { requireUser } from './session';
+import { deleteUpload, storeUpload } from './uploads';
 import { fieldErrors } from './validation';
 
 export type FormState = { errors?: Record<string, string>; saved?: boolean };
@@ -51,6 +52,24 @@ export async function updateProfile(
 
   const { name, bio, birthday, avatarColor, interests } = parsed.data;
 
+  const current = await db.user.findUniqueOrThrow({
+    where: { id: user.id },
+    select: { avatarUrl: true },
+  });
+
+  // Same three-way decision as a gift image: picked, removed, or unchanged.
+  let avatarUrl: string | null | undefined;
+  const file = formData.get('avatar');
+  if (file instanceof File && file.size > 0) {
+    const stored = await storeUpload(file, 'avatars');
+    if (!stored.ok) return { errors: { avatar: stored.error } };
+    await deleteUpload(current.avatarUrl);
+    avatarUrl = stored.path;
+  } else if (formData.get('avatarRemoved') === '1') {
+    await deleteUpload(current.avatarUrl);
+    avatarUrl = null;
+  }
+
   // Interests arrive as a comma-separated line; store them as rows so they
   // can be searched and counted later.
   const labels = [
@@ -71,6 +90,7 @@ export async function updateProfile(
         bio: bio || null,
         birthday: birthday ? new Date(`${birthday}T00:00:00Z`) : null,
         ...(avatarColor ? { avatarColor } : {}),
+        ...(avatarUrl !== undefined ? { avatarUrl } : {}),
       },
     }),
     db.interest.deleteMany({ where: { userId: user.id } }),

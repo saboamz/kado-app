@@ -29,6 +29,7 @@ export default async function EditProfilePage() {
             ? profile.birthday.toISOString().slice(0, 10)
             : '',
           avatarColor: profile.avatarColor,
+          avatarUrl: profile.avatarUrl,
           interests: profile.interests.map((i) => i.label).join(', '),
         }}
       />

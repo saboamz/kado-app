@@ -49,6 +49,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modul
 # below rather than by this image at boot.
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
+# The upload directory belongs to the app user; a mounted volume inherits
+# this ownership when Docker creates it.
+RUN mkdir -p /data/uploads && chown -R nextjs:nodejs /data
+ENV UPLOAD_DIR=/data/uploads
+
 USER nextjs
 EXPOSE 3000
 

@@ -28,6 +28,7 @@ export default async function BirthdaysPage() {
       id: true,
       name: true,
       avatarColor: true,
+      avatarUrl: true,
       birthday: true,
       _count: { select: { lists: true } },
     },
@@ -94,6 +95,7 @@ function PersonRow({
     id: string;
     name: string;
     avatarColor: string;
+    avatarUrl: string | null;
     days: number;
     _count: { lists: number };
   };
@@ -101,7 +103,12 @@ function PersonRow({
 }) {
   return (
     <CardLink href={`/u/${person.id}`} className={styles.row}>
-      <Avatar name={person.name} color={person.avatarColor} size={44} />
+      <Avatar
+        name={person.name}
+        color={person.avatarColor}
+        url={person.avatarUrl}
+        size={44}
+      />
       <div className={styles.text}>
         <span className={styles.name}>{person.name}</span>
         <span className={styles.lists}>

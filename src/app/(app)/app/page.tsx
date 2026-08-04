@@ -38,12 +38,20 @@ export default async function AppHomePage() {
     // in JavaScript on the day-of-year rather than in SQL on the date.
     db.user.findMany({
       where: { id: { in: friends }, birthday: { not: null } },
-      select: { id: true, name: true, avatarColor: true, birthday: true },
+      select: {
+        id: true,
+        name: true,
+        avatarColor: true,
+        avatarUrl: true,
+        birthday: true,
+      },
     }),
     db.giftList.findMany({
       where: { ownerId: { in: friends } },
       include: {
-        owner: { select: { id: true, name: true, avatarColor: true } },
+        owner: {
+          select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+        },
         _count: { select: { gifts: true } },
       },
       orderBy: { updatedAt: 'desc' },
@@ -75,7 +83,12 @@ export default async function AppHomePage() {
             {birthdays.map((b) => (
               <li key={b.id}>
                 <CardLink href={`/u/${b.id}`} plain className={styles.birthday}>
-                  <Avatar name={b.name} color={b.avatarColor} size={40} />
+                  <Avatar
+                    name={b.name}
+                    color={b.avatarColor}
+                    url={b.avatarUrl}
+                    size={40}
+                  />
                   <span className={styles.birthdayName}>{b.name}</span>
                   <span
                     className={styles.birthdayWhen}
@@ -139,6 +152,7 @@ export default async function AppHomePage() {
                   <Avatar
                     name={list.owner.name}
                     color={list.owner.avatarColor}
+                    url={list.owner.avatarUrl}
                     size={40}
                   />
                   <div className={styles.activityText}>

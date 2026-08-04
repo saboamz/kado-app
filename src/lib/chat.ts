@@ -5,7 +5,12 @@ export type ChatMessageView = {
   id: string;
   body: string;
   createdAt: string;
-  author: { id: string; name: string; avatarColor: string };
+  author: {
+    id: string;
+    name: string;
+    avatarColor: string;
+    avatarUrl: string | null;
+  };
   mine: boolean;
 };
 
@@ -35,7 +40,9 @@ export async function getChatForViewer(
   const messages = await db.chatMessage.findMany({
     where: { giftId },
     include: {
-      author: { select: { id: true, name: true, avatarColor: true } },
+      author: {
+        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+      },
     },
     orderBy: { createdAt: 'asc' },
     take: 200,

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { Badge, Card, PriorityStars } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
+import { UploadedImage } from '@/components/UploadedImage';
 import { Pot } from '@/components/Pot';
 import { SecretChat } from '@/components/SecretChat';
 import { ReserveButton } from '@/components/ReserveButton';
@@ -75,6 +76,10 @@ export default async function GiftPage({
           )
         }
       />
+
+      {gift.imageUrl && (
+        <UploadedImage src={gift.imageUrl} className={styles.photo} />
+      )}
 
       <div className={styles.headline}>
         <span className={styles.price}>

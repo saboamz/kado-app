@@ -68,7 +68,12 @@ export default async function PersonPage({
       <PageHeader title={person.name} back={{ href: '/app', label: 'Accueil' }} />
 
       <div className={styles.identity}>
-        <Avatar name={person.name} color={person.avatarColor} size={64} />
+        <Avatar
+          name={person.name}
+          color={person.avatarColor}
+          url={person.avatarUrl}
+          size={64}
+        />
         <div>
           {person.bio && <p className={styles.bio}>{person.bio}</p>}
           {days !== null && (

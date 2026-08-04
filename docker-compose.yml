@@ -46,8 +46,14 @@ services:
       DATABASE_URL: postgresql://kado:kado@postgres:5432/kado
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET before starting the app}
       NODE_ENV: production
+      UPLOAD_DIR: /data/uploads
     ports:
       - '3000:3000'
+    volumes:
+      # Uploaded images outlive the container: the image is rebuilt on every
+      # deploy, and anything written inside it would go with the old one.
+      - kado-uploads:/data/uploads
 
 volumes:
   kado-pgdata:
+  kado-uploads:

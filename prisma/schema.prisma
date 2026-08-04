@@ -15,6 +15,8 @@ model User {
   bio           String?
   birthday      DateTime?
   avatarColor   String    @default("#FF6A55")
+  /// An uploaded photo; falls back to the coloured initials when absent.
+  avatarUrl     String?
   theme         Theme     @default(SYSTEM)
   profilePublic Boolean   @default(false)
   currency      String    @default("EUR")
