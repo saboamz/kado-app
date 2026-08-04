@@ -4,10 +4,12 @@ import { ButtonLink } from '@/components/Button';
 import { Badge, Card, PriorityStars } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
 import { Pot } from '@/components/Pot';
+import { SecretChat } from '@/components/SecretChat';
 import { ReserveButton } from '@/components/ReserveButton';
 import { db } from '@/lib/db';
 import { formatMoney, priorityLabel } from '@/lib/format';
 import { canViewList, relationTo } from '@/lib/relations';
+import { getChatForViewer } from '@/lib/chat';
 import { giftInclude, viewGift } from '@/lib/secrecy';
 import { getCurrentUser } from '@/lib/session';
 import styles from './gift.module.css';
@@ -55,6 +57,10 @@ export default async function GiftPage({
   });
   const gift = viewGift(row, relation, viewerId);
   const isOwner = relation === 'owner';
+
+  // Null for an owner or a stranger: they are shown no room at all, rather
+  // than an empty one that would betray the room's existence.
+  const chat = viewerId ? await getChatForViewer(id, viewerId) : null;
 
   return (
     <>
@@ -114,6 +120,8 @@ export default async function GiftPage({
 
       {/* Like the reserve control, only ever rendered for a friend. */}
       {gift.pot && <Pot giftId={id} pot={gift.pot} />}
+
+      {chat && <SecretChat giftId={id} messages={chat} />}
 
       {/*
         The reassurance differs by role, and for the owner it is literally
