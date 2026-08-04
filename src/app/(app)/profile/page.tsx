@@ -63,11 +63,13 @@ export default async function ProfilePage() {
       {profile.interests.length > 0 && (
         <section className={styles.section}>
           <SectionTitle>Centres d&rsquo;intérêt</SectionTitle>
-          <div className={styles.interests}>
+          <ul className={styles.interests}>
             {profile.interests.map((i) => (
-              <Badge key={i.id}>{i.label}</Badge>
+              <li key={i.id}>
+                <Badge>{i.label}</Badge>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
 

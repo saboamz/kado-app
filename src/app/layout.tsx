@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Figtree, Roboto_Mono } from 'next/font/google';
+import { getCurrentUser } from '@/lib/session';
 import './globals.css';
 
 // Self-hosted by next/font: no request to Google at runtime, no layout shift.
@@ -33,13 +34,22 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // A signed-in choice wins over the device setting; SYSTEM leaves the
+  // attribute off so the prefers-color-scheme media query applies.
+  const user = await getCurrentUser();
+  const theme = user?.theme === 'SYSTEM' ? undefined : user?.theme.toLowerCase();
+
   return (
-    <html lang="fr" className={`${figtree.variable} ${robotoMono.variable}`}>
+    <html
+      lang="fr"
+      data-theme={theme}
+      className={`${figtree.variable} ${robotoMono.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

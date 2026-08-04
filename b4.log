@@ -1,0 +1,57 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.00kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.3s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:87999aa3d42bdc6bea60565083ee17e86d1f3339802f543c0d03998580f9cb89
+#3 resolve docker.io/docker/dockerfile:1@sha256:87999aa3d42bdc6bea60565083ee17e86d1f3339802f543c0d03998580f9cb89 0.0s done
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/node:22-alpine
+#4 DONE 0.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 130B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 435B 0.0s done
+#6 DONE 0.0s
+
+#7 [deps 1/5] FROM docker.io/library/node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+#7 resolve docker.io/library/node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32 0.0s done
+#7 DONE 0.0s
+
+#8 [deps 2/5] WORKDIR /app
+#8 CACHED
+
+#9 [deps 3/5] COPY package.json package-lock.json ./
+#9 CACHED
+
+#10 [deps 4/5] COPY prisma ./prisma
+#10 CACHED
+
+#11 [deps 5/5] RUN npm ci
+#11 CACHED
+
+#12 [migrate 3/4] COPY --from=deps /app/node_modules ./node_modules
+#12 CACHED
+
+#13 [migrate 4/4] COPY prisma ./prisma
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 51.2s done
+#14 exporting manifest sha256:101b20638d0e9f3a3414564e6b2ee5faee25e2efd9fa62be632480aafc965481 0.0s done
+#14 exporting config sha256:085152358d3bd5591b6ed272a24b81da637697937e70bd4cdd645beb8579278c 0.0s done
+#14 exporting attestation manifest sha256:be0aafe8062827e7a68d9c7c062d0c0d0d04b5b4256b94b63c1710951c2cf85d 0.0s done
+#14 exporting manifest list sha256:c44453c53529a7ce593e3f0f3245805242b72141fb9b3e6669b558c856726c77 0.0s done
+#14 naming to docker.io/library/kado-app:test done
+#14 unpacking to docker.io/library/kado-app:test
+#14 unpacking to docker.io/library/kado-app:test 15.2s done
+#14 DONE 66.6s
