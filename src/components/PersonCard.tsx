@@ -28,7 +28,12 @@ export function PersonCard({ person }: { person: PersonResult }) {
   return (
     <div className={styles.card}>
       <Link href={`/u/${person.id}`} className={styles.identity}>
-        <Avatar name={person.name} color={person.avatarColor} size={44} />
+        <Avatar
+          name={person.name}
+          color={person.avatarColor}
+          url={person.avatarUrl}
+          size={44}
+        />
         <span className={styles.text}>
           <span className={styles.name}>{person.name}</span>
           <span className={styles.meta}>

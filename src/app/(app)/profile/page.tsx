@@ -37,7 +37,12 @@ export default async function ProfilePage() {
       />
 
       <Card className={styles.identity}>
-        <Avatar name={profile.name} color={profile.avatarColor} size={72} />
+        <Avatar
+          name={profile.name}
+          color={profile.avatarColor}
+          url={profile.avatarUrl}
+          size={72}
+        />
         <div className={styles.identityText}>
           <h2 className={styles.name}>{profile.name}</h2>
           <p className={styles.email}>{profile.email}</p>

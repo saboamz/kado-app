@@ -10,6 +10,7 @@ import {
 } from '@/components/display';
 import { GiftIcon, PlusIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { UploadedImage } from '@/components/UploadedImage';
 import { formatMoney } from '@/lib/format';
 import { getListForViewer } from '@/lib/gifts';
 import { getCurrentUser } from '@/lib/session';
@@ -108,6 +109,13 @@ export default async function ListPage({
         <Grid>
           {gifts.map((gift) => (
             <CardLink key={gift.id} href={`/gifts/${gift.id}`}>
+              {gift.imageUrl && (
+                <UploadedImage
+                  src={gift.imageUrl}
+                  className={styles.giftPhoto}
+                />
+              )}
+
               <div className={styles.giftTop}>
                 <span className={styles.giftName}>{gift.name}</span>
                 <PriorityStars priority={gift.priority} />

@@ -64,6 +64,7 @@ export function SecretChat({
               <Avatar
                 name={message.author.name}
                 color={message.author.avatarColor}
+                url={message.author.avatarUrl}
                 size={30}
               />
               <div className={styles.bubble}>

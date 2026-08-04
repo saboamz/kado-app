@@ -38,7 +38,7 @@ ENV PORT=3000
 
 # An unprivileged user: nothing in the runtime needs root.
 RUN addgroup --system --gid 1001 nodejs \
- && adduser --system --uid 1001 nextjs
+ && adduser --system --uid 1001 --ingroup nodejs nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
@@ -48,6 +48,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modul
 # Migrations and the CLI live outside the server, run by the migrate stage
 # below rather than by this image at boot.
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# The upload directory belongs to the app user; a mounted volume inherits
+# this ownership when Docker creates it.
+RUN mkdir -p /data/uploads && chown -R nextjs:nodejs /data
+ENV UPLOAD_DIR=/data/uploads
 
 USER nextjs
 EXPOSE 3000

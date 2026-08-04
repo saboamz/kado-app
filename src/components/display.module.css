@@ -150,3 +150,10 @@ button.card:active {
   align-items: center;
   gap: 12px;
 }
+
+.avatarImage {
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface);
+}

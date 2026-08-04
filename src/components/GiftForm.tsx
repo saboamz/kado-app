@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import type { FormState } from '@/lib/gift-actions';
 import { Field, TextareaField } from './Field';
+import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
 import styles from './forms.module.css';
 
@@ -21,6 +22,7 @@ export type GiftInitial = {
   category: string | null;
   priority: number;
   isPot: boolean;
+  imageUrl: string | null;
 };
 
 export function GiftForm({
@@ -82,6 +84,13 @@ export function GiftForm({
           error={state.errors?.category}
         />
       </div>
+
+      <ImageUpload
+        name="image"
+        label="Photo"
+        initialUrl={initial?.imageUrl}
+        serverError={state.errors?.image}
+      />
 
       <TextareaField
         id="description"

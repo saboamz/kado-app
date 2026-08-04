@@ -5,6 +5,7 @@ export type PersonResult = {
   id: string;
   name: string;
   avatarColor: string;
+  avatarUrl: string | null;
   bio: string | null;
   listCount: number;
   relation: 'friend' | 'pending-sent' | 'pending-received' | 'none';
@@ -36,6 +37,7 @@ export async function searchPeople(
       id: true,
       name: true,
       avatarColor: true,
+      avatarUrl: true,
       bio: true,
       _count: { select: { lists: true } },
     },
@@ -58,6 +60,7 @@ export async function suggestPeople(
       id: true,
       name: true,
       avatarColor: true,
+      avatarUrl: true,
       bio: true,
       _count: { select: { lists: true } },
     },
@@ -74,6 +77,7 @@ async function withRelations(
     id: string;
     name: string;
     avatarColor: string;
+  avatarUrl: string | null;
     bio: string | null;
     _count: { lists: number };
   }[],
@@ -107,6 +111,7 @@ async function withRelations(
       id: person.id,
       name: person.name,
       avatarColor: person.avatarColor,
+      avatarUrl: person.avatarUrl,
       bio: person.bio,
       listCount: person._count.lists,
       relation,
@@ -136,6 +141,7 @@ export async function getFriendGroups(
           id: true,
           name: true,
           avatarColor: true,
+      avatarUrl: true,
           bio: true,
           _count: { select: { lists: true } },
         },
@@ -145,6 +151,7 @@ export async function getFriendGroups(
           id: true,
           name: true,
           avatarColor: true,
+      avatarUrl: true,
           bio: true,
           _count: { select: { lists: true } },
         },
@@ -162,6 +169,7 @@ export async function getFriendGroups(
       id: other.id,
       name: other.name,
       avatarColor: other.avatarColor,
+      avatarUrl: other.avatarUrl,
       bio: other.bio,
       listCount: other._count.lists,
       relation:

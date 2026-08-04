@@ -11,3 +11,6 @@ test-results
 playwright-report
 test-results
 playwright-report
+
+# Uploaded images; a Docker volume in production.
+.uploads/

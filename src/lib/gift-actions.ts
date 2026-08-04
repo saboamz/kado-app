@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from './db';
+import { deleteUpload, storeUpload } from './uploads';
 import { parseMoney } from './format';
 import { requireUser } from './session';
 import { fieldErrors, giftSchema, type GiftInput } from './validation';
@@ -45,7 +46,12 @@ async function requireOwnedGift(giftId: string) {
   const user = await requireUser();
   const gift = await db.gift.findUnique({
     where: { id: giftId },
-    select: { id: true, listId: true, list: { select: { ownerId: true } } },
+    select: {
+      id: true,
+      listId: true,
+      imageUrl: true,
+      list: { select: { ownerId: true } },
+    },
   });
   if (!gift || gift.list.ownerId !== user.id) {
     throw new Error('Cadeau introuvable');
@@ -81,6 +87,35 @@ function giftData(data: GiftInput) {
   };
 }
 
+/**
+ * Resolves what the image field should become.
+ *
+ * Three outcomes: a new file was picked, the existing one was removed, or
+ * nothing changed and the current value stands.
+ */
+async function resolveImage(
+  formData: FormData,
+  field: string,
+  current: string | null,
+): Promise<{ url?: string | null; error?: string }> {
+  const file = formData.get(field);
+
+  if (file instanceof File && file.size > 0) {
+    const stored = await storeUpload(file, 'gifts');
+    if (!stored.ok) return { error: stored.error };
+    // The replaced file is not needed once the new one is saved.
+    await deleteUpload(current);
+    return { url: stored.path };
+  }
+
+  if (formData.get(`${field}Removed`) === '1') {
+    await deleteUpload(current);
+    return { url: null };
+  }
+
+  return {};
+}
+
 export async function createGift(
   listId: string,
   _prev: FormState,
@@ -96,7 +131,16 @@ export async function createGift(
     return { errors: { price: 'Ce montant semble invalide.' } };
   }
 
-  await db.gift.create({ data: { listId, ...giftData(parsed.data) } });
+  const image = await resolveImage(formData, 'image', null);
+  if (image.error) return { errors: { image: image.error } };
+
+  await db.gift.create({
+    data: {
+      listId,
+      ...giftData(parsed.data),
+      ...(image.url !== undefined ? { imageUrl: image.url } : {}),
+    },
+  });
 
   revalidatePath(`/lists/${listId}`);
   redirect(`/lists/${listId}`);
@@ -115,7 +159,16 @@ export async function updateGift(
     return { errors: { price: 'Ce montant semble invalide.' } };
   }
 
-  await db.gift.update({ where: { id: giftId }, data: giftData(parsed.data) });
+  const image = await resolveImage(formData, 'image', gift.imageUrl);
+  if (image.error) return { errors: { image: image.error } };
+
+  await db.gift.update({
+    where: { id: giftId },
+    data: {
+      ...giftData(parsed.data),
+      ...(image.url !== undefined ? { imageUrl: image.url } : {}),
+    },
+  });
 
   revalidatePath(`/lists/${gift.listId}`);
   revalidatePath(`/gifts/${giftId}`);
@@ -125,6 +178,8 @@ export async function updateGift(
 export async function deleteGift(giftId: string): Promise<void> {
   const { gift } = await requireOwnedGift(giftId);
   await db.gift.delete({ where: { id: giftId } });
+  // The row is gone; its image would otherwise sit on disk forever.
+  await deleteUpload(gift.imageUrl);
   revalidatePath(`/lists/${gift.listId}`);
   redirect(`/lists/${gift.listId}`);
 }

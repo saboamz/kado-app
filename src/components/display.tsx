@@ -1,3 +1,4 @@
+import { UploadedImage } from './UploadedImage';
 import Link from 'next/link';
 import type { ComponentProps, ReactNode } from 'react';
 import { initials } from '@/lib/format';
@@ -43,11 +44,25 @@ export function Avatar({
   name,
   color = '#FF6A55',
   size = 44,
+  url,
 }: {
   name: string;
   color?: string;
   size?: number;
+  /** An uploaded photo; the coloured initials stand in when absent. */
+  url?: string | null;
 }) {
+  if (url) {
+    return (
+      <UploadedImage
+        src={url}
+        className={styles.avatarImage}
+        width={size}
+        height={size}
+      />
+    );
+  }
+
   return (
     <span
       className={styles.avatar}

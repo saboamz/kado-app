@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { updateProfile } from '@/lib/profile-actions';
 import { Field, TextareaField } from './Field';
+import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
 import styles from './forms.module.css';
 
@@ -16,6 +17,7 @@ export function ProfileForm({
     bio: string | null;
     birthday: string;
     avatarColor: string;
+    avatarUrl: string | null;
     interests: string;
   };
 }) {
@@ -23,6 +25,14 @@ export function ProfileForm({
 
   return (
     <form action={action} className={styles.form} noValidate>
+      <ImageUpload
+        name="avatar"
+        label="Photo de profil"
+        initialUrl={initial.avatarUrl}
+        shape="circle"
+        serverError={state.errors?.avatar}
+      />
+
       <Field
         id="name"
         name="name"
@@ -62,7 +72,9 @@ export function ProfileForm({
       />
 
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Couleur</legend>
+        <legend className={styles.legend}>
+          Couleur (sans photo de profil)
+        </legend>
         <div className={styles.colours}>
           {COLOURS.map((colour) => (
             <label key={colour} className={styles.colour}>
