@@ -16,7 +16,10 @@ const {
   storeUpload,
 } = await import('./uploads');
 
-/** A minimal but genuinely-shaped file of each type. */
+/**
+ * Header-only buffers: enough for the magic-byte check, which is all the
+ * detection tests need.
+ */
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0]);
 const JPEG = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0]);
 const GIF = Buffer.from('GIF89a-------', 'ascii');
@@ -26,6 +29,24 @@ const WEBP = Buffer.concat([
   Buffer.from('WEBP', 'ascii'),
   Buffer.from([0, 0, 0, 0]),
 ]);
+
+/**
+ * Real images, needed once storing means decoding. Built rather than
+ * committed as fixtures so the dimensions are visible in the test.
+ */
+const sharp = (await import('sharp')).default;
+
+function image(width: number, height: number, format: 'png' | 'jpeg' = 'png') {
+  const canvas = sharp({
+    create: {
+      width,
+      height,
+      channels: 3,
+      background: { r: 200, g: 80, b: 60 },
+    },
+  });
+  return format === 'png' ? canvas.png().toBuffer() : canvas.jpeg().toBuffer();
+}
 
 function asFile(bytes: Buffer, name: string, type = 'image/png') {
   return new File([new Uint8Array(bytes)], name, { type });
@@ -46,13 +67,14 @@ describe('recognising an image', () => {
 
 describe('storing an upload', () => {
   it('writes the file and returns a path under /uploads', async () => {
-    const result = await storeUpload(asFile(PNG, 'photo.png'), 'gifts');
+    const result = await storeUpload(asFile(await image(40, 30), 'photo.png'), 'gifts');
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    expect(result.path).toMatch(/^\/uploads\/gifts\/[\w-]+\.png$/);
+    // Everything is WebP once stored, whatever arrived.
+    expect(result.path).toMatch(/^\/uploads\/gifts\/[\w-]+\.webp$/);
     const onDisk = await readFile(join(dir, 'gifts', result.path.split('/').pop()!));
-    expect(onDisk.equals(PNG)).toBe(true);
+    expect(detectImageType(onDisk)?.ext).toBe('webp');
   });
 
   /**
@@ -70,7 +92,7 @@ describe('storing an upload', () => {
 
   it('names the file itself rather than trusting the uploader', async () => {
     const result = await storeUpload(
-      asFile(PNG, '../../../etc/passwd.png'),
+      asFile(await image(20, 20), '../../../etc/passwd.png'),
       'gifts',
     );
     expect(result.ok).toBe(true);
@@ -99,9 +121,98 @@ describe('storing an upload', () => {
   });
 
   it('gives two uploads of identical bytes separate paths', async () => {
-    const a = await storeUpload(asFile(PNG, 'a.png'), 'gifts');
-    const b = await storeUpload(asFile(PNG, 'b.png'), 'gifts');
+    const bytes = await image(20, 20);
+    const a = await storeUpload(asFile(bytes, 'a.png'), 'gifts');
+    const b = await storeUpload(asFile(bytes, 'b.png'), 'gifts');
     expect(a.ok && b.ok && a.path !== b.path).toBe(true);
+  });
+});
+
+describe('normalising what gets stored', () => {
+  async function stored(bytes: Buffer, kind: 'gifts' | 'avatars' = 'gifts') {
+    const result = await storeUpload(asFile(bytes, 'x.png'), kind);
+    if (!result.ok) throw new Error(result.error);
+    const file = await readFile(join(dir, kind, result.path.split('/').pop()!));
+    return { file, meta: await sharp(file).metadata() };
+  }
+
+  it('converts everything to WebP', async () => {
+    const { meta } = await stored(await image(50, 50, 'jpeg'));
+    expect(meta.format).toBe('webp');
+  });
+
+  /**
+   * The whole point of normalising: an oversized photo comes back inside the
+   * bound on its longest edge, so the layout can show it whole at a known
+   * cost instead of cropping to stay regular.
+   */
+  it('scales a large image down to the bound', async () => {
+    const { meta } = await stored(await image(3000, 2000));
+    expect(Math.max(meta.width!, meta.height!)).toBe(1600);
+  });
+
+  it('keeps the proportions, so nothing is cropped', async () => {
+    // A 3:2 photo must still be 3:2 afterwards; a changed ratio would mean
+    // pixels were cut off or squashed.
+    const { meta } = await stored(await image(3000, 2000));
+    expect(meta.width! / meta.height!).toBeCloseTo(1.5, 2);
+  });
+
+  it('handles a tall image as readily as a wide one', async () => {
+    const { meta } = await stored(await image(800, 2400));
+    expect(meta.height).toBe(1600);
+    expect(meta.width).toBe(Math.round(1600 * (800 / 2400)));
+  });
+
+  it('leaves a small image at its own size rather than blowing it up', async () => {
+    const { meta } = await stored(await image(120, 90));
+    expect(meta.width).toBe(120);
+    expect(meta.height).toBe(90);
+  });
+
+  it('holds avatars to a tighter bound than gift photos', async () => {
+    const { meta } = await stored(await image(2000, 2000), 'avatars');
+    expect(Math.max(meta.width!, meta.height!)).toBe(512);
+  });
+
+  it('makes a heavy photograph dramatically smaller', async () => {
+    // A camera-sized JPEG is the case that motivated this: it should land
+    // well under a megabyte without the layout doing any work.
+    const original = await image(4000, 3000, 'jpeg');
+    const { file } = await stored(original);
+    expect(file.length).toBeLessThan(original.length);
+    expect(file.length).toBeLessThan(1024 * 1024);
+  });
+
+  /**
+   * A phone held sideways records the rotation as EXIF metadata rather than
+   * rotating the pixels. Stripping that metadata without applying it first
+   * would store every such photo on its side.
+   */
+  it('applies the EXIF rotation before discarding it', async () => {
+    const landscape = await image(400, 200, 'jpeg');
+    const asShot = await sharp(landscape)
+      .withMetadata({ orientation: 6 })
+      .jpeg()
+      .toBuffer();
+
+    const { meta } = await stored(asShot);
+
+    // 400x200 tagged "rotate 90" is really a 200x400 portrait.
+    expect(meta.width).toBe(200);
+    expect(meta.height).toBe(400);
+  });
+
+  it('refuses a file whose header is valid but whose body is not', async () => {
+    // Passes the magic-byte check, then fails to decode.
+    const truncated = Buffer.concat([
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      Buffer.alloc(64, 7),
+    ]);
+    const result = await storeUpload(asFile(truncated, 'broken.png'), 'gifts');
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toMatch(/illisible/);
   });
 });
 
@@ -125,7 +236,10 @@ describe('resolving a stored path', () => {
 
 describe('deleting an upload', () => {
   it('removes a file we stored', async () => {
-    const result = await storeUpload(asFile(JPEG, 'x.jpg'), 'avatars');
+    const result = await storeUpload(
+      asFile(await image(20, 20, 'jpeg'), 'x.jpg', 'image/jpeg'),
+      'avatars',
+    );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 

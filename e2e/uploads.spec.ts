@@ -27,6 +27,21 @@ const PNG = Buffer.from(
   'base64',
 );
 
+/** A 2400x1800 PNG — bigger than the 1600px bound on both edges. */
+async function makeLargePng() {
+  const sharp = (await import('sharp')).default;
+  return sharp({
+    create: {
+      width: 2400,
+      height: 1800,
+      channels: 3,
+      background: { r: 180, g: 60, b: 40 },
+    },
+  })
+    .png()
+    .toBuffer();
+}
+
 async function signIn(page: Page, email: string) {
   await page.goto('/login');
   await page.getByLabel('Adresse e-mail').fill(email);
@@ -61,7 +76,36 @@ test('a photo can be attached to a wish and is shown afterwards', async ({
   const src = await stored.getAttribute('src');
   const response = await page.request.get(src!);
   expect(response.status()).toBe(200);
-  expect(response.headers()['content-type']).toBe('image/png');
+  // Stored as WebP whatever was uploaded, so every image costs the same.
+  expect(response.headers()['content-type']).toBe('image/webp');
+  expect(src).toMatch(/\.webp$/);
+});
+
+/**
+ * The reason for normalising: a camera-sized photo must not be served at
+ * camera size, and must still be visible in full rather than cropped.
+ */
+test('a large photo is stored smaller than it arrived', async ({ page }) => {
+  await signIn(page, scenario.ownerEmail);
+  await page.goto(`/gifts/${scenario.freeGiftId}/edit`);
+
+  const big = await makeLargePng();
+  await page.setInputFiles('input[name="image"]', {
+    name: 'huge.png',
+    mimeType: 'image/png',
+    buffer: big,
+  });
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
+  await page.waitForURL(`**/gifts/${scenario.freeGiftId}`);
+
+  const src = await page
+    .locator('img[src^="/uploads/gifts/"]')
+    .getAttribute('src');
+  const response = await page.request.get(src!);
+  const body = await response.body();
+
+  expect(body.length).toBeLessThan(big.length);
+  expect(response.headers()['content-type']).toBe('image/webp');
 });
 
 test('an avatar can be uploaded and replaces the initials', async ({ page }) => {
