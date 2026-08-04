@@ -73,6 +73,9 @@ export default async function ProfilePage() {
 
       <section className={styles.section}>
         <Stack>
+          <ButtonLink href="/friends" variant="secondary" block>
+            Mes amis ({friends.length})
+          </ButtonLink>
           <ButtonLink href="/profile/edit" variant="secondary" block>
             Modifier mon profil
           </ButtonLink>

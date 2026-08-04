@@ -1,0 +1,127 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { db } from './db';
+import { requireUser } from './session';
+
+export type FriendResult = { error?: string };
+
+/**
+ * Sends a friend request.
+ *
+ * Friendship is one row with a direction, so a request that crosses one
+ * already sent the other way is accepted rather than duplicated — otherwise
+ * two people who both press "add" would deadlock, each waiting on the other.
+ */
+export async function requestFriendship(
+  addresseeId: string,
+): Promise<FriendResult> {
+  const user = await requireUser();
+  if (addresseeId === user.id) {
+    return { error: 'Vous ne pouvez pas vous ajouter vous-même.' };
+  }
+
+  const target = await db.user.findUnique({
+    where: { id: addresseeId },
+    select: { id: true },
+  });
+  if (!target) return { error: 'Cette personne est introuvable.' };
+
+  const existing = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { requesterId: user.id, addresseeId },
+        { requesterId: addresseeId, addresseeId: user.id },
+      ],
+    },
+  });
+
+  if (existing) {
+    if (existing.status === 'BLOCKED') {
+      return { error: 'Impossible pour le moment.' };
+    }
+    if (existing.status === 'ACCEPTED') {
+      return { error: 'Vous êtes déjà amis.' };
+    }
+    // They asked first: treat this as the acceptance it plainly is.
+    if (existing.addresseeId === user.id) {
+      await db.friendship.update({
+        where: { id: existing.id },
+        data: { status: 'ACCEPTED' },
+      });
+      await notifyAccepted(existing.requesterId, user.name);
+      revalidatePath('/friends');
+      return {};
+    }
+    return { error: 'Demande déjà envoyée.' };
+  }
+
+  await db.friendship.create({
+    data: { requesterId: user.id, addresseeId, status: 'PENDING' },
+  });
+  await db.notification.create({
+    data: {
+      userId: addresseeId,
+      type: 'FRIEND_REQUEST',
+      body: `${user.name} souhaite devenir votre ami.`,
+      href: '/friends',
+    },
+  });
+
+  revalidatePath('/friends');
+  revalidatePath(`/u/${addresseeId}`);
+  return {};
+}
+
+export async function acceptFriendship(
+  friendshipId: string,
+): Promise<FriendResult> {
+  const user = await requireUser();
+
+  // Scoped to the addressee: only the person asked can accept.
+  const { count } = await db.friendship.updateMany({
+    where: { id: friendshipId, addresseeId: user.id, status: 'PENDING' },
+    data: { status: 'ACCEPTED' },
+  });
+  if (count === 0) return { error: 'Cette demande n’existe plus.' };
+
+  const friendship = await db.friendship.findUnique({
+    where: { id: friendshipId },
+    select: { requesterId: true },
+  });
+  if (friendship) await notifyAccepted(friendship.requesterId, user.name);
+
+  revalidatePath('/friends');
+  revalidatePath('/app');
+  return {};
+}
+
+/** Declines a pending request, or ends an existing friendship. */
+export async function removeFriendship(
+  friendshipId: string,
+): Promise<FriendResult> {
+  const user = await requireUser();
+
+  const { count } = await db.friendship.deleteMany({
+    where: {
+      id: friendshipId,
+      OR: [{ requesterId: user.id }, { addresseeId: user.id }],
+    },
+  });
+  if (count === 0) return { error: 'Cette relation n’existe plus.' };
+
+  revalidatePath('/friends');
+  revalidatePath('/app');
+  return {};
+}
+
+async function notifyAccepted(userId: string, name: string) {
+  await db.notification.create({
+    data: {
+      userId,
+      type: 'FRIEND_ACCEPTED',
+      body: `${name} a accepté votre demande.`,
+      href: '/friends',
+    },
+  });
+}
