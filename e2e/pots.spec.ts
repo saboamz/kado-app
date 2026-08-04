@@ -109,7 +109,9 @@ test('a contribution cannot overshoot the target', async ({ page }) => {
   await page.getByLabel('Montant de votre participation').fill('900');
   await page.getByRole('button', { name: 'Participer' }).click();
 
-  await expect(page.getByRole('alert')).toContainText(/il ne reste que/i);
+  await expect(page.locator('section p[role="alert"]')).toContainText(
+    /il ne reste que/i,
+  );
 });
 
 test('the owner cannot contribute to their own pot', async ({ page }) => {

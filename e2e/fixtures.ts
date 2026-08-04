@@ -84,7 +84,7 @@ export async function createScenario(): Promise<Scenario> {
         create: [
           { name: `Libre ${tag}`, priceCents: 4200 },
           { name: `Pris ${tag}`, priceCents: 6800 },
-          { name: `Cagnotte ${tag}`, priceCents: 50000, isPot: true },
+          { name: `Ensemble ${tag}`, priceCents: 50000, isPot: true },
         ],
       },
     },
@@ -93,7 +93,7 @@ export async function createScenario(): Promise<Scenario> {
 
   const free = list.gifts.find((g) => g.name.startsWith('Libre'))!;
   const taken = list.gifts.find((g) => g.name.startsWith('Pris'))!;
-  const pot = list.gifts.find((g) => g.name.startsWith('Cagnotte'))!;
+  const pot = list.gifts.find((g) => g.name.startsWith('Ensemble'))!;
 
   await db.reservation.create({
     data: { giftId: taken.id, reserverId: other.id },
