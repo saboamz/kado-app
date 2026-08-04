@@ -17,5 +17,37 @@ services:
       timeout: 5s
       retries: 10
 
+  # Started only with --profile app; day-to-day development runs the server
+  # on the host against the postgres above.
+  # Applies migrations, then exits. The app waits for it to succeed.
+  migrate:
+    profiles: ['app']
+    build:
+      context: .
+      target: migrate
+    container_name: kado-migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kado:kado@postgres:5432/kado
+
+  app:
+    profiles: ['app']
+    build: .
+    container_name: kado-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://kado:kado@postgres:5432/kado
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET before starting the app}
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+
 volumes:
   kado-pgdata:

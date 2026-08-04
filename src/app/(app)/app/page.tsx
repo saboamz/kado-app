@@ -65,7 +65,12 @@ export default async function AppHomePage() {
 
       {birthdays.length > 0 && (
         <section className={styles.section}>
-          <SectionTitle>Anniversaires</SectionTitle>
+          <div className={styles.sectionHead}>
+            <SectionTitle>Anniversaires</SectionTitle>
+            <ButtonLink href="/birthdays" variant="ghost">
+              Tout voir
+            </ButtonLink>
+          </div>
           <ul className={styles.birthdays}>
             {birthdays.map((b) => (
               <li key={b.id}>
