@@ -25,6 +25,8 @@ let counter = 0;
 const unique = () => `e2e-${Date.now()}-${counter++}`;
 
 export type Scenario = {
+  /** Unique per scenario; every generated name ends with it. */
+  tag: string;
   ownerEmail: string;
   friendEmail: string;
   otherFriendEmail: string;
@@ -100,6 +102,7 @@ export async function createScenario(): Promise<Scenario> {
   });
 
   return {
+    tag,
     ownerEmail: owner.email,
     friendEmail: friend.email,
     otherFriendEmail: other.email,

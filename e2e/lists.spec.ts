@@ -72,6 +72,10 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
     page.getByRole('heading', { name: `${wish} en fonte` }),
   ).toBeVisible();
 
+  // Wait for the save redirect to settle before navigating away, or the
+  // goto races it and Playwright aborts the frame.
+  await expect(page).toHaveURL(/\/gifts\/[a-z0-9]+$/);
+
   // Delete the list, and with it the wish.
   page.once('dialog', (d) => d.accept());
   await page.goto(`/lists`);
