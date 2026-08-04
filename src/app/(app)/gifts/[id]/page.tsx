@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { Badge, Card, PriorityStars } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
+import { Pot } from '@/components/Pot';
 import { ReserveButton } from '@/components/ReserveButton';
 import { db } from '@/lib/db';
 import { formatMoney, priorityLabel } from '@/lib/format';
@@ -110,6 +111,9 @@ export default async function GiftPage({
       {gift.reservation && !gift.isPot && (
         <ReserveButton giftId={id} reservation={gift.reservation} />
       )}
+
+      {/* Like the reserve control, only ever rendered for a friend. */}
+      {gift.pot && <Pot giftId={id} pot={gift.pot} />}
 
       {/*
         The reassurance differs by role, and for the owner it is literally
