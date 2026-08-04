@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import sharp from 'sharp';
 import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { MAX_UPLOAD_BYTES } from './upload-limits';
@@ -53,6 +54,24 @@ const SIGNATURES: Array<{ ext: string; mime: string; match: (b: Buffer) => boole
     },
   ];
 
+/**
+ * What every stored image is normalised to.
+ *
+ * Uploads arrive at whatever size the camera produced — a 4 MB portrait next
+ * to a 200 KB screenshot. Storing them as-is means the layout has to crop to
+ * stay regular, which hides part of the picture. Normalising on the way in
+ * lets every image be shown whole at a predictable cost.
+ *
+ * `fit: 'inside'` scales the longest edge down to the bound and stops; it
+ * never crops and never enlarges a small image. The remaining space is left
+ * to CSS rather than baked in as padding, so the surround follows the theme
+ * instead of being a fixed colour burnt into the file.
+ */
+const NORMALISED = {
+  gifts: { maxEdge: 1600, quality: 82 },
+  avatars: { maxEdge: 512, quality: 85 },
+} as const;
+
 export type UploadResult =
   | { ok: true; path: string }
   | { ok: false; error: string };
@@ -104,13 +123,34 @@ export async function storeUpload(
     };
   }
 
+  const { maxEdge, quality } = NORMALISED[kind];
+
+  let normalised: Buffer;
+  try {
+    normalised = await sharp(bytes, { animated: type.ext === 'gif' })
+      .rotate() // Honour the EXIF orientation before it is stripped below.
+      .resize({
+        width: maxEdge,
+        height: maxEdge,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality })
+      .toBuffer();
+  } catch {
+    // sharp rejects a file whose header passed our check but whose body is
+    // truncated or corrupt — worth its own message, not a generic failure.
+    return { ok: false, error: 'Cette image semble illisible.' };
+  }
+
   const dir = join(UPLOAD_DIR, kind);
   await mkdir(dir, { recursive: true });
 
   // A random name, not the uploader's: their filename may collide, contain
   // path separators, or leak something they did not mean to share.
-  const name = `${randomUUID()}.${type.ext}`;
-  await writeFile(join(dir, name), bytes);
+  // Everything is WebP once stored, whatever arrived.
+  const name = `${randomUUID()}.webp`;
+  await writeFile(join(dir, name), normalised);
 
   return { ok: true, path: `/uploads/${kind}/${name}` };
 }

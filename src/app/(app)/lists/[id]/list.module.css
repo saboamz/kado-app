@@ -58,6 +58,8 @@
   height: 132px;
   margin-bottom: 10px;
   border-radius: var(--radius);
-  object-fit: cover;
+  /* contain, not cover: every card is the same size, but a tall or wide
+     photo is shown whole rather than having its edges cut off. */
+  object-fit: contain;
   background: var(--surface);
 }
