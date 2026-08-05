@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "db:clean-tests": "tsx prisma/clean-tests.ts",
-    "embed": "tsx scripts/embed-products.ts"
+    "embed": "tsx scripts/embed-products.ts",
+    "db:seed-synthetic": "tsx prisma/seed-synthetic.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
