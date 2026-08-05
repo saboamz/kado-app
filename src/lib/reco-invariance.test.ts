@@ -1,4 +1,5 @@
 import { db } from './db';
+import { CF_READY_THRESHOLD, buildItemSimilarity, cfIsReady } from './cf';
 import { recommend, type Tier } from './reco';
 import { cleanup, makeFriends, makeGift, makeList, makeUser } from '@/test/factories';
 
@@ -90,6 +91,14 @@ const shape = (rows: { productId: string; score: number; rank: number }[]) =>
  * unimplemented-tier test below until then.
  */
 const IMPLEMENTED_TIERS = ['content_facet', 'popularity'] as const;
+
+/**
+ * cf_item is held to the SAME rule, in its own describe below, because it
+ * needs a world that crosses cfIsReady()'s threshold before it returns
+ * anything at all. Comparing two empty lists would prove nothing — and this is
+ * the tier where the leak would be most tempting, since "don't recommend what
+ * is already taken" is exactly the shape of a CF post-filter.
+ */
 
 describe.each(IMPLEMENTED_TIERS)('tier %s is blind to other peoples reservations', (tier: Tier) => {
   let ctx: Ctx;
@@ -286,5 +295,131 @@ describe("only the viewer's OWN reservations are excluded", () => {
     await db.reservation.deleteMany({ where: { giftId: gift.id } });
     await db.gift.delete({ where: { id: gift.id } });
     await db.giftList.delete({ where: { id: list.id } });
+  });
+});
+
+/**
+ * cf_item held to the invariance rule, in a world that actually crosses the
+ * readiness threshold.
+ *
+ * This is the tier where the leak would be most tempting: "don't recommend
+ * something already reserved" is the natural shape of a CF post-filter, and it
+ * is exactly the covert channel. So it gets the same treatment as the others,
+ * with the fixture built so the target is a REAL candidate.
+ */
+describe('tier cf_item is blind to other peoples reservations', () => {
+  const tag = `cfinv-${Date.now()}`;
+  let viewer: string;
+  let recipient: string;
+  let outsider: string;
+  const givers: string[] = [];
+  const products: string[] = [];
+  let seedProductId: string;
+
+  beforeAll(async () => {
+    const v = await makeUser(`V ${tag}`);
+    const r = await makeUser(`R ${tag}`);
+    const o = await makeUser(`O ${tag}`);
+    viewer = v.id;
+    recipient = r.id;
+    outsider = o.id;
+    await makeFriends(viewer, recipient);
+
+    // A seed the recipient wishes for, plus neighbours co-bought with it.
+    const seed = await db.product.create({ data: { title: `${tag}-seed` } });
+    seedProductId = seed.id;
+    products.push(seed.id);
+    for (let i = 0; i < 5; i++) {
+      const p = await db.product.create({
+        data: { title: `${tag}-n${i}`, categoryId: `${tag}-cat${i}` },
+      });
+      products.push(p.id);
+    }
+
+    // Six givers who took the seed together with every neighbour, so each
+    // pair clears MIN_SUPPORT and the neighbours are genuine candidates.
+    const rows = [];
+    for (let g = 0; g < 6; g++) {
+      const user = await makeUser(`G ${tag} ${g}`);
+      givers.push(user.id);
+      rows.push({
+        actorId: user.id,
+        kind: 'purchase' as const,
+        productId: seed.id,
+        weight: 10,
+      });
+      for (const productId of products.slice(1)) {
+        rows.push({ actorId: user.id, kind: 'purchase' as const, productId, weight: 10 });
+      }
+    }
+    await db.giftEvent.createMany({ data: rows });
+
+    // Cross the readiness threshold. Below it cf_item returns nothing and the
+    // comparison below would be between two empty lists.
+    const filler = Array.from({ length: CF_READY_THRESHOLD }, () => ({
+      actorId: givers[0]!,
+      kind: 'reserve' as const,
+      productId: seed.id,
+      weight: 6,
+    }));
+    for (let i = 0; i < filler.length; i += 1000) {
+      await db.giftEvent.createMany({ data: filler.slice(i, i + 1000) });
+    }
+
+    await buildItemSimilarity();
+
+    // The recipient wishes for the seed, which is what cf_item recommends from.
+    const list = await makeList(recipient);
+    const gift = await makeGift(list.id, { name: 'Souhait' });
+    await db.gift.update({ where: { id: gift.id }, data: { productId: seed.id } });
+  });
+
+  afterAll(async () => {
+    await db.itemSimilarity.deleteMany({ where: { productId: { in: products } } });
+    await db.giftEvent.deleteMany({
+      where: { actorId: { in: [...givers, viewer, recipient, outsider] } },
+    });
+    await db.gift.deleteMany({ where: { productId: { in: products } } });
+    await db.product.deleteMany({ where: { id: { in: products } } });
+    await cleanup([...givers, viewer, recipient, outsider]);
+    await db.$disconnect();
+  });
+
+  it('is ready, and produces a list', async () => {
+    // Both halves asserted: a tier that returned nothing would make the
+    // invariance test below vacuous.
+    expect(await cfIsReady()).toBe(true);
+    const rows = await recommend({ viewerId: viewer, recipientId: recipient, tier: 'cf_item', limit: 12 });
+    expect(rows.length).toBeGreaterThan(0);
+  });
+
+  it('explains itself with the product the recommendation came from', async () => {
+    const rows = await recommend({ viewerId: viewer, recipientId: recipient, tier: 'cf_item', limit: 12 });
+    // "parce que tu as offert X" — the reason a CF is explainable at all, and
+    // why item-item was chosen over matrix factorisation.
+    expect(rows[0]!.becauseProductId).toBe(seedProductId);
+  });
+
+  it('does not change when a third party reserves a product that IS a candidate', async () => {
+    const before = await recommend({ viewerId: viewer, recipientId: recipient, tier: 'cf_item', limit: 12 });
+    expect(before.length).toBeGreaterThan(0);
+
+    const target = before[0]!.productId;
+
+    // On the OUTSIDER's list, so the exclusion under test is the reservation
+    // and not the recipient's own wish.
+    const otherList = await makeList(outsider);
+    const gift = await makeGift(otherList.id, { name: 'Convoité' });
+    await db.gift.update({ where: { id: gift.id }, data: { productId: target } });
+    await db.reservation.create({ data: { giftId: gift.id, reserverId: outsider } });
+
+    const after = await recommend({ viewerId: viewer, recipientId: recipient, tier: 'cf_item', limit: 12 });
+
+    expect(shape(after)).toBe(shape(before));
+    expect(after.map((r) => r.productId)).toContain(target);
+
+    await db.reservation.deleteMany({ where: { giftId: gift.id } });
+    await db.gift.delete({ where: { id: gift.id } });
+    await db.giftList.delete({ where: { id: otherList.id } });
   });
 });

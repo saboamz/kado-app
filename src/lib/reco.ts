@@ -1,3 +1,4 @@
+import { cfCandidates } from './cf';
 import { db } from './db';
 
 /**
@@ -136,12 +137,51 @@ async function candidatesFor(
     case 'popularity':
       return popularityTier(excluded, take);
     case 'cf_item':
+      return cfTier(recipientId, excluded, take);
     case 'content_vector':
       // Not built yet. An unimplemented tier returns nothing so the cascade
       // falls through to content, rather than throwing and taking a page with
-      // it. Phase 5 fills cf_item in, gated on cfIsReady().
+      // it.
       return [];
   }
+}
+
+/**
+ * cf_item — neighbours of what the recipient already wants.
+ *
+ * Gated on cfIsReady() inside cfCandidates: below the threshold it returns
+ * nothing and the cascade falls through to content. A CF firing on too little
+ * data produces confident nonsense, which is harder to notice than an empty
+ * tier.
+ *
+ * The category and merchant are fetched only for the diversity pass — the
+ * scoring is entirely from the precomputed similarity table.
+ */
+async function cfTier(
+  recipientId: string | null,
+  excluded: Set<string>,
+  take: number,
+): Promise<Candidate[]> {
+  if (!recipientId) return [];
+
+  const candidates = await cfCandidates(recipientId, excluded, take);
+  if (candidates.length === 0) return [];
+
+  const products = await db.product.findMany({
+    where: { id: { in: candidates.map((c) => c.productId) }, status: 'active', mergedInto: null },
+    select: { id: true, categoryId: true, merchantId: true },
+  });
+  const facets = new Map(products.map((p) => [p.id, p]));
+
+  return candidates
+    .filter((c) => facets.has(c.productId))
+    .map((c) => ({
+      productId: c.productId,
+      score: c.score,
+      categoryId: facets.get(c.productId)!.categoryId,
+      merchantId: facets.get(c.productId)!.merchantId,
+      becauseProductId: c.becauseProductId,
+    }));
 }
 
 /**

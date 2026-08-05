@@ -279,6 +279,25 @@ model Recommendation {
   @@index([strategy])
 }
 
+/// Precomputed item-item similarity. Refreshed nightly, never on the fly:
+/// the serving path must be one indexed select.
+///
+/// Not a Prisma-managed relation on either side — both columns are Product
+/// ids, and modelling it as two relations would tempt a join that fans out.
+model ItemSimilarity {
+  productId  String
+  neighborId String
+  /// cosine × support/(support + SHRINKAGE). See buildItemSimilarity.
+  score      Float
+  /// How many distinct givers bought/reserved both. The reason the score is
+  /// trustworthy at all.
+  support    Int
+  computedAt DateTime @default(now())
+
+  @@id([productId, neighborId])
+  @@index([productId, score])
+}
+
 model Friendship {
   id          String           @id @default(cuid())
   requesterId String
