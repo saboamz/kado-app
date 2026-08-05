@@ -1,5 +1,6 @@
 import { cfCandidates } from './cf';
 import { db } from './db';
+import { categoriesForInterests } from './taxonomy';
 
 /**
  * The recommendation cascade.
@@ -205,11 +206,19 @@ async function contentFacet(
   });
   if (interests.length === 0) return [];
 
+  // Interests and categories are two different vocabularies: people declare
+  // "Café" and "Randonnée", products are filed under "Maison" and "Sport".
+  // Matching them with strict equality never matched anything, and did so
+  // silently — an empty tier is indistinguishable from a tier with nothing to
+  // suggest. categoriesForInterests bridges them.
+  const categories = categoriesForInterests(interests.map((i) => i.label));
+  if (categories.length === 0) return [];
+
   const rows = await db.product.findMany({
     where: {
       status: 'active',
       mergedInto: null, // never recommend a row that lost a dedup merge
-      categoryId: { in: interests.map((i) => i.label) },
+      categoryId: { in: categories },
       id: { notIn: [...excluded] },
     },
     orderBy: [{ popularity: 'desc' }, { id: 'asc' }], // id breaks ties stably
@@ -313,29 +322,43 @@ export function decayedWeight(weight: number, ageDays: number): number {
 
 /** Recomputes Product.popularity for every product with recent events. */
 export async function refreshPopularity(now = new Date()): Promise<number> {
-  const events = await db.giftEvent.findMany({
-    where: { productId: { not: null } },
-    select: { productId: true, weight: true, occurredAt: true },
-  });
+  // One statement, aggregated in the database.
+  //
+  // The first version read every event into a Map and issued one UPDATE per
+  // product. Both halves scale with the log rather than with the catalogue:
+  // at a million events that is a million rows crossing the wire, and the
+  // per-product round trips dominate whatever is left. This is a nightly cron
+  // query, so it has to be a query.
+  //
+  // The decay is the same 0.5^(age/half-life) as decayedWeight(), evaluated by
+  // Postgres. EXTRACT(EPOCH …)/86400 is the age in days as a float.
+  const updated = await db.$executeRawUnsafe(
+    `
+    WITH scored AS (
+      SELECT e."productId" AS id,
+             SUM(
+               e.weight
+               * POWER(
+                   0.5,
+                   EXTRACT(EPOCH FROM ($1::timestamptz - e."occurredAt")) / 86400.0 / $2
+                 )
+             ) AS score
+      FROM "GiftEvent" e
+      WHERE e."productId" IS NOT NULL
+      GROUP BY 1
+    )
+    UPDATE "Product" p
+    -- Negative evidence really can push a product below zero; clamping at 0
+    -- would throw away the distinction between "disliked" and "unknown".
+    SET popularity = ROUND(scored.score)
+    FROM scored
+    WHERE p.id = scored.id
+    `,
+    now,
+    POPULARITY_HALF_LIFE_DAYS,
+  );
 
-  const scores = new Map<string, number>();
-  for (const event of events) {
-    if (!event.productId) continue;
-    const ageDays = (now.getTime() - event.occurredAt.getTime()) / 86_400_000;
-    const current = scores.get(event.productId) ?? 0;
-    scores.set(event.productId, current + decayedWeight(event.weight, ageDays));
-  }
-
-  for (const [productId, score] of scores) {
-    await db.product.update({
-      where: { id: productId },
-      // Negative evidence really can push a product below zero; clamping at 0
-      // would throw away the distinction between "disliked" and "unknown".
-      data: { popularity: Math.round(score) },
-    }).catch(() => {}); // a product deleted mid-refresh is not an error
-  }
-
-  return scores.size;
+  return updated;
 }
 
 /**

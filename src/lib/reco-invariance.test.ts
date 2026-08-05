@@ -44,9 +44,13 @@ async function seedWorld(tag: string): Promise<Ctx> {
   await makeFriends(viewer.id, recipient.id);
   await makeFriends(outsider.id, recipient.id);
 
-  await db.interest.create({
-    data: { userId: recipient.id, label: `cuisine-${tag}` },
-  });
+  // A REAL interest label, mapped by the taxonomy onto real categories.
+  // The first version used `cuisine-${tag}` as both the interest and the
+  // product category, which only worked while content_facet compared the two
+  // with strict equality. Once the taxonomy went in, the tier returned nothing
+  // and the invariance tests would have compared two empty lists — caught by
+  // the "produces a list at all" assertion, which exists for exactly this.
+  await db.interest.create({ data: { userId: recipient.id, label: 'Céramique' } });
 
   const products = [];
   for (let i = 0; i < CATALOGUE_SIZE; i++) {
@@ -54,7 +58,7 @@ async function seedWorld(tag: string): Promise<Ctx> {
       await db.product.create({
         data: {
           title: `Produit ${tag} ${i}`,
-          categoryId: `cuisine-${tag}`,
+          categoryId: 'Maison', // what 'Céramique' maps to
           priceCents: 2000 + i * 100,
           priceBand: 3,
           popularity: CATALOGUE_SIZE - i,

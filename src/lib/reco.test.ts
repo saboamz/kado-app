@@ -143,6 +143,46 @@ describe('refreshPopularity against the database', () => {
     expect(r!.popularity).toBeGreaterThan(a!.popularity);
   });
 
+  it('agrees with decayedWeight to the cent', async () => {
+    // The decay now lives twice: in decayedWeight() for the unit tests, and in
+    // SQL inside refreshPopularity for the nightly job. Two implementations of
+    // one formula drift silently — POWER() and Math.pow() agreeing today is
+    // not a guarantee they agree after an edit to either.
+    //
+    // So the SQL result is checked against the TypeScript one on a case whose
+    // answer is neither round nor zero.
+    const product = await db.product.create({ data: { title: 'Accord' } });
+    productIds.push(product.id);
+
+    const now = new Date('2026-08-05T00:00:00Z');
+    const events = [
+      { weight: 10, ageDays: 90 },
+      { weight: 6, ageDays: 200 },
+      { weight: -3, ageDays: 12 },
+    ];
+    await db.giftEvent.createMany({
+      data: events.map((e) => ({
+        actorId: actor.id,
+        kind: 'purchase' as const,
+        productId: product.id,
+        weight: e.weight,
+        occurredAt: new Date(now.getTime() - e.ageDays * 86_400_000),
+      })),
+    });
+
+    await refreshPopularity(now);
+
+    const expected = Math.round(
+      events.reduce((sum, e) => sum + decayedWeight(e.weight, e.ageDays), 0),
+    );
+    const row = await db.product.findUnique({ where: { id: product.id } });
+    expect(row!.popularity).toBe(expected);
+    // Guards the guard: a formula that collapsed to 0 or to the raw sum would
+    // still "agree" if both sides were broken the same way.
+    expect(expected).not.toBe(0);
+    expect(expected).not.toBe(13); // the undecayed sum
+  });
+
   it('lets negative evidence push a product below zero', async () => {
     const disliked = await db.product.create({ data: { title: 'Rejeté' } });
     productIds.push(disliked.id);
