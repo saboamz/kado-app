@@ -1,6 +1,10 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    # pgvector rather than plain postgres: content_vector stores embeddings and
+    # queries them by cosine distance, which needs the `vector` type and an
+    # HNSW index. The stock postgres image does not ship the extension, and it
+    # cannot be added at runtime — it is a compiled module.
+    image: pgvector/pgvector:pg16
     container_name: kado-postgres
     restart: unless-stopped
     environment:
