@@ -105,6 +105,14 @@ describe('the readiness threshold, in both directions', () => {
   it('does not count browsing toward the gifting threshold', async () => {
     // Views are the kinds a client can log. If they counted, anyone could
     // trip the threshold by looping telemetry and force a CF built on nothing.
+    //
+    // Asserted as a DELTA, not as `events === 0`. The absolute version passed
+    // only on an empty database and went red the moment a seed added gifting
+    // rows — a global count that breaks as soon as the CI seeds. What this
+    // test actually claims is "browsing adds nothing", and a delta says that
+    // whatever else is in the table.
+    const before = (await cfReadiness()).events;
+
     await db.giftEvent.createMany({
       data: Array.from({ length: 100 }, (_, i) => ({
         actorId,
@@ -114,8 +122,15 @@ describe('the readiness threshold, in both directions', () => {
         sessionId: `s${i}`,
       })),
     });
-    const { events } = await cfReadiness();
-    expect(events).toBe(0);
+
+    const after = (await cfReadiness()).events;
+    expect(after).toBe(before);
+
+    // Guards the guard: if the inserts silently failed, `after === before`
+    // would hold for the wrong reason.
+    expect(
+      await db.giftEvent.count({ where: { actorId, kind: 'view_product' } }),
+    ).toBe(100);
   });
 });
 
