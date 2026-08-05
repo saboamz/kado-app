@@ -84,6 +84,67 @@ enum Visibility {
   PUBLIC
 }
 
+/// A merchant, identified by the domains its product links come from.
+model Merchant {
+  id      String   @id @default(cuid())
+  slug    String   @unique
+  name    String
+  domains String[]
+
+  products Product[]
+}
+
+/// The canonical thing a wish points at.
+///
+/// Free-text url/merchant on Gift cannot support recommendation: two people
+/// wanting the same item are only a signal if both wishes resolve to this same
+/// row. Everything with a "key" in its name below exists to make that
+/// resolution deterministic.
+model Product {
+  id          String    @id @default(cuid())
+  merchantId  String?
+  merchant    Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+  title       String
+  brand       String?
+  description String?
+  imageUrl    String?
+  sourceUrl   String?
+  /// Normalised URL. Computed in TS before every write — Prisma has no
+  /// generated columns, so this is not enforced by the database and a write
+  /// that skips normalizeUrl() would silently fragment the catalogue.
+  urlNorm     String?
+  /// SHA-256 of urlNorm. The primary deduplication key.
+  urlHash     String?   @unique
+  /// Case-folded, de-accented title. Secondary key, scoped per merchant:
+  /// the same title at two merchants is two listings, and only a GTIN can
+  /// prove they are one product.
+  titleKey    String?
+  /// EAN/UPC. The only globally unique key, when it exists at all.
+  gtin        String?   @unique
+  priceCents  Int?
+  currency    String    @default("EUR")
+  priceBand   Int?
+  categoryId  String?
+  /// Confidence-weighted and time-decayed; recomputed, never incremented.
+  popularity  Int       @default(0)
+  status      String    @default("active") // active|stale|dead|merged
+  /// Set when this row lost a dedup merge. Readers must follow it, or a
+  /// deduplicated pair contributes two rows to the matrix instead of one.
+  mergedInto  String?
+  /// Which extractor produced this row, so a bad line can be traced back to
+  /// its source months later.
+  extractedBy String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  gifts Gift[]
+
+  @@unique([merchantId, titleKey])
+  @@index([categoryId, priceBand])
+  @@index([popularity])
+  @@index([status])
+}
+
 model Gift {
   id          String   @id @default(cuid())
   name        String
@@ -100,6 +161,11 @@ model Gift {
   isPot       Boolean  @default(false)
   listId      String
   list        GiftList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  /// Nullable on purpose: "Un week-end en Islande" is a real wish with no
+  /// product behind it. These rows are invisible to collaborative filtering,
+  /// so their proportion is lost signal worth measuring.
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -108,6 +174,7 @@ model Gift {
   messages      ChatMessage[]
 
   @@index([listId])
+  @@index([productId])
 }
 
 /// A gift claimed by one friend.
