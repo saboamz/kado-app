@@ -26,10 +26,22 @@ import { join } from 'node:path';
  *    withdrawContribution) or aggregate-only with the figure kept server-side
  *    and never put in the response (the pot's remaining-amount cap).
  *
+ *  - reco.ts reads Reservation for ONE purpose: to drop products the viewer
+ *    has already reserved themselves, which they obviously already know
+ *    about. The query is scoped to `reserverId: viewerId` and nothing it
+ *    returns reaches a response — only productIds entering an exclusion Set.
+ *    Widening that scope to other people's reservations is THE leak the
+ *    recommender must never reopen (see reco-invariance.test.ts), so this
+ *    entry is the one to look at hardest if it ever changes.
+ *
  * secrecy.ts itself is absent on purpose — it names the tables only in types
  * and in the Prisma `include`, never as a query.
  */
-const ALLOWED = new Set(['src/lib/reservation-actions.ts', 'src/lib/pot-actions.ts']);
+const ALLOWED = new Set([
+  'src/lib/reservation-actions.ts',
+  'src/lib/pot-actions.ts',
+  'src/lib/reco.ts',
+]);
 
 /**
  * Matches a Prisma query against either secret table, on the `db` client or a
@@ -75,6 +87,23 @@ describe('reach of the secret tables', () => {
     const scanned = sourceFiles('src');
     expect(scanned.length).toBeGreaterThan(40);
     expect(scanned).toContain('src/lib/secrecy.ts');
+  });
+
+  it('keeps the recommenders reservation query scoped to the viewer', () => {
+    // reco.ts is allowlisted only because its query is scoped to the viewer's
+    // OWN reservations. An unscoped findMany there is the covert channel: the
+    // list would encode who has reserved what, and an owner with a second
+    // account could read it by difference over time.
+    //
+    // reco-invariance.test.ts catches that behaviourally; this catches it in
+    // the shape, because a grep is cheap and the assertion above only says
+    // "this file may touch the table", not "on these terms".
+    const source = readFileSync('src/lib/reco.ts', 'utf8');
+    const query = source.slice(
+      source.indexOf('db.reservation.findMany'),
+      source.indexOf('});', source.indexOf('db.reservation.findMany')),
+    );
+    expect(query).toContain('reserverId: viewerId');
   });
 
   it('has an allowlist that is still real', () => {

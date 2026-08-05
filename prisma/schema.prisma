@@ -254,6 +254,31 @@ enum EventKind {
   dismiss_reco
 }
 
+/// One line of a generated recommendation list.
+///
+/// Every row records the strategy that produced it. Without that the CTR per
+/// tier is unmeasurable and "why is this here?" has no answer — which is also
+/// what makes it possible to DELETE a tier that does not earn its keep.
+model Recommendation {
+  id       BigInt @id @default(autoincrement())
+  viewerId String
+  /// Who the gift is for. Null when browsing without a person in mind.
+  recipientId String?
+  productId   String
+  score       Float
+  /// cf_item | content_vector | content_facet | popularity
+  strategy    String
+  /// Explainability: "parce que tu as offert la Chemex".
+  becauseProductId String?
+  rank             Int
+  batchId          String
+  generatedAt      DateTime @default(now())
+
+  @@index([viewerId, recipientId, batchId])
+  @@index([batchId])
+  @@index([strategy])
+}
+
 model Friendship {
   id          String           @id @default(cuid())
   requesterId String
