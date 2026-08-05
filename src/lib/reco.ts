@@ -1,5 +1,6 @@
 import { cfCandidates } from './cf';
 import { db } from './db';
+import { nearestByTaste, tasteVector } from './embed';
 import { categoriesForInterests } from './taxonomy';
 
 /**
@@ -140,10 +141,7 @@ async function candidatesFor(
     case 'cf_item':
       return cfTier(recipientId, excluded, take);
     case 'content_vector':
-      // Not built yet. An unimplemented tier returns nothing so the cascade
-      // falls through to content, rather than throwing and taking a page with
-      // it.
-      return [];
+      return contentVector(recipientId, excluded, take);
   }
 }
 
@@ -182,6 +180,42 @@ async function cfTier(
       categoryId: facets.get(c.productId)!.categoryId,
       merchantId: facets.get(c.productId)!.merchantId,
       becauseProductId: c.becauseProductId,
+    }));
+}
+
+/**
+ * content_vector — nearest neighbours of the recipient's taste vector.
+ *
+ * Returns nothing when nothing is embedded yet, so the cascade falls through
+ * rather than taking a page down. The seed is the recipient's WISHES; no part
+ * of this reads Reservation, which is the invariant the leak suite enforces.
+ */
+async function contentVector(
+  recipientId: string | null,
+  excluded: Set<string>,
+  take: number,
+): Promise<Candidate[]> {
+  if (!recipientId) return [];
+
+  const vector = await tasteVector(recipientId);
+  if (!vector) return [];
+
+  const neighbours = await nearestByTaste(vector, excluded, take);
+  if (neighbours.length === 0) return [];
+
+  const products = await db.product.findMany({
+    where: { id: { in: neighbours.map((n) => n.productId) } },
+    select: { id: true, categoryId: true, merchantId: true },
+  });
+  const facets = new Map(products.map((p) => [p.id, p]));
+
+  return neighbours
+    .filter((n) => facets.has(n.productId))
+    .map((n) => ({
+      productId: n.productId,
+      score: n.score,
+      categoryId: facets.get(n.productId)!.categoryId,
+      merchantId: facets.get(n.productId)!.merchantId,
     }));
 }
 

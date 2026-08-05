@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model User {
@@ -134,6 +136,14 @@ model Product {
   /// Which extractor produced this row, so a bad line can be traced back to
   /// its source months later.
   extractedBy String?
+  /// Taste vector for content_vector. Unsupported because Prisma has no
+  /// `vector` type — every read and write goes through raw SQL in embed.ts.
+  embedding   Unsupported("vector(384)")?
+  /// WHICH model produced it. Cosine distance between vectors from different
+  /// models is not imprecise, it is meaningless — so a comparison must never
+  /// cross this field, and a re-embed must clear it.
+  embeddingModel String?
+  embeddedAt     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
