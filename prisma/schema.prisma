@@ -84,6 +84,67 @@ enum Visibility {
   PUBLIC
 }
 
+/// A merchant, identified by the domains its product links come from.
+model Merchant {
+  id      String   @id @default(cuid())
+  slug    String   @unique
+  name    String
+  domains String[]
+
+  products Product[]
+}
+
+/// The canonical thing a wish points at.
+///
+/// Free-text url/merchant on Gift cannot support recommendation: two people
+/// wanting the same item are only a signal if both wishes resolve to this same
+/// row. Everything with a "key" in its name below exists to make that
+/// resolution deterministic.
+model Product {
+  id          String    @id @default(cuid())
+  merchantId  String?
+  merchant    Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+  title       String
+  brand       String?
+  description String?
+  imageUrl    String?
+  sourceUrl   String?
+  /// Normalised URL. Computed in TS before every write — Prisma has no
+  /// generated columns, so this is not enforced by the database and a write
+  /// that skips normalizeUrl() would silently fragment the catalogue.
+  urlNorm     String?
+  /// SHA-256 of urlNorm. The primary deduplication key.
+  urlHash     String?   @unique
+  /// Case-folded, de-accented title. Secondary key, scoped per merchant:
+  /// the same title at two merchants is two listings, and only a GTIN can
+  /// prove they are one product.
+  titleKey    String?
+  /// EAN/UPC. The only globally unique key, when it exists at all.
+  gtin        String?   @unique
+  priceCents  Int?
+  currency    String    @default("EUR")
+  priceBand   Int?
+  categoryId  String?
+  /// Confidence-weighted and time-decayed; recomputed, never incremented.
+  popularity  Int       @default(0)
+  status      String    @default("active") // active|stale|dead|merged
+  /// Set when this row lost a dedup merge. Readers must follow it, or a
+  /// deduplicated pair contributes two rows to the matrix instead of one.
+  mergedInto  String?
+  /// Which extractor produced this row, so a bad line can be traced back to
+  /// its source months later.
+  extractedBy String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  gifts Gift[]
+
+  @@unique([merchantId, titleKey])
+  @@index([categoryId, priceBand])
+  @@index([popularity])
+  @@index([status])
+}
+
 model Gift {
   id          String   @id @default(cuid())
   name        String
@@ -100,6 +161,11 @@ model Gift {
   isPot       Boolean  @default(false)
   listId      String
   list        GiftList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  /// Nullable on purpose: "Un week-end en Islande" is a real wish with no
+  /// product behind it. These rows are invisible to collaborative filtering,
+  /// so their proportion is lost signal worth measuring.
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -108,6 +174,7 @@ model Gift {
   messages      ChatMessage[]
 
   @@index([listId])
+  @@index([productId])
 }
 
 /// A gift claimed by one friend.
@@ -138,6 +205,97 @@ model PotContribution {
 
   @@index([giftId])
   @@index([contributorId])
+}
+
+/// What someone did, and how much it counts as evidence of taste.
+///
+/// This is the recommender's training set, the analytics log, and the trace
+/// that explains a recommendation months after it was made.
+model GiftEvent {
+  id          BigInt    @id @default(autoincrement())
+  /// Always from the session, never from the caller.
+  actorId     String
+  kind        EventKind
+  recipientId String?
+  productId   String?
+  giftId      String?
+  categoryId  String?
+  /// Denormalised on purpose: a price is a fact about an INSTANT. Joining
+  /// Product later would read today's price and rewrite history at every sale.
+  priceCents  Int?
+  /// Resolved server-side from the kind. A client-supplied weight would let
+  /// anyone declare their own click worth ten purchases.
+  weight      Float
+  sessionId   String?
+  source      String?
+  occurredAt  DateTime  @default(now())
+
+  @@index([actorId, productId])
+  @@index([productId, kind, occurredAt])
+  @@index([occurredAt])
+  /// Deliberately NOT a unique constraint across all kinds. Once-per-session
+  /// is right for views, and wrong for everything else: someone really can
+  /// reserve, release and reserve the same product again, and a unique index
+  /// would silently swallow the second one. The view cap is a partial unique
+  /// index over the browsing kinds only, added in the migration by hand
+  /// because Prisma cannot express a WHERE clause on an index.
+}
+
+enum EventKind {
+  purchase
+  reserve
+  contribute
+  add_wish
+  like_wish
+  click_out
+  view_wish
+  view_product
+  unreserve
+  dismiss_reco
+}
+
+/// One line of a generated recommendation list.
+///
+/// Every row records the strategy that produced it. Without that the CTR per
+/// tier is unmeasurable and "why is this here?" has no answer — which is also
+/// what makes it possible to DELETE a tier that does not earn its keep.
+model Recommendation {
+  id       BigInt @id @default(autoincrement())
+  viewerId String
+  /// Who the gift is for. Null when browsing without a person in mind.
+  recipientId String?
+  productId   String
+  score       Float
+  /// cf_item | content_vector | content_facet | popularity
+  strategy    String
+  /// Explainability: "parce que tu as offert la Chemex".
+  becauseProductId String?
+  rank             Int
+  batchId          String
+  generatedAt      DateTime @default(now())
+
+  @@index([viewerId, recipientId, batchId])
+  @@index([batchId])
+  @@index([strategy])
+}
+
+/// Precomputed item-item similarity. Refreshed nightly, never on the fly:
+/// the serving path must be one indexed select.
+///
+/// Not a Prisma-managed relation on either side — both columns are Product
+/// ids, and modelling it as two relations would tempt a join that fans out.
+model ItemSimilarity {
+  productId  String
+  neighborId String
+  /// cosine × support/(support + SHRINKAGE). See buildItemSimilarity.
+  score      Float
+  /// How many distinct givers bought/reserved both. The reason the score is
+  /// trustworthy at all.
+  support    Int
+  computedAt DateTime @default(now())
+
+  @@id([productId, neighborId])
+  @@index([productId, score])
 }
 
 model Friendship {

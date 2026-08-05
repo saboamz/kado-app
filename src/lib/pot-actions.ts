@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from './db';
+import { logEvent } from './events';
 import { parseMoney } from './format';
 import { relationTo } from './relations';
 import { requireUser } from './session';
@@ -22,6 +23,8 @@ async function requirePotGift(giftId: string) {
       isPot: true,
       priceCents: true,
       listId: true,
+      productId: true,
+      category: true,
       list: { select: { ownerId: true, allowPots: true } },
     },
   });
@@ -75,8 +78,25 @@ export async function contribute(
   }
 
   // Contributions accumulate rather than replace: someone may chip in twice.
-  await db.potContribution.create({
-    data: { giftId, contributorId: user.id, amountCents: cents },
+  //
+  // Event in the same transaction, and priceCents is what was actually PUT IN,
+  // not the gift's asking price — the event records what happened.
+  await db.$transaction(async (tx) => {
+    await tx.potContribution.create({
+      data: { giftId, contributorId: user.id, amountCents: cents },
+    });
+    await logEvent(
+      {
+        actorId: user.id,
+        kind: 'contribute',
+        recipientId: gift.list.ownerId,
+        giftId,
+        productId: gift.productId,
+        priceCents: cents,
+        categoryId: gift.category,
+      },
+      tx,
+    );
   });
 
   revalidatePath(`/gifts/${giftId}`);

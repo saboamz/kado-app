@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from './db';
+import { logEvent } from './events';
 import { relationTo } from './relations';
 import { requireUser } from './session';
 
@@ -26,6 +27,11 @@ async function requireReservableGift(giftId: string) {
       name: true,
       isPot: true,
       listId: true,
+      // Carried onto the event: the product it resolves to, and the price and
+      // category AS THEY ARE NOW.
+      productId: true,
+      priceCents: true,
+      category: true,
       list: { select: { ownerId: true, visibility: true } },
     },
   });
@@ -55,8 +61,28 @@ export async function reserveGift(giftId: string): Promise<ReservationResult> {
   try {
     // giftId is unique on Reservation, so a second reservation loses the race
     // at the database rather than in a check-then-write window.
-    await db.reservation.create({
-      data: { giftId, reserverId: user.id },
+    //
+    // The event is written in the SAME transaction: an event describing a
+    // reservation that then failed is worse than no event, because it trains
+    // the model on something that never happened.
+    await db.$transaction(async (tx) => {
+      await tx.reservation.create({
+        data: { giftId, reserverId: user.id },
+      });
+      await logEvent(
+        {
+          actorId: user.id, // from the session, never from the caller
+          kind: 'reserve',
+          recipientId: gift.list.ownerId,
+          giftId,
+          productId: gift.productId,
+          // The price as it is NOW. Reading it back from Product later would
+          // rewrite history every time the merchant runs a sale.
+          priceCents: gift.priceCents,
+          categoryId: gift.category,
+        },
+        tx,
+      );
     });
   } catch {
     return { error: "Quelqu'un vient de réserver ce cadeau." };
@@ -73,9 +99,33 @@ export async function releaseGift(giftId: string): Promise<ReservationResult> {
   const { user, gift } = found;
 
   // Scoped to this reserver: you can only release what you hold.
-  const { count } = await db.reservation.deleteMany({
-    where: { giftId, reserverId: user.id },
+  //
+  // The event is written only when a row was actually deleted, and inside the
+  // same transaction as the delete. Logging unconditionally would let anyone
+  // manufacture negative signal against any product by repeatedly "releasing"
+  // gifts they never reserved — unreserve carries −3.0, so it is the cheapest
+  // way to push something out of everyone's recommendations.
+  const count = await db.$transaction(async (tx) => {
+    const deleted = await tx.reservation.deleteMany({
+      where: { giftId, reserverId: user.id },
+    });
+    if (deleted.count > 0) {
+      await logEvent(
+        {
+          actorId: user.id,
+          kind: 'unreserve',
+          recipientId: gift.list.ownerId,
+          giftId,
+          productId: gift.productId,
+          priceCents: gift.priceCents,
+          categoryId: gift.category,
+        },
+        tx,
+      );
+    }
+    return deleted.count;
   });
+
   if (count === 0) {
     return { error: "Vous n'aviez pas réservé ce cadeau." };
   }
