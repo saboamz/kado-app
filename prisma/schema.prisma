@@ -207,6 +207,53 @@ model PotContribution {
   @@index([contributorId])
 }
 
+/// What someone did, and how much it counts as evidence of taste.
+///
+/// This is the recommender's training set, the analytics log, and the trace
+/// that explains a recommendation months after it was made.
+model GiftEvent {
+  id          BigInt    @id @default(autoincrement())
+  /// Always from the session, never from the caller.
+  actorId     String
+  kind        EventKind
+  recipientId String?
+  productId   String?
+  giftId      String?
+  categoryId  String?
+  /// Denormalised on purpose: a price is a fact about an INSTANT. Joining
+  /// Product later would read today's price and rewrite history at every sale.
+  priceCents  Int?
+  /// Resolved server-side from the kind. A client-supplied weight would let
+  /// anyone declare their own click worth ten purchases.
+  weight      Float
+  sessionId   String?
+  source      String?
+  occurredAt  DateTime  @default(now())
+
+  @@index([actorId, productId])
+  @@index([productId, kind, occurredAt])
+  @@index([occurredAt])
+  /// Deliberately NOT a unique constraint across all kinds. Once-per-session
+  /// is right for views, and wrong for everything else: someone really can
+  /// reserve, release and reserve the same product again, and a unique index
+  /// would silently swallow the second one. The view cap is a partial unique
+  /// index over the browsing kinds only, added in the migration by hand
+  /// because Prisma cannot express a WHERE clause on an index.
+}
+
+enum EventKind {
+  purchase
+  reserve
+  contribute
+  add_wish
+  like_wish
+  click_out
+  view_wish
+  view_product
+  unreserve
+  dismiss_reco
+}
+
 model Friendship {
   id          String           @id @default(cuid())
   requesterId String

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from './db';
+import { logEvent } from './events';
 import { deleteUpload, storeUpload } from './uploads';
 import { parseMoney } from './format';
 import { requireUser } from './session';
@@ -121,7 +122,7 @@ export async function createGift(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  await requireOwnedList(listId);
+  const { user } = await requireOwnedList(listId);
 
   const parsed = parseGiftForm(formData);
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
@@ -134,12 +135,26 @@ export async function createGift(
   const image = await resolveImage(formData, 'image', null);
   if (image.error) return { errors: { image: image.error } };
 
-  await db.gift.create({
+  // add_wish is evidence about the person who ADDED it — themselves — not
+  // about giving anything to anyone. recipientId is deliberately null: mixing
+  // these in with the gift events would train the model on the wrong axis,
+  // because "people who wanted X also wanted Y" is a different question from
+  // "people who gave X also gave Y".
+  const gift = await db.gift.create({
     data: {
       listId,
       ...giftData(parsed.data),
       ...(image.url !== undefined ? { imageUrl: image.url } : {}),
     },
+  });
+
+  await logEvent({
+    actorId: user.id,
+    kind: 'add_wish',
+    giftId: gift.id,
+    productId: gift.productId,
+    priceCents: gift.priceCents,
+    categoryId: gift.category,
   });
 
   revalidatePath(`/lists/${listId}`);
