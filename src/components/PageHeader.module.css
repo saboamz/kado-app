@@ -2,9 +2,10 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-4);
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  /* The header owns the space beneath it, so pages do not each invent one. */
+  margin-bottom: var(--space-6);
 }
 
 .titles {
@@ -13,23 +14,27 @@
 
 .title {
   margin: 0;
-  font-size: clamp(24px, 6vw, 32px);
-  line-height: 1.14;
-  letter-spacing: -0.03em;
-  text-wrap: pretty;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .subtitle {
-  margin: 6px 0 0;
-  font-size: 14.5px;
-  line-height: 1.5;
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-md);
+  line-height: 1.55;
   color: var(--fg-muted);
+  /* Long enough to be a sentence, short enough to stay readable. */
+  max-width: 52ch;
   text-wrap: pretty;
 }
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
@@ -40,7 +45,7 @@
   min-height: 40px;
   margin-bottom: 4px;
   padding-right: 8px;
-  font-size: 14px;
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--fg-muted);
   text-decoration: none;

@@ -126,8 +126,15 @@ export default async function AppHomePage() {
                   <span className={styles.listName}>{list.name}</span>
                   {list.isDefault && <Badge>Par défaut</Badge>}
                 </div>
-                <span className={styles.listMeta}>
-                  {list._count.gifts} envie{list._count.gifts > 1 ? 's' : ''}
+                <span
+                  className={styles.listMeta}
+                  data-empty={list._count.gifts === 0 ? '' : undefined}
+                >
+                  {/* Same rule as the lists index: an empty list prompts
+                      rather than reporting a zero. */}
+                  {list._count.gifts === 0
+                    ? 'Rien encore'
+                    : `${list._count.gifts} envie${list._count.gifts > 1 ? 's' : ''}`}
                 </span>
               </CardLink>
             ))}
@@ -160,9 +167,10 @@ export default async function AppHomePage() {
                       <strong>{list.owner.name}</strong> · {list.name}
                     </p>
                     <p className={styles.activityMeta}>
-                      {list._count.gifts} envie
-                      {list._count.gifts > 1 ? 's' : ''} ·{' '}
-                      {formatRelative(list.updatedAt)}
+                      {list._count.gifts === 0
+                        ? 'Liste vide'
+                        : `${list._count.gifts} envie${list._count.gifts > 1 ? 's' : ''}`}{' '}
+                      · {formatRelative(list.updatedAt)}
                     </p>
                   </div>
                 </div>

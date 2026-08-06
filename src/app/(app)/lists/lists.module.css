@@ -2,19 +2,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .name {
-  font-size: 16px;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .occasion {
   display: block;
-  margin-top: 3px;
-  font-size: 13px;
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
   color: var(--fg-muted);
 }
 
@@ -22,20 +23,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  /* A hairline separates the card's identity from its metadata, which is what
+     lets the eye skip the second row when scanning for a list by name. */
+  border-top: 1px solid var(--line);
 }
 
 .count {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--fg-subtle);
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+}
+
+/* An empty list invites rather than reports; the accent marks it as the thing
+   to act on. */
+.count[data-empty] {
+  color: var(--accent-ink);
 }
 
 .visibility {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--fg-subtle);
 }

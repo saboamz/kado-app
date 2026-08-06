@@ -5,7 +5,7 @@
 }
 
 .label {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: -0.005em;
 }
@@ -52,7 +52,7 @@
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--bg);
-  font-size: 13.5px;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
 }
@@ -76,7 +76,7 @@
 }
 
 .remove {
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--fg-subtle);
   text-decoration: underline;
 }
@@ -87,8 +87,7 @@
 
 .hint {
   flex-basis: 100%;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   color: var(--fg-subtle);
 }
 
@@ -98,5 +97,5 @@
   border-radius: var(--radius-sm);
   background: var(--accent-soft);
   color: var(--accent-ink);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }

@@ -2,23 +2,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   /* 44px is the minimum comfortable touch target on a phone. */
   min-height: 48px;
-  padding: 0 18px;
-  border-radius: var(--radius);
+  padding: 0 20px;
+  border-radius: 999px;
   font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.01em;
+  font-size: var(--text-base);
+  letter-spacing: -0.005em;
   transition:
-    background 0.16s,
-    transform 0.16s,
-    opacity 0.16s;
+    background 0.18s ease,
+    transform 0.18s ease,
+    opacity 0.18s ease;
   text-decoration: none;
 }
 
 .button:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(1px);
 }
 
 .button:disabled {
@@ -26,10 +26,17 @@
   cursor: not-allowed;
 }
 
+/*
+ * No coloured glow under the primary button.
+ *
+ * The old `box-shadow: … var(--accent-glow)` painted an orange halo that, on
+ * the dark theme especially, read as the button being lit from behind — a
+ * neon effect that belongs to a landing page, not to a form control the user
+ * presses twenty times a day.
+ */
 .primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 10px 22px -14px var(--accent-glow);
 }
 
 .primary:hover:not(:disabled) {
@@ -56,7 +63,7 @@
 
 .danger {
   background: transparent;
-  color: #d4381c;
+  color: var(--danger);
   border: 1px solid var(--line-strong);
 }
 
@@ -71,7 +78,7 @@
 }
 
 .label {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--fg);
 }
@@ -87,7 +94,9 @@
   background: var(--bg);
   /* 16px keeps iOS Safari from zooming the viewport on focus. */
   font-size: 16px;
-  transition: border-color 0.16s;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .textarea {
@@ -101,19 +110,22 @@
 .select:focus {
   outline: none;
   border-color: var(--accent);
+  /* A soft ring instead of the browser default, so focus is unmistakable
+     without the field appearing to change size. */
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .input[aria-invalid='true'],
 .textarea[aria-invalid='true'] {
-  border-color: #d4381c;
+  border-color: var(--danger);
 }
 
 .error {
-  font-size: 12.5px;
-  color: #d4381c;
+  font-size: var(--text-sm);
+  color: var(--danger);
 }
 
 .hint {
-  font-size: 12.5px;
+  font-size: var(--text-sm);
   color: var(--fg-subtle);
 }

@@ -3,75 +3,128 @@
  *
  * Light and dark are both defined here; the app follows the system setting by
  * default and honours an explicit choice via data-theme on <html>.
+ *
+ * ── The palette is warm on purpose ─────────────────────────────────────────
+ *
+ * Kado is a place where friends prepare a surprise for someone they like. A
+ * neutral grey chrome reads as an admin tool and makes the whole thing feel
+ * like work. So the page sits on a paper tone rather than a grey, the accent
+ * is a muted terracotta rather than a saturated coral, and the ink is warm
+ * near-black rather than pure black. None of it is decoration: it is the
+ * difference between a wishlist and a dashboard.
  */
 :root {
-  --accent: #ff6a55;
-  --accent-hover: #e5543f;
-  --accent-soft: rgba(255, 106, 85, 0.1);
-  --accent-ink: #b3391f;
-  --accent-glow: rgba(255, 106, 85, 0.5);
+  /* Terracotta, desaturated. The old #ff6a55 was loud enough to compete with
+     the content it sat next to; this holds the same hue at less volume. */
+  --accent: #c9553d;
+  --accent-hover: #ad4530;
+  --accent-soft: rgba(201, 85, 61, 0.09);
+  --accent-ink: #9c3f2b;
 
-  --bg: #ffffff;
-  --bg-page: #eceae7;
-  --surface: #f4f4f6;
-  --surface-hover: #ececf0;
-  --chip: #eaeaee;
-  --fg: #0b0b0c;
-  --fg-muted: #6b6b73;
-  --fg-subtle: #a1a1aa;
-  --line: rgba(0, 0, 0, 0.08);
-  --line-strong: rgba(0, 0, 0, 0.16);
-  --glass: rgba(255, 255, 255, 0.85);
-  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.25);
+  --bg: #fffdfa;
+  --bg-page: #f6f1e9;
+  --surface: #f0e9df;
+  --surface-hover: #e9e0d4;
+  --chip: #ece4d8;
+  /* Warm near-black: pure #000 on a paper ground reads as a print error. */
+  --fg: #211c18;
+  --fg-muted: #6d6259;
+  --fg-subtle: #9a8e83;
+  --line: rgba(33, 28, 24, 0.1);
+  --line-strong: rgba(33, 28, 24, 0.2);
+  --glass: rgba(255, 253, 250, 0.94);
+  --shadow: 0 10px 30px -12px rgba(61, 47, 36, 0.18);
+  --danger: #b23a24;
 
   --font-sans: var(--font-figtree), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+  /* Display face for page titles and card names. Its higher contrast is what
+     makes a heading read as editorial rather than as a table header. */
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  /* Kept for the two places that are genuinely technical — a code sample on
+     the sign-in page and a raw product URL. Counts, prices and dates are NOT
+     technical, and setting them in mono is what made the app read as a
+     readout rather than as a wishlist. */
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
 
   --radius-sm: 10px;
   --radius: 14px;
-  --radius-lg: 20px;
+  --radius-lg: 18px;
+
+  /* Type scale. Every size in the app comes from here, so a heading cannot
+     drift into the same weight as the body text it is meant to lead. */
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.25rem);
+
+  /* Spacing rhythm, so vertical gaps are chosen rather than improvised. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
 
   /* Fluid page gutter: tight on a phone, generous on a desktop. */
   --gutter: clamp(16px, 4vw, 32px);
   --tabbar-height: 64px;
 }
 
+/*
+ * Dark is warm too — browns rather than blue-greys.
+ *
+ * The near-black page in the previous version made the cards float in a void
+ * and the accent glow like a notification. Here the surfaces stay slightly
+ * warm and separated by tone, so the same hierarchy holds in both themes.
+ *
+ * Declared once, applied by both the media query and the explicit attribute.
+ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --accent-soft: rgba(255, 122, 102, 0.16);
-    --accent-ink: #ff9d8b;
+    --accent: #e08267;
+    --accent-hover: #eb9880;
+    --accent-soft: rgba(224, 130, 103, 0.16);
+    --accent-ink: #f0a992;
 
-    --bg: #0b0b0d;
-    --bg-page: #08080a;
-    --surface: #17171a;
-    --surface-hover: #1e1e22;
-    --chip: #232328;
-    --fg: #f4f4f7;
-    --fg-muted: #9a9aa4;
-    --fg-subtle: #66666f;
-    --line: rgba(255, 255, 255, 0.1);
-    --line-strong: rgba(255, 255, 255, 0.18);
-    --glass: rgba(16, 16, 19, 0.82);
-    --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+    --bg: #221d1a;
+    --bg-page: #191512;
+    --surface: #2b2521;
+    --surface-hover: #352d28;
+    --chip: #332b26;
+    --fg: #f5efe8;
+    --fg-muted: #b0a297;
+    --fg-subtle: #7d7168;
+    --line: rgba(245, 239, 232, 0.1);
+    --line-strong: rgba(245, 239, 232, 0.2);
+    --glass: rgba(25, 21, 18, 0.94);
+    --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.5);
+    --danger: #e0806a;
   }
 }
 
 :root[data-theme='dark'] {
-  --accent-soft: rgba(255, 122, 102, 0.16);
-  --accent-ink: #ff9d8b;
+  --accent: #e08267;
+  --accent-hover: #eb9880;
+  --accent-soft: rgba(224, 130, 103, 0.16);
+  --accent-ink: #f0a992;
 
-  --bg: #0b0b0d;
-  --bg-page: #08080a;
-  --surface: #17171a;
-  --surface-hover: #1e1e22;
-  --chip: #232328;
-  --fg: #f4f4f7;
-  --fg-muted: #9a9aa4;
-  --fg-subtle: #66666f;
-  --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --glass: rgba(16, 16, 19, 0.82);
-  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  --bg: #221d1a;
+  --bg-page: #191512;
+  --surface: #2b2521;
+  --surface-hover: #352d28;
+  --chip: #332b26;
+  --fg: #f5efe8;
+  --fg-muted: #b0a297;
+  --fg-subtle: #7d7168;
+  --line: rgba(245, 239, 232, 0.1);
+  --line-strong: rgba(245, 239, 232, 0.2);
+  --glass: rgba(25, 21, 18, 0.94);
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.5);
+  --danger: #e0806a;
 }
 
 *,
@@ -82,6 +135,20 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Tells the browser to render native controls (scrollbars, date pickers,
+     form widgets) in the matching theme. Without it they stay light on a dark
+     page, which is the giveaway that a dark mode was painted on afterwards. */
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme='light']) {
+    color-scheme: dark;
+  }
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
@@ -90,9 +157,27 @@ body {
   color: var(--fg);
   font-family: var(--font-sans);
   font-size: 16px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   /* Never let a wide child scroll the whole page sideways on a phone. */
   overflow-x: hidden;
+}
+
+/*
+ * Headings carry the display face by default.
+ *
+ * Set here rather than per-component so a new page cannot accidentally ship a
+ * heading in the body font — the drift that flattens a type system one screen
+ * at a time.
+ */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 button {

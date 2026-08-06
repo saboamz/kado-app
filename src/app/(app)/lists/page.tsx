@@ -43,18 +43,33 @@ export default async function ListsPage() {
         <Grid>
           {lists.map((list) => {
             const { label, Icon } = VISIBILITY[list.visibility];
+            // Most lists are named after their occasion, so printing both
+            // rendered "Anniversaire" twice, one line under the other. The
+            // occasion only earns its line when it says something the name
+            // does not.
+            const occasion =
+              list.occasion?.trim().toLowerCase() === list.name.trim().toLowerCase()
+                ? null
+                : list.occasion;
             return (
               <CardLink key={list.id} href={`/lists/${list.id}`}>
                 <div className={styles.top}>
                   <span className={styles.name}>{list.name}</span>
                   {list.isDefault && <Badge>Par défaut</Badge>}
                 </div>
-                {list.occasion && (
-                  <span className={styles.occasion}>{list.occasion}</span>
+                {occasion && (
+                  <span className={styles.occasion}>{occasion}</span>
                 )}
                 <div className={styles.meta}>
-                  <span className={styles.count}>
-                    {list.giftCount} envie{list.giftCount > 1 ? 's' : ''}
+                  <span
+                    className={styles.count}
+                    data-empty={list.giftCount === 0 ? '' : undefined}
+                  >
+                    {/* "0 envie" reported an absence as a measurement. An
+                        empty list is a prompt, so it says what to do next. */}
+                    {list.giftCount === 0
+                      ? 'Rien encore — ajoutez une envie'
+                      : `${list.giftCount} envie${list.giftCount > 1 ? 's' : ''}`}
                   </span>
                   <span className={styles.visibility}>
                     <Icon size={14} />

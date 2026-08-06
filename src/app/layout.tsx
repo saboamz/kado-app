@@ -1,20 +1,33 @@
 import type { Metadata, Viewport } from 'next';
-import { Figtree, Roboto_Mono } from 'next/font/google';
+import { Figtree, Fraunces } from 'next/font/google';
 import { getCurrentUser } from '@/lib/session';
 import './globals.css';
 
 // Self-hosted by next/font: no request to Google at runtime, no layout shift.
 const figtree = Figtree({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-figtree',
   display: 'swap',
 });
 
-const robotoMono = Roboto_Mono({
+/**
+ * The display face, for headings and the names of things.
+ *
+ * It replaces the monospace that used to set counts and section labels.
+ * Numbers in a mono face read as telemetry — "5 envies" looked like a metric
+ * rather than like five presents somebody hopes for — and that single choice
+ * did most of the work of making the app feel like a dashboard.
+ *
+ * Fraunces is a variable serif with a soft, slightly quirky axis; the optical
+ * size setting keeps it from looking brittle at heading sizes.
+ */
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-roboto-mono',
+  // Variable font: the weight axis is continuous, so no fixed list. `axes`
+  // and an explicit `weight` are mutually exclusive in next/font.
+  axes: ['SOFT', 'WONK', 'opsz'],
+  variable: '--font-fraunces',
   display: 'swap',
 });
 
@@ -29,8 +42,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#eceae7' },
-    { media: '(prefers-color-scheme: dark)', color: '#08080a' },
+    { media: '(prefers-color-scheme: light)', color: '#f6f1e9' },
+    { media: '(prefers-color-scheme: dark)', color: '#191512' },
   ],
 };
 
@@ -48,7 +61,7 @@ export default async function RootLayout({
     <html
       lang="fr"
       data-theme={theme}
-      className={`${figtree.variable} ${robotoMono.variable}`}
+      className={`${figtree.variable} ${fraunces.variable}`}
     >
       <body>{children}</body>
     </html>

@@ -7,7 +7,7 @@
 
 .bio {
   margin: 0;
-  font-size: 14.5px;
+  font-size: var(--text-base);
   line-height: 1.5;
   color: var(--fg-muted);
   text-wrap: pretty;
@@ -15,8 +15,7 @@
 
 .birthday {
   margin: 5px 0 0;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--accent);
 }
 
@@ -29,7 +28,7 @@
 
 .listName {
   display: block;
-  font-size: 15.5px;
+  font-size: var(--text-md);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -37,7 +36,6 @@
 .listMeta {
   display: block;
   margin-top: 5px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--fg-subtle);
 }
