@@ -48,6 +48,36 @@ export async function getListForViewer(
   };
 }
 
+/**
+ * What the index selects per gift when the viewer is allowed a count: the
+ * presence of a reservation and nothing else, never who made it.
+ */
+type GiftReservationOnly = { reservation: { id: string } | null };
+
+/**
+ * The include for the list index, chosen by relation.
+ *
+ * The index needs reservations only to count them, and an owner is never shown
+ * that count — so for an owner the gifts relation is not selected at all. It is
+ * giftInclude's rule one level up: fetching the rows and discarding them later
+ * leaves the secret one refactor away from the response, and a leak introduced
+ * that way would arrive with every existing test still green.
+ *
+ * Exported so list-secrecy.test.ts can assert the shape rather than only the
+ * behaviour, which is the part the discarding version already satisfied.
+ */
+export function listInclude(relation: ViewerRelation) {
+  const base = {
+    owner: { select: { id: true, name: true, avatarColor: true } },
+    _count: { select: { gifts: true } },
+  };
+  if (relation === 'owner') return base;
+  return {
+    ...base,
+    gifts: { select: { reservation: { select: { id: true } } } },
+  };
+}
+
 /** Lists belonging to one user, as visible to one viewer. */
 export async function getListsForViewer(
   ownerId: string,
@@ -56,11 +86,7 @@ export async function getListsForViewer(
   const relation = await relationTo(viewerId, ownerId);
   const lists = await db.giftList.findMany({
     where: { ownerId },
-    include: {
-      owner: { select: { id: true, name: true, avatarColor: true } },
-      _count: { select: { gifts: true } },
-      gifts: { select: { reservation: { select: { id: true } } } },
-    },
+    include: listInclude(relation),
     orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
   });
 
@@ -68,10 +94,10 @@ export async function getListsForViewer(
     .filter((l) => canViewList(l.visibility, relation))
     .map((l) => ({
       ...summarise(l, relation, l._count.gifts),
-      ...reservedCount(
-        relation,
-        l.gifts.map((g) => ({ reservation: g.reservation })),
-      ),
+      // `gifts` is absent for an owner by construction — listInclude did not
+      // select it — and reservedCount returns {} for them regardless. The two
+      // agree, so an owner gets no count, from data that was never loaded.
+      ...reservedCount(relation, 'gifts' in l ? (l.gifts as GiftReservationOnly[]) : []),
     }));
 }
 
