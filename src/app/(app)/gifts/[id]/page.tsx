@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
-import { Badge, Card, PriorityStars } from '@/components/display';
+import { Badge, Card, Priority } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
+import { SecretSeal, SecretZone } from '@/components/SecretSeal';
 import { UploadedImage } from '@/components/UploadedImage';
+import { ViewpointBanner } from '@/components/Viewpoint';
 import { Pot } from '@/components/Pot';
 import { SecretChat } from '@/components/SecretChat';
 import { ReserveButton } from '@/components/ReserveButton';
 import { db } from '@/lib/db';
-import { formatMoney, priorityLabel } from '@/lib/format';
+import { formatMoney } from '@/lib/format';
 import { canViewList, relationTo } from '@/lib/relations';
 import { getChatForViewer } from '@/lib/chat';
 import { giftInclude, viewGift } from '@/lib/secrecy';
@@ -41,7 +43,15 @@ export default async function GiftPage({
     where: { id },
     select: {
       list: {
-        select: { id: true, name: true, ownerId: true, visibility: true },
+        select: {
+          id: true,
+          name: true,
+          ownerId: true,
+          visibility: true,
+          // For the viewpoint banner. This is the list's OWNER — public
+          // profile data, nothing to do with who reserved anything.
+          owner: { select: { name: true, avatarUrl: true } },
+        },
       },
     },
   });
@@ -63,8 +73,22 @@ export default async function GiftPage({
   // than an empty one that would betray the room's existence.
   const chat = viewerId ? await getChatForViewer(id, viewerId) : null;
 
+  // Is there anything to put in the ochre zone? Each of these is already
+  // absent for an owner by construction — this only decides whether to draw
+  // the container, never what may go in it.
+  const hasSecretZone = Boolean(gift.reservation || gift.pot || chat);
+  const ownerFirstName =
+    owning.list.owner.name.trim().split(/\s+/)[0] ?? owning.list.owner.name;
+
   return (
     <>
+      {/* Absent for an owner — that absence is the signal. */}
+      <ViewpointBanner
+        relation={relation}
+        person={owning.list.owner}
+        what="un cadeau"
+      />
+
       <PageHeader
         title={gift.name}
         back={{ href: `/lists/${owning.list.id}`, label: owning.list.name }}
@@ -85,19 +109,18 @@ export default async function GiftPage({
         <span className={styles.price}>
           {formatMoney(gift.priceCents, gift.currency)}
         </span>
-        <PriorityStars priority={gift.priority} />
-        <span className={styles.priorityLabel}>
-          {priorityLabel(gift.priority)}
-        </span>
+        <Priority priority={gift.priority} />
       </div>
 
       <div className={styles.flags}>
         {gift.isPot && <Badge tone="solid">Cadeau à plusieurs</Badge>}
         {gift.category && <Badge>{gift.category}</Badge>}
         {gift.reservation?.state === 'mine' && (
-          <Badge tone="accent">Vous l&rsquo;avez réservé</Badge>
+          <Badge tone="secret">Vous l&rsquo;avez réservé</Badge>
         )}
-        {gift.reservation?.state === 'taken' && <Badge>Déjà réservé</Badge>}
+        {gift.reservation?.state === 'taken' && (
+          <Badge tone="muted">Déjà réservé</Badge>
+        )}
       </div>
 
       {gift.description && (
@@ -116,29 +139,50 @@ export default async function GiftPage({
       )}
 
       {/*
-        Rendered only when gift.reservation exists, which it never does for
-        an owner: there is no branch here that could leak to them.
+        Everything below is gathered into one ochre zone: the design's rule is
+        that what the owner cannot see lives in a single region rather than
+        scattered down the page, so a friend reads the boundary once.
+
+        The zone is rendered only when there is something in it, and every
+        piece inside is already owner-proof on its own: gift.reservation and
+        gift.pot are undefined for an owner (secrecy.ts never builds them) and
+        chat is null. `hasSecretZone` is a rendering convenience, never the
+        thing that enforces the rule.
       */}
-      {gift.reservation && !gift.isPot && (
-        <ReserveButton giftId={id} reservation={gift.reservation} />
+      {hasSecretZone && (
+        <SecretZone>
+          <SecretSeal title="Côté amis">
+            {gift.pot
+              ? `${ownerFirstName} ne voit ni le total, ni les participants, ni même l’existence de cette cagnotte.`
+              : gift.reservation?.state === 'free'
+                ? 'Si vous le réservez, cela restera invisible pour le propriétaire de la liste.'
+                : 'Le propriétaire de la liste ne voit rien de tout ceci.'}
+          </SecretSeal>
+
+          {gift.reservation && !gift.isPot && (
+            <ReserveButton giftId={id} reservation={gift.reservation} />
+          )}
+
+          {gift.pot && <Pot giftId={id} pot={gift.pot} />}
+
+          {chat && <SecretChat giftId={id} messages={chat} />}
+        </SecretZone>
       )}
 
-      {/* Like the reserve control, only ever rendered for a friend. */}
-      {gift.pot && <Pot giftId={id} pot={gift.pot} />}
-
-      {chat && <SecretChat giftId={id} messages={chat} />}
-
       {/*
-        The reassurance differs by role, and for the owner it is literally
-        true of this page: no reservation data was fetched to render it.
+        For the owner it is literally true of this page: no reservation data
+        was fetched to render it.
       */}
-      <Card plain className={styles.secrecy}>
-        {isOwner
-          ? "Vue propriétaire : aucune information de réservation n'existe sur cette page."
-          : gift.reservation?.state === 'free'
-            ? 'Si vous le réservez, cela restera invisible pour le propriétaire de la liste.'
-            : "Le propriétaire de la liste ne voit rien de tout ceci."}
-      </Card>
+      {isOwner && (
+        <div className={styles.guarantee}>
+          {/* One string, not JSX text across two lines: a line break renders
+              as a space mid-sentence. The apostrophe is the straight one this
+              sentence has always used. */}
+          <SecretSeal tone="guarantee">
+            {"Vue propriétaire : aucune information de réservation n'existe sur cette page."}
+          </SecretSeal>
+        </div>
+      )}
     </>
   );
 }

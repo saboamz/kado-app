@@ -37,20 +37,32 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
     });
   }
 
+  // The bar is split in two: what everybody else put in, and your own share.
+  // That split is the only nominative thing the design allows here — your own
+  // figure is yours to know, and nobody else's can be inferred from it.
+  const othersCents = Math.max(0, pot.raisedCents - pot.myContributionCents);
+  const othersPercent = target
+    ? Math.min(100, (othersCents / target) * 100)
+    : 0;
+  const minePercent = target
+    ? Math.min(100 - othersPercent, (pot.myContributionCents / target) * 100)
+    : 0;
+
   return (
     <section className={styles.pot} aria-labelledby="pot-heading">
       <h2 id="pot-heading" className={styles.heading}>
         Cagnotte
       </h2>
 
-      <div className={styles.amounts}>
+      <p className={styles.amounts}>
         <span className={styles.raised}>{formatMoney(pot.raisedCents)}</span>
         {target && (
           <span className={styles.target}>
+            {' '}
             réunis sur {formatMoney(target)}
           </span>
         )}
-      </div>
+      </p>
 
       {target && (
         <div
@@ -61,30 +73,48 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
           aria-valuenow={pot.raisedCents}
           aria-label={`Cagnotte à ${percent} %`}
         >
-          <div className={styles.fill} style={{ width: `${percent}%` }} />
+          <span className={styles.fill} style={{ width: `${othersPercent}%` }} />
+          <span className={styles.fillMine} style={{ width: `${minePercent}%` }} />
         </div>
       )}
 
       <p className={styles.people}>
-        {/* A count, never names: who paid what stays between each person and the app. */}
-        {pot.contributorCount === 0
-          ? 'Personne n’a encore participé.'
-          : `${pot.contributorCount} ${
-              pot.contributorCount > 1 ? 'personnes participent' : 'personne participe'
-            }`}
-        {remaining !== null && remaining > 0 && (
-          <> · il reste {formatMoney(remaining)}</>
+        {/*
+          A count and anonymous dots, never names or initials: who paid what
+          stays between each person and the app.
+        */}
+        {pot.contributorCount > 0 && (
+          <span className={styles.dots} aria-hidden>
+            {Array.from({ length: Math.min(5, pot.contributorCount) }).map(
+              (_, i) => (
+                <span key={i} className={styles.dot} />
+              ),
+            )}
+          </span>
         )}
+        <span>
+          {pot.contributorCount === 0
+            ? 'Personne n’a encore participé.'
+            : `${pot.contributorCount} ${
+                pot.contributorCount > 1
+                  ? 'personnes participent'
+                  : 'personne participe'
+              }`}
+          {remaining !== null && remaining > 0 && (
+            <> · il reste {formatMoney(remaining)}</>
+          )}
+        </span>
       </p>
 
       {pot.myContributionCents > 0 && (
         <p className={styles.mine}>
-          Vous avez versé {formatMoney(pot.myContributionCents)}.
+          Votre part : <strong>{formatMoney(pot.myContributionCents)}</strong>
         </p>
       )}
 
       {complete ? (
         <p className={styles.complete}>
+          <span aria-hidden>✓</span>
           La cagnotte est complète. Le cadeau peut être acheté.
         </p>
       ) : (
@@ -142,10 +172,11 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
         </p>
       )}
 
-      <p className={styles.note}>
-        Le propriétaire de la liste ne voit ni le total, ni les participants, ni
-        même l’existence de cette cagnotte.
-      </p>
+      {/*
+        The secrecy note used to live here. It now sits once at the top of the
+        ochre zone that contains this pot, so a friend reads the rule for the
+        whole region instead of the same sentence three times down one page.
+      */}
     </section>
   );
 }

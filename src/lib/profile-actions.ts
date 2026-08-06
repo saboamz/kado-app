@@ -27,10 +27,20 @@ const profileSchema = z.object({
     (v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v),
     'Date invalide.',
   ),
+  /*
+   * The avatar colour is no longer edited: an avatar's tint is derived from
+   * the name, so the picker was removed from the form. FormData.get returns
+   * null for a field that is not in the form, and `.optional()` does not
+   * accept null — without the nullish() the whole profile form failed
+   * validation silently and never redirected.
+   *
+   * Kept in the schema rather than dropped so an older client that still
+   * posts a colour is accepted rather than rejected.
+   */
   avatarColor: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/, 'Couleur invalide.')
-    .optional()
+    .nullish()
     .or(z.literal('')),
   interests: optionalText(200),
 });

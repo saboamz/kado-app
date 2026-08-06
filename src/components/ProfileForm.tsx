@@ -7,8 +7,6 @@ import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
 import styles from './forms.module.css';
 
-const COLOURS = ['#FF6A55', '#6C5CE7', '#2F6BFF', '#11A56F', '#111114'];
-
 export function ProfileForm({
   initial,
 }: {
@@ -71,25 +69,12 @@ export function ProfileForm({
         error={state.errors?.interests}
       />
 
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>
-          Couleur (sans photo de profil)
-        </legend>
-        <div className={styles.colours}>
-          {COLOURS.map((colour) => (
-            <label key={colour} className={styles.colour}>
-              <input
-                type="radio"
-                name="avatarColor"
-                value={colour}
-                defaultChecked={initial.avatarColor === colour}
-              />
-              <span style={{ background: colour }} />
-              <span className="srOnly">{colour}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {/*
+        The colour picker is gone with the redesign. An avatar's tint is now
+        derived from the name, so this field edited a value nothing displayed.
+        The column and the action's optional handling of it are left alone —
+        pre-existing data, not this change's to drop.
+      */}
 
       <SubmitButton pendingLabel="Enregistrement…">Enregistrer</SubmitButton>
     </form>

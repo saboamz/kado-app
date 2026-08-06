@@ -6,10 +6,11 @@ import {
   CardLink,
   EmptyState,
   Grid,
-  PriorityStars,
+  Priority,
 } from '@/components/display';
 import { GiftIcon, PlusIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { ViewpointBanner } from '@/components/Viewpoint';
 import { UploadedImage } from '@/components/UploadedImage';
 import { formatMoney } from '@/lib/format';
 import { getListForViewer } from '@/lib/gifts';
@@ -45,6 +46,13 @@ export default async function ListPage({
 
   return (
     <>
+      {/* Absent on your own list — the absence is the signal. */}
+      <ViewpointBanner
+        relation={isOwner ? 'owner' : 'friend'}
+        person={list.owner}
+        what="la liste"
+      />
+
       <PageHeader
         title={list.name}
         subtitle={
@@ -82,9 +90,14 @@ export default async function ListPage({
         {/*
           Only a friend sees how many are spoken for. Telling the owner
           "2 réservées" gives away most of the surprise without naming anybody.
+
+          Set in ochre, like every other thing the owner cannot see.
         */}
         {list.reservedCount !== undefined && list.reservedCount > 0 && (
-          <> · {list.reservedCount} déjà réservée{list.reservedCount > 1 ? 's' : ''}</>
+          <span className={styles.reserved}>
+            {' · '}
+            {list.reservedCount} déjà réservée{list.reservedCount > 1 ? 's' : ''}
+          </span>
         )}
       </p>
 
@@ -118,7 +131,7 @@ export default async function ListPage({
 
               <div className={styles.giftTop}>
                 <span className={styles.giftName}>{gift.name}</span>
-                <PriorityStars priority={gift.priority} />
+                <Priority priority={gift.priority} compact />
               </div>
 
               <div className={styles.giftMeta}>
@@ -137,10 +150,10 @@ export default async function ListPage({
                   undefined. There is nothing here to render for them.
                 */}
                 {gift.reservation?.state === 'mine' && (
-                  <Badge tone="accent">Réservé par vous</Badge>
+                  <Badge tone="secret">Réservé par vous</Badge>
                 )}
                 {gift.reservation?.state === 'taken' && (
-                  <Badge>Déjà réservé</Badge>
+                  <Badge tone="muted">Déjà réservé</Badge>
                 )}
               </div>
             </CardLink>

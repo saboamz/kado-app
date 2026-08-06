@@ -1,0 +1,67 @@
+/*
+ * The viewpoint banner sits above everything, full-bleed, in the ochre that
+ * means "not visible to the person whose screen this is about".
+ *
+ * It bleeds past the page gutter because it belongs to the frame rather than
+ * to the content: it is a statement about the whole screen, not a note within
+ * it.
+ */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px var(--gutter);
+  margin: calc(var(--gutter) * -1) calc(var(--gutter) * -1) var(--gutter);
+  background: var(--sec-bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.initials,
+.photo {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.initials {
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.text strong {
+  font-weight: 600;
+}
+
+.chip {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--sec);
+  color: var(--sec-on);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (min-width: 900px) {
+  .banner {
+    /* The desktop shell already centres the column; the banner keeps its
+       full-bleed behaviour relative to that column's padding. */
+    margin-inline: calc(var(--gutter) * -1);
+    border-radius: 0;
+  }
+}

@@ -120,7 +120,10 @@ test('an avatar can be uploaded and replaces the initials', async ({ page }) => 
   await page.getByRole('button', { name: 'Enregistrer' }).click();
   await page.waitForURL('**/profile');
 
-  await expect(page.locator('img[src^="/uploads/avatars/"]')).toBeVisible();
+  // The avatar now also appears in the desktop nav, so scope to the page.
+  await expect(
+    page.getByRole('main').locator('img[src^="/uploads/avatars/"]'),
+  ).toBeVisible();
 });
 
 /** The declared MIME type is a claim; only the bytes decide. */

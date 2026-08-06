@@ -87,8 +87,10 @@ describe('initials', () => {
 
 describe('priorityLabel', () => {
   it('names each level', () => {
-    expect(priorityLabel(3)).toBe('Coup de cœur');
-    expect(priorityLabel(1)).toBe('Ce serait sympa');
+    // Wording comes from the design system: written from the wisher's side
+    // rather than as a rank.
+    expect(priorityLabel(3)).toBe('Ça me ferait très plaisir');
+    expect(priorityLabel(1)).toBe('Une idée, sans plus');
   });
 
   it('stays empty for an unknown level', () => {

@@ -1,159 +1,226 @@
+/*
+ * The shared vocabulary, ported from the Claude Design system.
+ *
+ * Two rules from the source document govern everything here:
+ *
+ *  - the name of a thing (a list, a gift, a person) is set in the display
+ *    face, so it reads as a title rather than as a table cell;
+ *  - ochre (--sec) appears only where something is hidden from the person the
+ *    screen is about. No card, badge or state may borrow it for emphasis.
+ */
 .card {
   display: block;
-  padding: 16px;
-  border-radius: var(--radius-lg);
-  background: var(--bg);
+  padding: 15px;
+  border-radius: 12px;
+  background: var(--card);
   border: 1px solid var(--line);
   text-decoration: none;
   color: inherit;
   transition:
-    border-color 0.16s,
-    transform 0.16s;
+    border-color 0.16s ease,
+    background 0.16s ease;
 }
 
 a.card:hover,
 button.card:hover {
-  border-color: var(--line-strong);
-}
-
-a.card:active,
-button.card:active {
-  transform: scale(0.995);
+  border-color: var(--ink3);
+  text-decoration: none;
 }
 
 .cardPlain {
-  background: var(--surface);
+  background: var(--card2);
   border-color: transparent;
 }
 
+a.cardPlain:hover,
+button.cardPlain:hover {
+  background: var(--line2);
+  border-color: transparent;
+}
+
+/*
+ * A person, as initials on a tint derived from their name: a light background
+ * with dark text of the same hue. Legible at 26px and never competing with
+ * the two colours that carry meaning.
+ */
 .avatar {
   display: grid;
   place-items: center;
   flex: none;
   border-radius: 50%;
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  user-select: none;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 9px;
-  border-radius: 8px;
-  font-size: 11.5px;
   font-weight: 600;
-  white-space: nowrap;
-}
-
-.badgeNeutral {
-  background: var(--chip);
-  color: var(--fg-muted);
-}
-
-.badgeAccent {
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-}
-
-.badgeSolid {
-  background: var(--accent);
-  color: #fff;
-}
-
-.badgeOutline {
-  border: 1px solid var(--line-strong);
-  color: var(--fg-muted);
-}
-
-.stars {
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  white-space: nowrap;
-}
-
-.empty {
-  display: grid;
-  place-items: center;
-  gap: 6px;
-  padding: 48px 24px;
-  text-align: center;
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--radius-lg);
-}
-
-.emptyIcon {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  margin-bottom: 6px;
-  border-radius: 16px;
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-
-.emptyTitle {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.emptyBody {
-  margin: 0;
-  max-width: 34ch;
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--fg-muted);
-  text-wrap: pretty;
-}
-
-.emptyAction {
-  margin-top: 10px;
-}
-
-.sectionTitle {
-  margin: 0 0 10px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--fg-subtle);
-}
-
-.grid {
-  display: grid;
-  gap: 12px;
-  /* Single column on a phone, filling in as the viewport allows. */
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 560px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-}
-
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  letter-spacing: -0.01em;
+  user-select: none;
 }
 
 .avatarImage {
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
-  background: var(--surface);
+  background: var(--card2);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badgeNeutral {
+  background: var(--card2);
+  color: var(--ink2);
+}
+
+/* Turquoise: a property of the thing itself — a pot, a category. */
+.badgeAccent,
+.badgeSolid {
+  background: var(--acc-bg);
+  color: var(--acc);
+  font-weight: 600;
+}
+
+.badgeOutline {
+  border: 1px solid var(--line);
+  color: var(--ink2);
+}
+
+/*
+ * Ochre badge — "Réservé par vous". The only badge allowed the secret colour,
+ * and only because that is exactly what it reports.
+ */
+.badgeSecret {
+  background: var(--sec-bg);
+  color: var(--sec);
+  font-weight: 600;
+}
+
+/* "Déjà réservé": taken by someone else, deliberately quieter than yours. */
+.badgeMuted {
+  background: var(--card2);
+  color: var(--ink3);
+}
+
+/*
+ * Priority: three bars, never without their label.
+ *
+ * A count of filled bars is a poor signal for anyone who does not distinguish
+ * the shades, and the words are the part that actually helps someone choose.
+ */
+.priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.bars {
+  display: flex;
+  gap: 3px;
+  flex: none;
+}
+
+.bar {
+  width: 7px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.bar[data-on] {
+  background: var(--acc);
+}
+
+.priorityLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  min-width: 0;
+}
+
+/*
+ * An empty state is an invitation, not a report. Nine screens rely on this
+ * template during a new user's first days.
+ */
+.empty {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 30px 22px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  color: var(--ink3);
+}
+
+.emptyTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.emptyBody {
+  margin: 0;
+  max-width: 280px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
+.emptyAction {
+  margin-top: 2px;
+}
+
+/*
+ * Section heads: small, upper, tracked — a label above a group rather than a
+ * heading competing with the screen title in the display face.
+ */
+.sectionTitle {
+  margin: 0 0 11px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.grid {
+  display: grid;
+  gap: 9px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }

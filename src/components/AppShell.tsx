@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { Avatar } from './display';
 import {
   BellIcon,
   GiftIcon,
@@ -29,9 +30,12 @@ const TABS = [
 export function AppShell({
   children,
   unreadCount = 0,
+  user,
 }: {
   children: ReactNode;
   unreadCount?: number;
+  /** Shown at the far right of the desktop bar; absent on a phone. */
+  user?: { name: string; avatarUrl?: string | null };
 }) {
   const pathname = usePathname();
 
@@ -40,9 +44,6 @@ export function AppShell({
       <div className={styles.body}>
         <nav className={styles.nav} aria-label="Navigation principale">
           <Link href="/app" className={styles.brand}>
-            <span className={styles.brandMark} aria-hidden>
-              K
-            </span>
             Kado
           </Link>
 
@@ -72,6 +73,13 @@ export function AppShell({
               </Link>
             );
           })}
+
+          {user && (
+            <Link href="/profile" className={styles.navUser}>
+              {user.name}
+              <Avatar name={user.name} url={user.avatarUrl} size={32} />
+            </Link>
+          )}
         </nav>
 
         <main className={styles.main}>

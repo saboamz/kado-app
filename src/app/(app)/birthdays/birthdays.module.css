@@ -14,6 +14,7 @@
 }
 
 .name {
+  font-family: var(--font-display);
   display: block;
   font-size: 15px;
   font-weight: 600;
@@ -23,7 +24,6 @@
 .lists {
   display: block;
   margin-top: 2px;
-  font-family: var(--font-mono);
   font-size: 11.5px;
-  color: var(--fg-subtle);
+  color: var(--ink3);
 }

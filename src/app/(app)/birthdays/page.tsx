@@ -105,7 +105,6 @@ function PersonRow({
     <CardLink href={`/u/${person.id}`} className={styles.row}>
       <Avatar
         name={person.name}
-        color={person.avatarColor}
         url={person.avatarUrl}
         size={44}
       />

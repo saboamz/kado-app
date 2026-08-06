@@ -39,7 +39,7 @@ test('friends coordinate in the secret chat', async ({ page }) => {
   await signIn(page, scenario.friendEmail);
   await page.goto(`/gifts/${scenario.potGiftId}`);
 
-  await expect(page.getByRole('heading', { name: 'Salon privé' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Discussion secrète' })).toBeVisible();
   await expect(page.getByText('Aucun message')).toBeVisible();
 
   await page.getByLabel('Votre message').fill('Je peux mettre 50 €.');
@@ -73,14 +73,14 @@ test('the owner sees no chat and none of its contents', async ({ page }) => {
 
   // No room, and no hint that a room exists.
   await expect(
-    page.getByRole('heading', { name: 'Salon privé' }),
+    page.getByRole('region', { name: 'Discussion secrète' }),
   ).toHaveCount(0);
   await expect(page.getByLabel('Votre message')).toHaveCount(0);
 
   // And not a word of what was said.
   const body = await page.locator('body').innerText();
   expect(body).not.toContain('On lui offre ça ensemble.');
-  expect(body).not.toContain('Salon privé');
+  expect(body).not.toContain('Discussion secrète');
 });
 
 test('an author can delete their own message but not another’s', async ({
@@ -122,5 +122,5 @@ test('the chat is available on ordinary gifts too', async ({ page }) => {
   await page.goto(`/gifts/${scenario.freeGiftId}`);
 
   // Coordination is not only for pots: two people may still want to agree.
-  await expect(page.getByRole('heading', { name: 'Salon privé' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Discussion secrète' })).toBeVisible();
 });

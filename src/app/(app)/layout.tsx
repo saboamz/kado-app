@@ -14,9 +14,24 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
-  const unreadCount = await db.notification.count({
-    where: { userId: user.id, read: false },
-  });
 
-  return <AppShell unreadCount={unreadCount}>{children}</AppShell>;
+  // The avatar is read here rather than added to SessionUser: getCurrentUser
+  // runs on every request under this layout, and the desktop bar is the only
+  // thing that needs the photo.
+  const [unreadCount, profile] = await Promise.all([
+    db.notification.count({ where: { userId: user.id, read: false } }),
+    db.user.findUnique({
+      where: { id: user.id },
+      select: { avatarUrl: true },
+    }),
+  ]);
+
+  return (
+    <AppShell
+      unreadCount={unreadCount}
+      user={{ name: user.name, avatarUrl: profile?.avatarUrl ?? null }}
+    >
+      {children}
+    </AppShell>
+  );
 }
