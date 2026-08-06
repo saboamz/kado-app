@@ -50,6 +50,33 @@ const ALLOWED = new Set([
  */
 const SECRET_QUERY = /\b(?:db|prisma|tx)\s*\.\s*(reservation|potContribution)\s*\./;
 
+/**
+ * The same reach, one level down: a secret table pulled in as a NESTED
+ * relation.
+ *
+ * SECRET_QUERY only sees a query rooted at the client, so
+ * `db.giftList.findMany({ include: { gifts: { select: { reservation: … } } } })`
+ * slipped past it — which is precisely how the list index came to load an
+ * owner's reservations and discard them afterwards. Every behavioural test
+ * stayed green, because the rows never reached the response; the leak was that
+ * they had been fetched at all, one careless spread away from it.
+ *
+ * So nesting is matched on its own terms, and gifts.ts is allowlisted for it
+ * with the condition stated below and asserted further down.
+ */
+const NESTED_SECRET = /\b(reservation|contributions|potContribution)\s*:\s*\{/;
+
+/**
+ * gifts.ts may name `reservation` inside an include for ONE reason: the list
+ * index counts reservations for a friend. It must do so through
+ * listInclude(relation), which omits the whole gifts relation for an owner —
+ * not by selecting the rows and dropping them later.
+ *
+ * secrecy.ts is here because giftInclude() is the canonical statement of that
+ * rule; it names the tables in an include and nowhere else.
+ */
+const NESTED_ALLOWED = new Set(['src/lib/gifts.ts', 'src/lib/secrecy.ts']);
+
 function sourceFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const path = join(dir, entry);
@@ -104,6 +131,49 @@ describe('reach of the secret tables', () => {
       source.indexOf('});', source.indexOf('db.reservation.findMany')),
     );
     expect(query).toContain('reserverId: viewerId');
+  });
+
+  it('is limited to the allowlist when the table is nested in an include', () => {
+    const nested = sourceFiles('src')
+      .filter((path) => NESTED_SECRET.test(readFileSync(path, 'utf8')))
+      .map((path) => path.split(/[\\/]/).join('/'))
+      .filter((path) => !NESTED_ALLOWED.has(path));
+
+    expect(nested).toEqual([]);
+  });
+
+  it('would notice a secret table nested inside an include', () => {
+    // Guards the guard, as above: a nesting pattern that matched nothing would
+    // make the assertion before it vacuously green — which is the state this
+    // whole pair was added to end.
+    expect(
+      NESTED_SECRET.test('gifts: { select: { reservation: { select: { id: true } } } }'),
+    ).toBe(true);
+    expect(NESTED_SECRET.test('include: { contributions: { select: {} } }')).toBe(true);
+    expect(NESTED_SECRET.test('include: { owner: { select: { id: true } } }')).toBe(false);
+  });
+
+  it('keeps the list index from selecting reservations for an owner', () => {
+    // gifts.ts holds the nested privilege only on the terms in the comment on
+    // NESTED_ALLOWED: the gifts relation is selected for a friend and omitted
+    // for an owner. A version that selected it unconditionally and filtered
+    // afterwards would satisfy every behavioural test in list-secrecy.test.ts,
+    // so the shape is asserted here.
+    const source = readFileSync('src/lib/gifts.ts', 'utf8');
+    const include = source.slice(
+      source.indexOf('export function listInclude'),
+      source.indexOf('export async function getListsForViewer'),
+    );
+
+    expect(include).toContain("relation === 'owner'");
+    // The owner must be returned BEFORE the gifts relation carrying
+    // `reservation` is ever added — that ordering is what makes the omission
+    // structural rather than a filter applied afterwards. Anchored on the
+    // reservation select itself, since `_count: { select: { gifts: true } }`
+    // also contains the substring "gifts:" and is not the relation at issue.
+    const reservationSelect = include.search(/gifts\s*:\s*\{\s*select\s*:\s*\{\s*reservation/);
+    expect(reservationSelect).toBeGreaterThan(-1);
+    expect(include.indexOf("relation === 'owner'")).toBeLessThan(reservationSelect);
   });
 
   it('has an allowlist that is still real', () => {
