@@ -4,6 +4,7 @@ import { normalizeUrl, priceBand, titleKey, urlHash } from '../src/lib/catalogue
 import { CF_READY_THRESHOLD } from '../src/lib/cf';
 import { categoriesForInterest } from '../src/lib/taxonomy';
 import { WEIGHTS } from '../src/lib/events';
+import { loginSchema } from '../src/lib/validation';
 
 /**
  * Synthetic demo data, deliberately kept BELOW the CF threshold.
@@ -41,6 +42,10 @@ const rnd = () => {
   state = (state * 1664525 + 1013904223) % 4294967296;
   return state / 4294967296;
 };
+/** Strips accents so the generated address passes the login validator. */
+const slugifyName = (name: string) =>
+  name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
 const pick = <T>(items: readonly T[]): T => items[Math.floor(rnd() * items.length)]!;
 const int = (min: number, max: number) => min + Math.floor(rnd() * (max - min + 1));
 
@@ -217,7 +222,11 @@ async function main() {
 
     const user = await db.user.create({
       data: {
-        email: `${first.toLowerCase()}${i}@synth.kado.app`,
+        // De-accented: the login validator rejects accented characters in an
+        // address, so `léa1@…` created an account that could never sign in —
+        // 11 of 40 on the first run. The row was valid, the form refused it
+        // before the password was ever checked.
+        email: `${slugifyName(first)}${i}@synth.kado.app`,
         passwordHash,
         name: `${first} ${last}`,
         bio: `${labels.join(', ')}.`,
@@ -422,6 +431,26 @@ async function main() {
   console.log(`${events.length} événements`);
 
   // ── The assertion this whole script is shaped around ──
+  // Every generated account must actually be able to sign in. A dataset whose
+  // logins are refused by the form is worse than no dataset: the rows look
+  // right in the database and the app rejects them, which sends you hunting in
+  // the wrong place. Found the hard way — 11 of 40 accounts on the first run.
+  const created = await db.user.findMany({
+    where: { email: { endsWith: '@synth.kado.app' } },
+    select: { email: true },
+  });
+  const unusable = created.filter(
+    (u) => !loginSchema.safeParse({ email: u.email, password: DEMO_PASSWORD }).success,
+  );
+  if (unusable.length > 0) {
+    throw new Error(
+      `${unusable.length} comptes générés ne passent pas la validation de connexion : ` +
+        `${unusable.slice(0, 5).map((u) => u.email).join(', ')}. ` +
+        `Ils existent en base mais le formulaire les refuse.`,
+    );
+  }
+  console.log(`${created.length} comptes vérifiés connectables`);
+
   const gifting = await db.giftEvent.count({
     where: { kind: { in: ['reserve', 'purchase', 'contribute'] }, productId: { not: null } },
   });
