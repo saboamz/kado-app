@@ -1,20 +1,25 @@
 /*
- * One layout, two shapes.
+ * One layout, two shapes — ported from the Claude Design system.
  *
  * Phone: content fills the screen with a fixed bottom tab bar, the way a
- * native app behaves. Desktop: the same navigation becomes a sidebar and the
- * content column is capped so lines stay readable.
+ * native app behaves. Desktop: the same five destinations move to a bar
+ * across the TOP, beside the wordmark, and the content column is capped so
+ * lines stay readable.
  *
- * The breakpoint is 900px — below that a sidebar would eat too much of the
- * viewport to leave a usable content column.
+ * The design chose a top bar over the previous sidebar: on a wishlist the
+ * content is short and wide-ish (cards, rows of people), so a 236px rail took
+ * width from the thing being read to display five links that fit in 400px.
+ *
+ * The breakpoint is 900px, as before.
  */
 .shell {
   min-height: 100dvh;
-  background: var(--bg-page);
+  background: var(--canvas);
 }
 
 .body {
   display: flex;
+  flex-direction: column;
   min-height: 100dvh;
 }
 
@@ -26,9 +31,8 @@
   display: flex;
   align-items: stretch;
   gap: 2px;
-  padding: 6px 6px max(6px, env(safe-area-inset-bottom));
-  background: var(--glass);
-  backdrop-filter: blur(20px);
+  padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+  background: var(--card);
   border-top: 1px solid var(--line);
 }
 
@@ -37,45 +41,54 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
+  gap: 5px;
+  padding: 6px 2px 4px;
+  border-radius: 10px;
   min-height: 52px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  color: var(--fg-subtle);
-  font-size: 10.5px;
+  color: var(--ink3);
+  font-size: 10px;
   font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  text-align: center;
   text-decoration: none;
   transition:
-    color 0.16s,
-    background 0.16s;
+    color 0.16s ease,
+    background 0.16s ease;
 }
 
+.navItem:hover {
+  text-decoration: none;
+}
+
+/* The active destination takes the action colour — on a phone the tab bar is
+   the only persistent orientation cue there is. */
 .navItem[aria-current='page'] {
-  color: var(--fg);
+  color: var(--acc);
+  font-weight: 600;
 }
 
 .navIcon {
   position: relative;
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
 }
 
 .navBadge {
   position: absolute;
   top: -6px;
-  left: 12px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  right: -8px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
   border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 10px;
+  background: var(--acc);
+  color: var(--acc-on);
+  font-size: 9px;
   font-weight: 700;
-  line-height: 16px;
+  line-height: 15px;
   text-align: center;
 }
 
@@ -88,116 +101,103 @@
 
 .container {
   width: 100%;
-  max-width: 780px;
+  max-width: 760px;
   margin: 0 auto;
   padding: var(--gutter);
-}
-
-.desktopOnly {
-  display: none;
-}
-
-@media (min-width: 900px) {
-  .nav {
-    position: sticky;
-    inset: 0 auto 0 0;
-    top: 0;
-    align-self: flex-start;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-    width: 236px;
-    height: 100dvh;
-    padding: 20px 12px;
-    border-top: 0;
-    border-right: 1px solid var(--line);
-    background: var(--bg);
-    backdrop-filter: none;
-  }
-
-  .navItem {
-    flex: none;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    min-height: 44px;
-    padding: 0 12px;
-    border-radius: var(--radius);
-    font-size: 14.5px;
-  }
-
-  /* The badge leaves the icon's stacking context and sits inline instead. */
-  .navIcon {
-    position: static;
-    overflow: visible;
-  }
-
-  .navItem:hover {
-    background: var(--surface);
-    color: var(--fg);
-  }
-
-  .navItem[aria-current='page'] {
-    background: var(--surface);
-  }
-
-  .navBadge {
-    position: static;
-    transform: none;
-    margin-left: auto;
-    align-self: center;
-  }
-
-  .main {
-    padding-bottom: 0;
-    display: flex;
-    justify-content: center;
-  }
-
-  .container {
-    padding: 32px var(--gutter) 64px;
-    /* Cap the column so long lines stay readable on a wide monitor. */
-    max-width: 920px;
-  }
-
-  .desktopOnly {
-    display: block;
-  }
 }
 
 .brand {
   display: none;
 }
 
+.navUser {
+  display: none;
+}
+
 @media (min-width: 900px) {
+  .body {
+    display: block;
+  }
+
+  .nav {
+    position: sticky;
+    inset: 0 0 auto 0;
+    top: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    height: 64px;
+    padding: 0 32px;
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .navItem {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 9px 13px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    text-align: left;
+  }
+
+  .navItem[aria-current='page'] {
+    background: var(--acc-bg);
+  }
+
+  .navItem:hover {
+    color: var(--ink);
+  }
+
+  .navItem[aria-current='page']:hover {
+    color: var(--acc);
+  }
+
+  .navIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .main {
+    padding-bottom: 0;
+  }
+
+  .container {
+    max-width: 1000px;
+    padding: 38px var(--gutter) 64px;
+  }
+
   .brand {
+    display: block;
+    margin-right: 8px;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .brand:hover {
+    text-decoration: none;
+  }
+
+  /* Pushed to the far right, opposite the wordmark. */
+  .navUser {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 12px 18px;
-    font-weight: 700;
-    font-size: 17px;
-    color: var(--fg);
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--ink2);
     text-decoration: none;
-    letter-spacing: -0.01em;
   }
 
-  .brandMark {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 800;
-    font-size: 15px;
-  }
-
-  .navFooter {
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid var(--line);
+  .navUser:hover {
+    color: var(--ink);
+    text-decoration: none;
   }
 }

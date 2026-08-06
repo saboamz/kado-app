@@ -1,51 +1,57 @@
+/*
+ * The secret room, as a white card inside the ochre zone.
+ *
+ * The design gives the chat its own screen on a phone; here it stays inline
+ * on the gift page, which keeps a friend's coordination next to the thing
+ * being coordinated. The card treatment matches the pot and the reserve
+ * control so the three read as one region.
+ */
 .chat {
-  margin: 20px 0;
-  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--bg);
+  border-radius: 12px;
+  background: var(--card);
 }
 
 .heading {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 0 8px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--fg-subtle);
+  gap: 7px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-transform: none;
 }
 
 .intro {
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--fg-muted);
+  line-height: 1.45;
+  color: var(--ink2);
   text-wrap: pretty;
 }
 
 .empty {
-  margin: 0 0 16px;
-  padding: 16px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  font-size: 13.5px;
-  color: var(--fg-muted);
+  margin: 0;
+  padding: 18px 0;
+  font-size: 13px;
+  color: var(--ink3);
   text-align: center;
 }
 
 .messages {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 0 0 16px;
+  gap: 16px;
+  margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 420px;
-  overflow-y: auto;
 }
 
 .message {
@@ -54,23 +60,27 @@
   align-items: flex-start;
 }
 
+/* Your own messages mirror to the right, as in any chat. */
+.message[data-mine] {
+  flex-direction: row-reverse;
+}
+
 .bubble {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   min-width: 0;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  background: var(--surface);
+  max-width: 290px;
 }
 
 .message[data-mine] .bubble {
-  background: var(--accent-soft);
+  align-items: flex-end;
 }
 
 .meta {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 3px;
 }
 
 .author {
@@ -79,59 +89,77 @@
 }
 
 .time {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--fg-subtle);
+  font-size: 10.5px;
+  color: var(--ink3);
 }
 
 .body {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  text-wrap: pretty;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--card2);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
   overflow-wrap: anywhere;
-  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+
+.message[data-mine] .body {
+  background: var(--acc-bg);
 }
 
 .delete {
-  margin-top: 6px;
+  align-self: flex-start;
+  min-height: 32px;
   font-size: 11.5px;
-  color: var(--fg-subtle);
+  color: var(--ink3);
   text-decoration: underline;
 }
 
+.message[data-mine] .delete {
+  align-self: flex-end;
+}
+
 .delete:hover {
-  color: var(--fg);
+  color: var(--ink);
 }
 
 .compose {
   display: flex;
   gap: 8px;
   align-items: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid var(--line2);
 }
 
 .input {
   flex: 1;
   min-width: 0;
-  padding: 11px 13px;
-  border: 1px solid var(--line-strong);
+  min-height: 46px;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--card);
   font-size: 16px;
-  line-height: 1.45;
-  resize: vertical;
+  line-height: 1.5;
+  resize: none;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--acc);
+}
+
+.count {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink3);
 }
 
 .error {
-  margin: 12px 0 0;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-  font-size: 13px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--danger);
 }

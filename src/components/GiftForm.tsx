@@ -2,16 +2,20 @@
 
 import { useActionState } from 'react';
 import type { FormState } from '@/lib/gift-actions';
+import { PRIORITY_LABELS } from '@/lib/format';
 import { Field, TextareaField } from './Field';
 import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
 import styles from './forms.module.css';
 
-const PRIORITIES = [
-  { value: 1, stars: '★☆☆', label: 'Ce serait sympa' },
-  { value: 2, stars: '★★☆', label: "J'en ai envie" },
-  { value: 3, stars: '★★★', label: 'Coup de cœur' },
-];
+// Derived from the one label table, so the wording a person picks here is
+// literally the wording shown back to them on the gift. They used to be two
+// separate lists that had already drifted: level 2 read "J'en ai envie" in
+// this form and "J'en ai vraiment envie" everywhere else.
+const PRIORITIES = [3, 2, 1].map((value) => ({
+  value,
+  label: PRIORITY_LABELS[value],
+}));
 
 export type GiftInitial = {
   name: string;
@@ -112,8 +116,10 @@ export function GiftForm({
                 value={p.value}
                 defaultChecked={(initial?.priority ?? 2) === p.value}
               />
-              <span className={styles.priorityStars} aria-hidden>
-                {p.stars}
+              <span className={styles.priorityBars} aria-hidden>
+                <span data-on={p.value >= 1 ? '' : undefined} />
+                <span data-on={p.value >= 2 ? '' : undefined} />
+                <span data-on={p.value >= 3 ? '' : undefined} />
               </span>
               <span className={styles.priorityText}>{p.label}</span>
             </label>

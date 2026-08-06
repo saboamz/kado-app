@@ -43,16 +43,18 @@ test.describe('the app frame adapts to the viewport', () => {
     expect(box.width).toBe(390);
   });
 
-  test('turns the navigation into a sidebar on a desktop', async ({ page }) => {
+  test('moves the navigation to the top on a desktop', async ({ page }) => {
     await signIn(page);
     await page.setViewportSize({ width: 1440, height: 900 });
 
     const nav = page.getByRole('navigation', { name: 'Navigation principale' });
     const box = (await nav.boundingBox())!;
-    // Down the left edge, narrow, and full height.
-    expect(box.x).toBe(0);
-    expect(box.width).toBeLessThan(280);
-    expect(box.height).toBeGreaterThan(600);
+    // Across the top edge, full width and short. The design moved this from a
+    // left sidebar: on a wishlist the content is short and wide-ish, so a
+    // 236px rail spent width on five links that fit comfortably in a bar.
+    expect(box.y).toBe(0);
+    expect(box.width).toBe(1440);
+    expect(box.height).toBeLessThan(120);
   });
 
   test('keeps every tap target comfortably large on a phone', async ({

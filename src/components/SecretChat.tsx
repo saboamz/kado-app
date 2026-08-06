@@ -37,11 +37,23 @@ export function SecretChat({
     });
   }
 
+  // How many people have actually spoken. The design titles the room by its
+  // participants ("Entre vous quatre") rather than by a generic label, which
+  // is also the honest count: nobody silent is claimed to be in on it.
+  const speakers = new Set(messages.map((m) => m.author.id)).size;
+
   return (
-    <section className={styles.chat} aria-labelledby="chat-heading">
-      <h2 id="chat-heading" className={styles.heading}>
+    <section className={styles.chat} aria-label="Discussion secrète">
+      {/*
+        The visible title counts the people who have actually spoken, as the
+        design does ("Entre vous 3"). The section keeps a fixed accessible
+        name so the room can be found — and, more importantly, asserted
+        absent on an owner's page — without depending on how many friends
+        happen to be talking.
+      */}
+      <h2 className={styles.heading}>
         <LockIcon size={14} />
-        Salon privé
+        {speakers > 1 ? `Entre vous ${speakers}` : 'Discussion secrète'}
       </h2>
 
       <p className={styles.intro}>
@@ -63,7 +75,6 @@ export function SecretChat({
             >
               <Avatar
                 name={message.author.name}
-                color={message.author.avatarColor}
                 url={message.author.avatarUrl}
                 size={30}
               />
@@ -121,6 +132,10 @@ export function SecretChat({
           {pending ? 'Envoi…' : 'Envoyer'}
         </Button>
       </div>
+
+      {/* The server rejects past 2000; showing the count avoids losing a long
+          message to an error after the fact. */}
+      <span className={styles.count}>{draft.length} / 2000</span>
 
       {error && (
         <p className={styles.error} role="alert">

@@ -69,11 +69,48 @@ export function initials(name: string): string {
   return parts.map((p) => p[0]?.toUpperCase() ?? '').join('') || '?';
 }
 
+/**
+ * The hue an avatar takes, derived from the name.
+ *
+ * The design pairs a light tint with dark text of the same hue — legible at
+ * 26px, and never fighting the two colours that carry meaning (turquoise for
+ * actions, ochre for the secret). The stored `avatarColor` could not be used
+ * for that: those are saturated hexes from the previous palette, one of them
+ * near-black, and a solid fill of an arbitrary hex is exactly what the design
+ * replaces.
+ *
+ * Derived rather than stored, so it needs no migration and stays stable for a
+ * given person: the same name always yields the same hue.
+ */
+export function avatarHue(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) % 360;
+  }
+  return hash;
+}
+
+/** Background and foreground for an avatar, as the design specifies them. */
+export function avatarTint(name: string): { bg: string; fg: string } {
+  const hue = avatarHue(name);
+  return {
+    bg: `oklch(0.88 0.07 ${hue})`,
+    fg: `oklch(0.34 0.11 ${hue})`,
+  };
+}
+
+/**
+ * Priority labels, in the design's wording.
+ *
+ * Written from the wisher's side — "Ça me ferait très plaisir" rather than a
+ * rank — because the person reading them is choosing what to buy for someone
+ * they like, not sorting a backlog.
+ */
 export const PRIORITY_LABELS = [
   '',
-  'Ce serait sympa',
-  "J'en ai vraiment envie",
-  'Coup de cœur',
+  'Une idée, sans plus',
+  "J'aimerais bien",
+  'Ça me ferait très plaisir',
 ] as const;
 
 export function priorityLabel(priority: number): string {

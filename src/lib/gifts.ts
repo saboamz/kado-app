@@ -9,7 +9,7 @@ export type ListView = {
   visibility: 'PRIVATE' | 'FRIENDS' | 'PUBLIC';
   isDefault: boolean;
   allowPots: boolean;
-  owner: { id: string; name: string; avatarColor: string };
+  owner: { id: string; name: string; avatarColor: string; avatarUrl: string | null };
   giftCount: number;
   /** Absent for owners: a count of taken gifts is itself a leak. */
   reservedCount?: number;
@@ -28,7 +28,11 @@ export async function getListForViewer(
 ): Promise<ListView | null> {
   const list = await db.giftList.findUnique({
     where: { id: listId },
-    include: { owner: { select: { id: true, name: true, avatarColor: true } } },
+    include: {
+      owner: {
+        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+      },
+    },
   });
   if (!list) return null;
 
@@ -68,7 +72,9 @@ type GiftReservationOnly = { reservation: { id: string } | null };
  */
 export function listInclude(relation: ViewerRelation) {
   const base = {
-    owner: { select: { id: true, name: true, avatarColor: true } },
+    owner: {
+        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+      },
     _count: { select: { gifts: true } },
   };
   if (relation === 'owner') return base;
@@ -109,7 +115,7 @@ function summarise(
     visibility: 'PRIVATE' | 'FRIENDS' | 'PUBLIC';
     isDefault: boolean;
     allowPots: boolean;
-    owner: { id: string; name: string; avatarColor: string };
+    owner: { id: string; name: string; avatarColor: string; avatarUrl: string | null };
   },
   _relation: ViewerRelation,
   giftCount: number,

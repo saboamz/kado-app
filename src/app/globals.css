@@ -1,77 +1,118 @@
 /*
- * Design tokens.
+ * Design tokens — ported from the Claude Design system
+ * ("Kado: Design system et wireframes", Kado.dc.html).
  *
- * Light and dark are both defined here; the app follows the system setting by
- * default and honours an explicit choice via data-theme on <html>.
+ * The design names its own tokens (--ink, --card, --acc, --sec); those names
+ * are canonical here so a value can be traced back to the source document.
+ * The older app names (--fg, --bg-page, --accent…) are kept as aliases at the
+ * bottom of each block, because ~20 stylesheets still reference them and
+ * renaming every call site at once would bury the design change in noise.
+ *
+ * ── The two colours that carry the product ─────────────────────────────────
+ *
+ * --acc (turquoise) is actions, and only actions.
+ * --sec (ochre) is the one thing the list owner will never see: a reservation,
+ * a pot, a secret chat. Nothing else may use it. That restraint is what lets
+ * a friend learn the code in one screen — ochre means "hidden from them".
  */
 :root {
-  --accent: #ff6a55;
-  --accent-hover: #e5543f;
-  --accent-soft: rgba(255, 106, 85, 0.1);
-  --accent-ink: #b3391f;
-  --accent-glow: rgba(255, 106, 85, 0.5);
+  --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
-  --bg: #ffffff;
-  --bg-page: #eceae7;
-  --surface: #f4f4f6;
-  --surface-hover: #ececf0;
-  --chip: #eaeaee;
-  --fg: #0b0b0c;
-  --fg-muted: #6b6b73;
-  --fg-subtle: #a1a1aa;
-  --line: rgba(0, 0, 0, 0.08);
-  --line-strong: rgba(0, 0, 0, 0.16);
-  --glass: rgba(255, 255, 255, 0.85);
-  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.25);
+  --canvas: oklch(0.945 0.006 40);
+  --bg: oklch(0.985 0.005 30);
+  --card: oklch(1 0 0);
+  --card2: oklch(0.968 0.008 45);
+  --ink: oklch(0.235 0.015 40);
+  --ink2: oklch(0.475 0.013 40);
+  --ink3: oklch(0.615 0.011 40);
+  --line: oklch(0.895 0.008 40);
+  --line2: oklch(0.935 0.006 40);
+  --acc: oklch(0.5 0.098 195);
+  --acc-on: oklch(0.99 0.01 195);
+  --acc-bg: oklch(0.955 0.03 195);
+  --sec: oklch(0.505 0.11 48);
+  --sec-on: oklch(0.99 0.01 48);
+  --sec-bg: oklch(0.96 0.032 55);
+  --danger: oklch(0.505 0.15 25);
+  --danger-bg: oklch(0.955 0.03 25);
 
-  --font-sans: var(--font-figtree), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+  --font-sans: var(--font-libre-franklin), Helvetica, Arial, sans-serif;
+  --font-display: var(--font-lora), Georgia, serif;
+  --font-mono: var(--mono);
 
-  --radius-sm: 10px;
-  --radius: 14px;
-  --radius-lg: 20px;
+  --radius-sm: 7px;
+  --radius: 11px;
+  --radius-lg: 16px;
 
   /* Fluid page gutter: tight on a phone, generous on a desktop. */
-  --gutter: clamp(16px, 4vw, 32px);
-  --tabbar-height: 64px;
+  --gutter: clamp(20px, 4vw, 40px);
+  --tabbar-height: 66px;
+
+  /* Aliases for stylesheets not yet migrated to the design's names. */
+  --bg-page: var(--canvas);
+  --surface: var(--card2);
+  --surface-hover: var(--line2);
+  --chip: var(--card2);
+  --fg: var(--ink);
+  --fg-muted: var(--ink2);
+  --fg-subtle: var(--ink3);
+  --line-strong: var(--line);
+  --accent: var(--acc);
+  --accent-hover: var(--acc);
+  --accent-soft: var(--acc-bg);
+  --accent-ink: var(--acc);
+  --glass: var(--card);
+  --shadow: 0 10px 30px -14px oklch(0.235 0.015 40 / 0.18);
 }
 
+/*
+ * Dark theme.
+ *
+ * Declared once and applied by both the media query and the explicit
+ * attribute, so "Système" and an explicit choice cannot drift apart.
+ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --accent-soft: rgba(255, 122, 102, 0.16);
-    --accent-ink: #ff9d8b;
-
-    --bg: #0b0b0d;
-    --bg-page: #08080a;
-    --surface: #17171a;
-    --surface-hover: #1e1e22;
-    --chip: #232328;
-    --fg: #f4f4f7;
-    --fg-muted: #9a9aa4;
-    --fg-subtle: #66666f;
-    --line: rgba(255, 255, 255, 0.1);
-    --line-strong: rgba(255, 255, 255, 0.18);
-    --glass: rgba(16, 16, 19, 0.82);
-    --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+    --canvas: oklch(0.145 0.008 40);
+    --bg: oklch(0.195 0.008 40);
+    --card: oklch(0.238 0.009 40);
+    --card2: oklch(0.278 0.01 40);
+    --ink: oklch(0.955 0.006 60);
+    --ink2: oklch(0.775 0.008 60);
+    --ink3: oklch(0.635 0.008 60);
+    --line: oklch(0.345 0.01 40);
+    --line2: oklch(0.3 0.01 40);
+    --acc: oklch(0.775 0.105 195);
+    --acc-on: oklch(0.185 0.025 195);
+    --acc-bg: oklch(0.3 0.042 195);
+    --sec: oklch(0.8 0.098 60);
+    --sec-on: oklch(0.19 0.025 55);
+    --sec-bg: oklch(0.3 0.038 55);
+    --danger: oklch(0.735 0.135 25);
+    --danger-bg: oklch(0.3 0.045 25);
+    --shadow: 0 10px 30px -14px oklch(0 0 0 / 0.5);
   }
 }
 
 :root[data-theme='dark'] {
-  --accent-soft: rgba(255, 122, 102, 0.16);
-  --accent-ink: #ff9d8b;
-
-  --bg: #0b0b0d;
-  --bg-page: #08080a;
-  --surface: #17171a;
-  --surface-hover: #1e1e22;
-  --chip: #232328;
-  --fg: #f4f4f7;
-  --fg-muted: #9a9aa4;
-  --fg-subtle: #66666f;
-  --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --glass: rgba(16, 16, 19, 0.82);
-  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  --canvas: oklch(0.145 0.008 40);
+  --bg: oklch(0.195 0.008 40);
+  --card: oklch(0.238 0.009 40);
+  --card2: oklch(0.278 0.01 40);
+  --ink: oklch(0.955 0.006 60);
+  --ink2: oklch(0.775 0.008 60);
+  --ink3: oklch(0.635 0.008 60);
+  --line: oklch(0.345 0.01 40);
+  --line2: oklch(0.3 0.01 40);
+  --acc: oklch(0.775 0.105 195);
+  --acc-on: oklch(0.185 0.025 195);
+  --acc-bg: oklch(0.3 0.042 195);
+  --sec: oklch(0.8 0.098 60);
+  --sec-on: oklch(0.19 0.025 55);
+  --sec-bg: oklch(0.3 0.038 55);
+  --danger: oklch(0.735 0.135 25);
+  --danger-bg: oklch(0.3 0.045 25);
+  --shadow: 0 10px 30px -14px oklch(0 0 0 / 0.5);
 }
 
 *,
@@ -82,17 +123,46 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Renders native controls (scrollbars, date pickers) in the matching theme.
+     Without it they stay light on a dark page. */
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme='light']) {
+    color-scheme: dark;
+  }
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
-  background: var(--bg-page);
-  color: var(--fg);
+  background: var(--canvas);
+  color: var(--ink);
   font-family: var(--font-sans);
   font-size: 16px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   /* Never let a wide child scroll the whole page sideways on a phone. */
   overflow-x: hidden;
+}
+
+/*
+ * Headings carry the display face by default, so a new page cannot ship a
+ * heading in the body font — the drift that flattens a type system one
+ * screen at a time.
+ */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 button {
@@ -102,13 +172,14 @@ button {
   border: 0;
   background: none;
   padding: 0;
+  text-align: left;
 }
 
 input,
 textarea,
 select {
   font: inherit;
-  color: inherit;
+  color: var(--ink);
 }
 
 img {
@@ -117,13 +188,24 @@ img {
 }
 
 a {
-  color: var(--accent);
+  color: var(--acc);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--acc);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Respect the system preference for reduced motion. */

@@ -39,7 +39,6 @@ export default async function ProfilePage() {
       <Card className={styles.identity}>
         <Avatar
           name={profile.name}
-          color={profile.avatarColor}
           url={profile.avatarUrl}
           size={72}
         />

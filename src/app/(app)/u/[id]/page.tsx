@@ -10,6 +10,7 @@ import {
 } from '@/components/display';
 import { GiftIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { ViewpointBanner } from '@/components/Viewpoint';
 import { db } from '@/lib/db';
 import {
   daysUntilBirthday,
@@ -65,12 +66,18 @@ export default async function PersonPage({
 
   return (
     <>
+      {/* You are never the owner here: /u/<your id> redirects to /profile. */}
+      <ViewpointBanner
+        relation={relation}
+        person={person}
+        what="le profil"
+      />
+
       <PageHeader title={person.name} back={{ href: '/app', label: 'Accueil' }} />
 
       <div className={styles.identity}>
         <Avatar
           name={person.name}
-          color={person.avatarColor}
           url={person.avatarUrl}
           size={64}
         />

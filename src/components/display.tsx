@@ -1,7 +1,7 @@
 import { UploadedImage } from './UploadedImage';
 import Link from 'next/link';
 import type { ComponentProps, ReactNode } from 'react';
-import { initials } from '@/lib/format';
+import { avatarTint, initials, priorityLabel } from '@/lib/format';
 import styles from './display.module.css';
 
 export function Card({
@@ -40,9 +40,19 @@ export function CardLink({
   );
 }
 
+/**
+ * A person, as a photo or as their initials.
+ *
+ * The tint is derived from the name rather than read from the stored
+ * `avatarColor`: the design pairs a light background with dark text of the
+ * same hue, and the stored values are saturated hexes from the previous
+ * palette (one of them near-black) that cannot carry dark text. Deriving keeps
+ * a person's colour stable without a migration. `color` is still accepted so a
+ * caller can override, but nothing does today.
+ */
 export function Avatar({
   name,
-  color = '#FF6A55',
+  color,
   size = 44,
   url,
 }: {
@@ -63,14 +73,17 @@ export function Avatar({
     );
   }
 
+  const tint = avatarTint(name);
+
   return (
     <span
       className={styles.avatar}
       style={{
         width: size,
         height: size,
-        background: color,
-        fontSize: Math.round(size * 0.38),
+        background: color ?? tint.bg,
+        color: color ? '#fff' : tint.fg,
+        fontSize: Math.round(size * 0.34),
       }}
       aria-hidden
     >
@@ -79,11 +92,17 @@ export function Avatar({
   );
 }
 
+/**
+ * `secret` is the ochre tone, and it is reserved for the one thing ochre
+ * means: a reservation the list owner will never see. `muted` is its
+ * counterpart for a gift taken by someone else — deliberately quieter, since
+ * it is not yours and not actionable.
+ */
 export function Badge({
   tone = 'neutral',
   children,
 }: {
-  tone?: 'neutral' | 'accent' | 'solid' | 'outline';
+  tone?: 'neutral' | 'accent' | 'solid' | 'outline' | 'secret' | 'muted';
   children: ReactNode;
 }) {
   const toneClass = {
@@ -91,20 +110,47 @@ export function Badge({
     accent: styles.badgeAccent,
     solid: styles.badgeSolid,
     outline: styles.badgeOutline,
+    secret: styles.badgeSecret,
+    muted: styles.badgeMuted,
   }[tone];
   return <span className={`${styles.badge} ${toneClass}`}>{children}</span>;
 }
 
-/** Priority as stars, with a text label for anyone not seeing them. */
-export function PriorityStars({ priority }: { priority: number }) {
+/**
+ * Priority: three bars and the words for them.
+ *
+ * The design's rule is that the bars are never shown alone — a filled-bar
+ * count is a poor signal for anyone who does not distinguish the shades, and
+ * "Ça me ferait très plaisir" is the part that actually helps someone choose.
+ * `compact` drops the visible label in dense list rows, where the accessible
+ * name still carries it.
+ */
+export function Priority({
+  priority,
+  compact = false,
+}: {
+  priority: number;
+  compact?: boolean;
+}) {
   const filled = Math.max(0, Math.min(3, priority));
+  const label = priorityLabel(filled);
+
   return (
-    <span className={styles.stars}>
-      <span aria-hidden>
-        {'★'.repeat(filled)}
-        {'☆'.repeat(3 - filled)}
+    <span className={styles.priority}>
+      <span className={styles.bars} aria-hidden>
+        {[1, 2, 3].map((n) => (
+          <span
+            key={n}
+            className={styles.bar}
+            data-on={n <= filled ? '' : undefined}
+          />
+        ))}
       </span>
-      <span className="srOnly">Priorité {filled} sur 3</span>
+      {compact ? (
+        <span className="srOnly">{label}</span>
+      ) : (
+        <span className={styles.priorityLabel}>{label}</span>
+      )}
     </span>
   );
 }

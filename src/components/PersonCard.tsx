@@ -30,7 +30,6 @@ export function PersonCard({ person }: { person: PersonResult }) {
       <Link href={`/u/${person.id}`} className={styles.identity}>
         <Avatar
           name={person.name}
-          color={person.avatarColor}
           url={person.avatarUrl}
           size={44}
         />

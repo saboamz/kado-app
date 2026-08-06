@@ -1,20 +1,27 @@
 import type { Metadata, Viewport } from 'next';
-import { Figtree, Roboto_Mono } from 'next/font/google';
+import { Libre_Franklin, Lora } from 'next/font/google';
 import { getCurrentUser } from '@/lib/session';
 import './globals.css';
 
 // Self-hosted by next/font: no request to Google at runtime, no layout shift.
-const figtree = Figtree({
+//
+// The pairing comes from the design system: Lora sets the name of anything —
+// a screen title, a list, a gift, a price — and Libre Franklin carries
+// everything else. Monospace is not loaded as a webfont at all: the design
+// reserves it for relative dates and technical markers, where the platform
+// stack is indistinguishable at 10–11px and cheaper.
+const libreFranklin = Libre_Franklin({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-figtree',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-libre-franklin',
   display: 'swap',
 });
 
-const robotoMono = Roboto_Mono({
+const lora = Lora({
   subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-roboto-mono',
+  weight: ['500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-lora',
   display: 'swap',
 });
 
@@ -29,8 +36,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#eceae7' },
-    { media: '(prefers-color-scheme: dark)', color: '#08080a' },
+    // Matches --canvas in globals.css for each theme.
+    { media: '(prefers-color-scheme: light)', color: '#eeeae5' },
+    { media: '(prefers-color-scheme: dark)', color: '#211f1d' },
   ],
 };
 
@@ -48,7 +56,7 @@ export default async function RootLayout({
     <html
       lang="fr"
       data-theme={theme}
-      className={`${figtree.variable} ${robotoMono.variable}`}
+      className={`${libreFranklin.variable} ${lora.variable}`}
     >
       <body>{children}</body>
     </html>

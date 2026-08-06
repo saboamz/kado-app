@@ -85,7 +85,6 @@ export default async function AppHomePage() {
                 <CardLink href={`/u/${b.id}`} plain className={styles.birthday}>
                   <Avatar
                     name={b.name}
-                    color={b.avatarColor}
                     url={b.avatarUrl}
                     size={40}
                   />
@@ -151,7 +150,6 @@ export default async function AppHomePage() {
                 <div className={styles.activityRow}>
                   <Avatar
                     name={list.owner.name}
-                    color={list.owner.avatarColor}
                     url={list.owner.avatarUrl}
                     size={40}
                   />

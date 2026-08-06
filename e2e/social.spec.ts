@@ -93,8 +93,11 @@ test('search finds a person by name', async ({ page }) => {
   // themselves, who is never returned in their own results.
   await page.getByLabel('Rechercher une personne').fill(scenario.tag);
   await expect(page.getByText(/2 résultats/)).toBeVisible();
+  // Scoped to the page: the desktop nav carries a link to the signed-in
+  // user's own profile, whose name is "Ami <tag>" in this scenario.
+  const results = page.getByRole('main');
   await expect(
-    page.getByRole('link', { name: new RegExp(`Ami ${scenario.tag}`) }),
+    results.getByRole('link', { name: new RegExp(`Ami ${scenario.tag}`) }),
   ).toHaveCount(0);
   await expect(
     page.getByRole('link', { name: new RegExp(`Propriétaire ${scenario.tag}`) }),
@@ -129,8 +132,12 @@ test('notifications arrive and can be cleared', async ({ page }) => {
   await signIn(page, scenario.ownerEmail);
 
   // The request shows as an unread notification, badged in the navigation.
+  // Target the badge by its accessible text: the nav also carries the signed-in
+  // user's name, which can itself contain the digit.
   const nav = page.getByRole('navigation', { name: 'Navigation principale' });
-  await expect(nav.getByText('1')).toBeVisible();
+  await expect(
+    nav.getByRole('link', { name: /notifications non lues/ }),
+  ).toBeVisible();
 
   await page.goto('/notifications');
   await expect(page.getByText(/souhaite devenir votre ami/)).toBeVisible();

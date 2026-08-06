@@ -41,7 +41,10 @@ test('the profile can be edited and the changes show on the profile page', async
   await page.getByRole('button', { name: 'Enregistrer' }).click();
 
   await page.waitForURL('**/profile');
-  await expect(page.getByText('Nom Modifié')).toBeVisible();
+  // The name now also appears in the desktop nav, so target the heading.
+  await expect(
+    page.getByRole('heading', { name: 'Nom Modifié' }),
+  ).toBeVisible();
   await expect(page.getByText('J’aime le café filtre.')).toBeVisible();
   await expect(
     page.getByRole('listitem').filter({ hasText: /^Café$/ }),
