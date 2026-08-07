@@ -65,7 +65,8 @@ export function GiftForm({
         type="url"
         inputMode="url"
         defaultValue={initial?.url ?? ''}
-        placeholder="Facultatif — la boutique sera devinée"
+        placeholder="Facultatif — collez le lien de la boutique"
+        hint="La boutique, la photo et le prix seront repris de la page si nous arrivons à la lire."
         error={state.errors?.url}
       />
 

@@ -7,6 +7,7 @@ import { logEvent } from './events';
 import { deleteUpload, storeUpload } from './uploads';
 import { parseMoney } from './format';
 import { requireUser } from './session';
+import { linkGiftToProduct } from './gift-product-link';
 import { fieldErrors, giftSchema, type GiftInput } from './validation';
 
 export type FormState = { errors?: Record<string, string> };
@@ -51,6 +52,9 @@ async function requireOwnedGift(giftId: string) {
       id: true,
       listId: true,
       imageUrl: true,
+      // Compared against the submitted link, to know whether the product
+      // this wish points at has changed.
+      url: true,
       list: { select: { ownerId: true } },
     },
   });
@@ -146,11 +150,31 @@ export async function createGift(
     },
   });
 
+  /*
+   * Resolve the link to a catalogue row, before the event is written.
+   *
+   * The event carries productId, and it is the recommender's training set: an
+   * event with a null product is invisible to collaborative filtering
+   * forever, because the log is append-only and nothing backfills it. So the
+   * ordering matters — link first, then log.
+   *
+   * Awaited rather than fired and forgotten: a serverless function is frozen
+   * the moment its response is returned, so a detached promise here would be
+   * killed mid-request and the link would never be written. The gift is
+   * already saved, and this never throws, so the cost of waiting is a slower
+   * save — not a lost one.
+   */
+  const productId = await linkGiftToProduct(
+    gift.id,
+    gift.url,
+    gift.category,
+  );
+
   await logEvent({
     actorId: user.id,
     kind: 'add_wish',
     giftId: gift.id,
-    productId: gift.productId,
+    productId,
     priceCents: gift.priceCents,
     categoryId: gift.category,
   });
@@ -175,13 +199,31 @@ export async function updateGift(
   const image = await resolveImage(formData, 'image', gift.imageUrl);
   if (image.error) return { errors: { image: image.error } };
 
+  const next = giftData(parsed.data);
+
+  /*
+   * A changed link points at a different thing, so the old product row is no
+   * longer what this wish means. Clearing it lets the resolver below attach
+   * the right one — its update is scoped to `productId: null`, so without
+   * this the stale link would simply survive.
+   *
+   * An unchanged link keeps its product: re-resolving on every edit would
+   * fetch the merchant again for a title tweak.
+   */
+  const urlChanged = next.url !== gift.url;
+
   await db.gift.update({
     where: { id: giftId },
     data: {
-      ...giftData(parsed.data),
+      ...next,
       ...(image.url !== undefined ? { imageUrl: image.url } : {}),
+      ...(urlChanged ? { productId: null } : {}),
     },
   });
+
+  if (urlChanged) {
+    await linkGiftToProduct(giftId, next.url, next.category);
+  }
 
   revalidatePath(`/lists/${gift.listId}`);
   revalidatePath(`/gifts/${giftId}`);
