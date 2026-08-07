@@ -86,7 +86,7 @@ export async function createScenario(): Promise<Scenario> {
         create: [
           { name: `Libre ${tag}`, priceCents: 4200 },
           { name: `Pris ${tag}`, priceCents: 6800 },
-          { name: `Ensemble ${tag}`, priceCents: 50000, isPot: true },
+          { name: `Ensemble ${tag}`, priceCents: 50000 },
         ],
       },
     },
@@ -99,6 +99,18 @@ export async function createScenario(): Promise<Scenario> {
 
   await db.reservation.create({
     data: { giftId: taken.id, reserverId: other.id },
+  });
+
+  // The "Ensemble" gift is a pot because `other` reserved it and opened it to
+  // the rest — the model now. The list's owner never ticked a box, and the
+  // specs that check what they can see rely on that being the only route in.
+  await db.reservation.create({
+    data: {
+      giftId: pot.id,
+      reserverId: other.id,
+      openedToOthers: true,
+      openedAt: new Date(),
+    },
   });
 
   return {

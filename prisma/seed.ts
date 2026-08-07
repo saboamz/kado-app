@@ -119,7 +119,6 @@ async function main() {
             url: 'https://www.apple.com/fr/macbook-air/',
             category: 'Tech',
             priority: 3,
-            isPot: true,
           },
           {
             name: 'Vase en grès émaillé',
@@ -193,7 +192,6 @@ async function main() {
             priceCents: 124000,
             category: 'Voyage',
             priority: 2,
-            isPot: true,
           },
         ],
       },
@@ -212,6 +210,18 @@ async function main() {
   });
   await db.reservation.create({
     data: { giftId: chemex.id, reserverId: emma.id },
+  });
+
+  // The MacBook is a pot because Thomas reserved it and then opened it to the
+  // others — the model now, rather than a flag the owner set.
+  await db.reservation.create({
+    data: {
+      giftId: macbook.id,
+      reserverId: thomas.id,
+      openedToOthers: true,
+      openedAt: daysAgo(3),
+      createdAt: daysAgo(3),
+    },
   });
 
   await db.potContribution.createMany({

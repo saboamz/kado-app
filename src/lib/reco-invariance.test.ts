@@ -187,7 +187,7 @@ describe.each(IMPLEMENTED_TIERS)('tier %s is blind to other peoples reservations
     // Same reasoning: another person's list, so the exclusion under test is
     // the pot contribution and not the recipient's own wish.
     const otherList = await makeList(ctx.outsider);
-    const pot = await makeGift(otherList.id, { isPot: true, priceCents: 10000 });
+    const pot = await makeGift(otherList.id, { priceCents: 10000 });
     await db.gift.update({ where: { id: pot.id }, data: { productId: target } });
     await db.potContribution.create({
       data: { giftId: pot.id, contributorId: ctx.outsider, amountCents: 5000 },

@@ -147,7 +147,9 @@ export default async function ListPage({
               </div>
 
               <div className={styles.flags}>
-                {gift.isPot && <Badge tone="solid">Cagnotte</Badge>}
+                {gift.reservation?.state === 'open' && (
+                  <Badge tone="solid">Cagnotte</Badge>
+                )}
                 {/*
                   gift.reservation is undefined for the owner — not "free",
                   undefined. There is nothing here to render for them.

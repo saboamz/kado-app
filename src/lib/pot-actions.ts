@@ -20,17 +20,20 @@ async function requirePotGift(giftId: string) {
     where: { id: giftId },
     select: {
       id: true,
-      isPot: true,
       priceCents: true,
       listId: true,
       productId: true,
       category: true,
       list: { select: { ownerId: true, allowPots: true } },
+      // A pot exists because the holder opened their reservation to others.
+      reservation: { select: { openedToOthers: true } },
     },
   });
   if (!gift) return { error: 'Cadeau introuvable' } as const;
-  if (!gift.isPot) {
-    return { error: "Ce cadeau n'est pas collaboratif." } as const;
+  if (!gift.reservation?.openedToOthers) {
+    return {
+      error: "Ce cadeau n'est pas ouvert à plusieurs.",
+    } as const;
   }
 
   const relation = await relationTo(user.id, gift.list.ownerId);

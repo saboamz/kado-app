@@ -114,3 +114,39 @@ describe('list validation', () => {
     ).toBe(false);
   });
 });
+
+describe('the category is a closed list', () => {
+  const base = {
+    name: 'Casque',
+    description: null,
+    price: '',
+    url: '',
+    merchant: '',
+    priority: 2,
+  };
+
+  it('accepts a canonical category', () => {
+    for (const category of ['Maison', 'Jardin', 'Bijoux', 'Autre']) {
+      expect(giftSchema.safeParse({ ...base, category }).success).toBe(true);
+    }
+  });
+
+  it('refuses anything off the list', () => {
+    // The reason the field stopped being free text: the recommender matches
+    // on this value, so "Tech", "tech" and "High-tech" were three buckets
+    // nobody shared, and content_facet quietly found less as the catalogue
+    // grew. Every spelling that is not canonical is refused at the door.
+    for (const category of ['tech', 'High-tech', 'Cuisine', 'inventé']) {
+      const parsed = giftSchema.safeParse({ ...base, category });
+      expect(parsed.success).toBe(false);
+    }
+  });
+
+  it('still allows no category at all', () => {
+    // "Un week-end en Islande" has no obvious bucket, and forcing a choice
+    // would push people into picking one at random — worse than none.
+    for (const category of ['', null, undefined]) {
+      expect(giftSchema.safeParse({ ...base, category }).success).toBe(true);
+    }
+  });
+});

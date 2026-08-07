@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { releaseGift, reserveGift } from '@/lib/reservation-actions';
+import {
+  closeToOthers,
+  openToOthers,
+  releaseGift,
+  reserveGift,
+} from '@/lib/reservation-actions';
 import type { ReservationView } from '@/lib/secrecy';
 import { Button } from './Button';
 import styles from './reserve.module.css';
@@ -48,18 +53,60 @@ export function ReserveButton({
     return (
       <div className={styles.wrap}>
         <Button
-          variant="secondary"
           block
           disabled={pending}
           aria-busy={pending}
-          onClick={() => run(() => releaseGift(giftId))}
+          onClick={() => run(() => openToOthers(giftId))}
         >
-          {pending ? 'Annulation…' : 'Annuler ma réservation'}
+          {pending ? 'Ouverture…' : 'Inviter d’autres à participer'}
         </Button>
         <p className={styles.note}>
-          Vous avez réservé ce cadeau. Personne d&rsquo;autre ne peut le prendre,
-          et le propriétaire n&rsquo;en sait rien.
+          Vous avez réservé ce cadeau. Si le prix est élevé, ouvrez-le aux
+          autres invités : chacun mettra ce qu&rsquo;il veut, et le propriétaire
+          n&rsquo;en saura toujours rien.
         </p>
+        <button
+          type="button"
+          className={styles.secondaryAction}
+          disabled={pending}
+          onClick={() => run(() => releaseGift(giftId))}
+        >
+          Annuler ma réservation
+        </button>
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  /*
+   * Open to everyone who can see the list.
+   *
+   * The person who opened it gets the option to close it again; the others
+   * only ever see the pot, which is rendered separately. Neither of them is
+   * told who else has joined — a count, never names.
+   */
+  if (reservation.state === 'open') {
+    return (
+      <div className={styles.wrap}>
+        <p className={styles.note}>
+          {reservation.mine
+            ? 'Vous avez ouvert ce cadeau aux autres invités. Participez à la cagnotte ci-dessous.'
+            : 'Un proche a ouvert ce cadeau à plusieurs. Vous pouvez participer à la cagnotte ci-dessous.'}
+        </p>
+        {reservation.mine && (
+          <button
+            type="button"
+            className={styles.secondaryAction}
+            disabled={pending}
+            onClick={() => run(() => closeToOthers(giftId))}
+          >
+            Le reprendre pour moi seul
+          </button>
+        )}
         {error && (
           <p className={styles.error} role="alert">
             {error}

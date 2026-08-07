@@ -14,16 +14,45 @@
  * under; interests are the fine-grained things people actually declare.
  */
 
-/** Canonical product categories. Kept small deliberately. */
+/**
+ * Canonical product categories. The closed list — nothing else is accepted.
+ *
+ * ── Why a fixed list, and why this one ─────────────────────────────────────
+ *
+ * The field used to be free text. Two people filing the same kind of thing
+ * would write "Tech", "tech" and "High-tech", and the recommender's
+ * content_facet tier matches on this value: every spelling is a bucket nobody
+ * else falls into, so the tier finds less and less as the catalogue grows,
+ * silently. A closed list is what makes the data worth keeping.
+ *
+ * The original eight are all still here, in their original spelling, so
+ * nothing already stored becomes invalid. The rest fill the gaps that forced
+ * people into "Maison" for a plant, a drill and a board game alike.
+ *
+ * Order is deliberate: related things sit together, so the dropdown reads as
+ * groups rather than as an alphabetical wall. "Autre" is last and is the
+ * escape hatch — without one, anything unclassifiable gets filed under
+ * whatever happens to be first, which is worse than an honest "Autre".
+ */
 export const CATEGORIES = [
   'Maison',
-  'Sport',
+  'Jardin',
+  'Bricolage',
   'Tech',
-  'Voyage',
-  'Culture',
-  'Mode',
-  'Gourmandise',
+  'Musique',
+  'Jeux',
+  'Sport',
   'Bien-être',
+  'Beauté',
+  'Mode',
+  'Bijoux',
+  'Culture',
+  'Papeterie',
+  'Gourmandise',
+  'Voyage',
+  'Enfants',
+  'Animaux',
+  'Autre',
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -44,9 +73,11 @@ const INTEREST_TO_CATEGORIES: Record<string, Category[]> = {
   poterie: ['Maison'],
   design: ['Maison', 'Mode'],
   décoration: ['Maison'],
-  jardinage: ['Maison'],
-  plantes: ['Maison'],
-  bricolage: ['Maison'],
+  jardinage: ['Jardin'],
+  plantes: ['Jardin', 'Maison'],
+  potager: ['Jardin'],
+  bricolage: ['Bricolage'],
+  menuiserie: ['Bricolage'],
   randonnée: ['Sport', 'Voyage'],
   course: ['Sport'],
   running: ['Sport'],
@@ -57,20 +88,36 @@ const INTEREST_TO_CATEGORIES: Record<string, Category[]> = {
   natation: ['Sport'],
   ski: ['Sport', 'Voyage'],
   football: ['Sport'],
-  musique: ['Culture', 'Tech'],
+  musique: ['Musique', 'Culture'],
+  vinyles: ['Musique'],
+  guitare: ['Musique'],
+  piano: ['Musique'],
   lecture: ['Culture'],
   livres: ['Culture'],
   cinéma: ['Culture'],
   photographie: ['Culture', 'Tech'],
-  'jeux vidéo': ['Tech', 'Culture'],
+  'jeux vidéo': ['Jeux', 'Tech'],
+  'jeux de société': ['Jeux'],
+  puzzle: ['Jeux'],
   informatique: ['Tech'],
   voyage: ['Voyage'],
   camping: ['Voyage', 'Sport'],
   mode: ['Mode'],
-  bijoux: ['Mode'],
-  parfum: ['Bien-être', 'Mode'],
-  'soins du visage': ['Bien-être'],
+  bijoux: ['Bijoux', 'Mode'],
+  montres: ['Bijoux'],
+  parfum: ['Beauté', 'Bien-être'],
+  maquillage: ['Beauté'],
+  'soins du visage': ['Beauté', 'Bien-être'],
   méditation: ['Bien-être'],
+  écriture: ['Papeterie', 'Culture'],
+  papeterie: ['Papeterie'],
+  calligraphie: ['Papeterie'],
+  dessin: ['Papeterie', 'Culture'],
+  chats: ['Animaux'],
+  chiens: ['Animaux'],
+  animaux: ['Animaux'],
+  enfants: ['Enfants'],
+  bébé: ['Enfants'],
 };
 
 /**
@@ -124,4 +171,11 @@ export function categoriesForInterests(labels: string[]): Category[] {
  */
 export function unmappedInterests(labels: string[]): string[] {
   return [...new Set(labels.filter((l) => categoriesForInterest(l).length === 0))];
+}
+
+/** Whether a string is one of the canonical categories. */
+export function isCategory(value: unknown): value is Category {
+  return (
+    typeof value === 'string' && (CATEGORIES as readonly string[]).includes(value)
+  );
 }

@@ -122,11 +122,41 @@ test('the owner cannot contribute to their own pot', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Modifier' })).toBeVisible();
 });
 
-test('a collaborative gift is not reservable', async ({ page }) => {
+test('an already-open gift is joined, not reserved', async ({ page }) => {
   await signIn(page, scenario.friendEmail);
   await page.goto(`/gifts/${scenario.potGiftId}`);
 
-  // Money goes in the pot; there is no single person who "takes" it.
+  // Somebody else holds this one and opened it. There is nothing left to
+  // reserve — the way in is the pot.
   await expect(page.getByRole('button', { name: /réserve/i })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Cagnotte' })).toBeVisible();
+});
+
+test('a friend reserves a gift, then opens it to the others', async ({
+  page,
+}) => {
+  // The decision the owner used to make when they added the wish, now taken
+  // by the person who actually knows the price and who else is interested.
+  await signIn(page, scenario.friendEmail);
+  await page.goto(`/gifts/${scenario.freeGiftId}`);
+
+  await page.getByRole('button', { name: 'Je réserve ce cadeau' }).click();
+  await expect(
+    page.getByRole('button', { name: /Inviter d.autres à participer/ }),
+  ).toBeVisible();
+  // Not a pot yet: reserving alone is still the default.
+  await expect(page.getByRole('heading', { name: 'Cagnotte' })).toHaveCount(0);
+
+  await page
+    .getByRole('button', { name: /Inviter d.autres à participer/ })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Cagnotte' })).toBeVisible();
+
+  // And the owner still sees none of it.
+  await signOut(page);
+  await signIn(page, scenario.ownerEmail);
+  await page.goto(`/gifts/${scenario.freeGiftId}`);
+  await expect(page.getByRole('heading', { name: 'Cagnotte' })).toHaveCount(0);
+  const body = await page.locator('body').innerText();
+  expect(body).not.toContain('Cadeau à plusieurs');
 });

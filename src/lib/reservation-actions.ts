@@ -16,6 +16,10 @@ export type ReservationResult = { error?: string };
  *    would put a row in a table their own queries must never touch;
  *  - a stranger, because reservations are a thing friends do;
  *  - a list whose visibility does not admit this viewer.
+ *
+ * It no longer refuses a "collaborative" gift: there is no such gift any
+ * more. Every gift is reserved the same way, and its holder decides
+ * afterwards whether to invite the others in.
  */
 async function requireReservableGift(giftId: string) {
   const user = await requireUser();
@@ -25,7 +29,6 @@ async function requireReservableGift(giftId: string) {
     select: {
       id: true,
       name: true,
-      isPot: true,
       listId: true,
       // Carried onto the event: the product it resolves to, and the price and
       // category AS THEY ARE NOW.
@@ -44,12 +47,6 @@ async function requireReservableGift(giftId: string) {
   if (relation === 'stranger') {
     return { error: "Vous n'avez pas accès à cette liste." } as const;
   }
-  if (gift.isPot) {
-    return {
-      error: 'Ce cadeau est collaboratif : participez à la cagnotte.',
-    } as const;
-  }
-
   return { user, gift } as const;
 }
 
@@ -128,6 +125,74 @@ export async function releaseGift(giftId: string): Promise<ReservationResult> {
 
   if (count === 0) {
     return { error: "Vous n'aviez pas réservé ce cadeau." };
+  }
+
+  revalidatePath(`/gifts/${giftId}`);
+  revalidatePath(`/lists/${gift.listId}`);
+  return {};
+}
+
+/**
+ * Opens a reservation to the other friends, turning it into a pot.
+ *
+ * Only the holder may do this: it is their claim to share. Everyone who can
+ * see the list can then contribute — the same audience that could already see
+ * the gift was taken, so opening reveals nothing new to anyone.
+ *
+ * The list's owner is not among them, and nothing here changes that: the pot
+ * is derived from the reservation, and an owner's queries never load one.
+ */
+export async function openToOthers(giftId: string): Promise<ReservationResult> {
+  const found = await requireReservableGift(giftId);
+  if ('error' in found) return { error: found.error };
+  const { user, gift } = found;
+
+  // Scoped to this reserver, and to a reservation that is not open already,
+  // so a second click cannot move openedAt and rewrite when it happened.
+  const { count } = await db.reservation.updateMany({
+    where: { giftId, reserverId: user.id, openedToOthers: false },
+    data: { openedToOthers: true, openedAt: new Date() },
+  });
+
+  if (count === 0) {
+    return { error: "Vous n'avez pas réservé ce cadeau." };
+  }
+
+  revalidatePath(`/gifts/${giftId}`);
+  revalidatePath(`/lists/${gift.listId}`);
+  return {};
+}
+
+/**
+ * Closes an open reservation back to a solo one.
+ *
+ * Refused once anybody else has put money in. Closing then would leave their
+ * contributions attached to a gift they can no longer see or withdraw from —
+ * the app would be holding money on behalf of someone it had just shut out.
+ * They have to withdraw first, which they can do themselves.
+ */
+export async function closeToOthers(giftId: string): Promise<ReservationResult> {
+  const found = await requireReservableGift(giftId);
+  if ('error' in found) return { error: found.error };
+  const { user, gift } = found;
+
+  const others = await db.potContribution.count({
+    where: { giftId, contributorId: { not: user.id } },
+  });
+  if (others > 0) {
+    return {
+      error:
+        'D’autres personnes ont déjà participé. Elles doivent retirer leur participation avant que vous puissiez refermer.',
+    };
+  }
+
+  const { count } = await db.reservation.updateMany({
+    where: { giftId, reserverId: user.id, openedToOthers: true },
+    data: { openedToOthers: false, openedAt: null },
+  });
+
+  if (count === 0) {
+    return { error: "Ce cadeau n'est pas ouvert aux autres." };
   }
 
   revalidatePath(`/gifts/${giftId}`);

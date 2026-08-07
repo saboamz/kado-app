@@ -56,8 +56,12 @@ describe('categoriesForInterest', () => {
     ['Randonnée', 'Sport'],
     ['Lecture', 'Culture'],
     ['Vélo', 'Sport'],
-    ['Musique', 'Culture'],
-    ['Jardinage', 'Maison'],
+    ['Musique', 'Musique'],
+    // Jardinage used to fall into Maison for want of anywhere better; the
+    // enriched list gives it its own bucket.
+    ['Jardinage', 'Jardin'],
+    ['Bricolage', 'Bricolage'],
+    ['Bijoux', 'Bijoux'],
     ['Design', 'Maison'],
   ])('maps %s to %s', (interest, expected) => {
     expect(categoriesForInterest(interest)).toContain(expected);

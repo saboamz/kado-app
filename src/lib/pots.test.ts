@@ -4,6 +4,7 @@ import {
   cleanup,
   makeFriends,
   makeGift,
+  makeReservation,
   makeList,
   makeUser,
 } from '@/test/factories';
@@ -28,9 +29,11 @@ describe('collaborative pots', () => {
       await makeGift(list.id, {
         name: 'MacBook',
         priceCents: 159900,
-        isPot: true,
       })
     ).id;
+    // A pot is a reservation its holder opened to the others. Alice holds
+    // this one; the gift itself carries no "collaborative" flag any more.
+    await makeReservation(potId, alice.id, { openedToOthers: true });
   });
 
   afterEach(async () => {
@@ -105,7 +108,7 @@ describe('collaborative pots', () => {
   });
 
   it('vanishes with the gift', async () => {
-    const doomed = await makeGift(listId, { isPot: true, priceCents: 1000 });
+    const doomed = await makeGift(listId, { priceCents: 1000 });
     await db.potContribution.create({
       data: { giftId: doomed.id, contributorId: alice.id, amountCents: 500 },
     });
@@ -132,7 +135,10 @@ describe('what a pot reveals, and to whom', () => {
 
     const list = await makeList(owner.id);
     listId = list.id;
-    potId = (await makeGift(list.id, { priceCents: 100000, isPot: true })).id;
+    potId = (await makeGift(list.id, { priceCents: 100000 })).id;
+    // Alice holds the reservation and opened it; without that there is no pot
+    // for anyone to see.
+    await makeReservation(potId, alice.id, { openedToOthers: true });
 
     await db.potContribution.createMany({
       data: [

@@ -25,18 +25,32 @@ export type GiftRow = {
   imageUrl: string | null;
   category: string | null;
   priority: number;
-  isPot: boolean;
   listId: string;
   createdAt: Date;
-  reservation?: { reserverId: string; createdAt: Date } | null;
+  reservation?: {
+    reserverId: string;
+    createdAt: Date;
+    openedToOthers: boolean;
+  } | null;
   contributions?: { contributorId: string; amountCents: number }[];
 };
 
-/** What a viewer is allowed to know about a gift's reservation. */
+/**
+ * What a viewer is allowed to know about a gift's reservation.
+ *
+ * `open` is a gift somebody claimed and then invited the others into. It is
+ * deliberately distinct from `taken`: a friend arriving at an open gift can
+ * still act on it, where a taken one is closed to them.
+ *
+ * Whether the viewer holds it is carried alongside the state rather than
+ * folded into it, because an open pot needs both — the holder sees "you
+ * started this", everyone else sees "you can join".
+ */
 export type ReservationView =
   | { state: 'free' }
   | { state: 'mine'; since: string }
-  | { state: 'taken' };
+  | { state: 'taken' }
+  | { state: 'open'; mine: boolean; since: string };
 
 export type PotView = {
   targetCents: number | null;
@@ -57,12 +71,16 @@ export type GiftView = {
   imageUrl: string | null;
   category: string | null;
   priority: number;
-  isPot: boolean;
   listId: string;
   createdAt: string;
   /** Absent for owners. Its absence is the feature. */
   reservation?: ReservationView;
-  /** Absent for owners, and for gifts that are not collaborative. */
+  /**
+   * Absent for owners, and for any gift whose holder has not opened it.
+   *
+   * A pot now exists because a friend invited others in, not because the list
+   * owner ticked a box when they added the wish.
+   */
   pot?: PotView;
 };
 
@@ -90,7 +108,6 @@ export function viewGift(
     imageUrl: gift.imageUrl,
     category: gift.category,
     priority: gift.priority,
-    isPot: gift.isPot,
     listId: gift.listId,
     createdAt: gift.createdAt.toISOString(),
   };
@@ -99,7 +116,12 @@ export function viewGift(
 
   base.reservation = viewReservation(gift.reservation ?? null, viewerId);
 
-  if (gift.isPot) {
+  /*
+   * The pot exists because the holder opened the reservation to others — not
+   * because the list owner ticked a box. It is therefore derived from the
+   * reservation, and an owner never reaches this line: they returned above.
+   */
+  if (gift.reservation?.openedToOthers) {
     const contributions = gift.contributions ?? [];
     base.pot = {
       targetCents: gift.priceCents,
@@ -120,14 +142,24 @@ export function viewGift(
  * to the owner by accident, and it is not information they need.
  */
 export function viewReservation(
-  reservation: { reserverId: string; createdAt: Date } | null,
+  reservation: {
+    reserverId: string;
+    createdAt: Date;
+    openedToOthers: boolean;
+  } | null,
   viewerId: string | null,
 ): ReservationView {
   if (!reservation) return { state: 'free' };
-  if (viewerId && reservation.reserverId === viewerId) {
-    return { state: 'mine', since: reservation.createdAt.toISOString() };
-  }
-  return { state: 'taken' };
+
+  const mine = Boolean(viewerId) && reservation.reserverId === viewerId;
+  const since = reservation.createdAt.toISOString();
+
+  // Open to everyone who can see the list: the state says so plainly, and
+  // `mine` distinguishes the person who started it from those joining. Who
+  // else has joined is still never named.
+  if (reservation.openedToOthers) return { state: 'open', mine, since };
+
+  return mine ? { state: 'mine', since } : { state: 'taken' };
 }
 
 /**
@@ -140,7 +172,9 @@ export function viewReservation(
 export function giftInclude(relation: ViewerRelation) {
   if (relation === 'owner') return {} as const;
   return {
-    reservation: { select: { reserverId: true, createdAt: true } },
+    reservation: {
+      select: { reserverId: true, createdAt: true, openedToOthers: true },
+    },
     contributions: { select: { contributorId: true, amountCents: true } },
   } as const;
 }

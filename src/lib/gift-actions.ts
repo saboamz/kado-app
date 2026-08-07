@@ -69,7 +69,6 @@ function parseGiftForm(formData: FormData) {
     merchant: formData.get('merchant'),
     category: formData.get('category'),
     priority: formData.get('priority') ?? 2,
-    isPot: formData.get('isPot') === 'on',
   });
 }
 
@@ -84,7 +83,6 @@ function giftData(data: GiftInput) {
     merchant: data.merchant || merchantFromUrl(url),
     category: data.category || null,
     priority: data.priority,
-    isPot: !!data.isPot,
   };
 }
 
