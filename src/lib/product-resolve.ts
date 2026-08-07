@@ -16,7 +16,21 @@ import type { Extracted } from './extract';
  * right answer.
  */
 
-export type ResolveInput = Extracted & { sourceUrl: string | null };
+export type ResolveInput = Extracted & {
+  sourceUrl: string | null;
+  /**
+   * The category the wisher picked for their gift.
+   *
+   * A merchant page does not carry OUR taxonomy — Extracted has no category
+   * field and cannot have one — so the value comes from the person who added
+   * the wish. They know what they want better than a keyword rule does, and
+   * the list is closed, so what they pick is already canonical.
+   *
+   * Product.categoryId is what content_facet matches on; without this it
+   * stays null and that tier finds nothing however many products exist.
+   */
+  categoryId?: string | null;
+};
 
 /** Follows mergedInto so a deduplicated pair contributes one row, not two. */
 export async function resolveCanonical(productId: string): Promise<string> {
@@ -50,8 +64,25 @@ export async function findOrCreateProduct(input: ResolveInput) {
 
   if (existing) {
     const canonicalId = await resolveCanonical(existing.id);
-    // Fill gaps only. Overwriting a good GTIN with a null from a weaker
-    // extraction would lose the one key that identifies this across merchants.
+
+    /*
+     * Fill gaps only. Overwriting a good GTIN with a null from a weaker
+     * extraction would lose the one key that identifies this across
+     * merchants.
+     *
+     * The category needs a stronger rule than the rest. The other fields come
+     * from the merchant's page, where a fresher read is a better read; the
+     * category comes from a PERSON, and two people can legitimately disagree
+     * about whether a bike is Sport or Voyage. `?? undefined` only skips a
+     * null input — it would happily let the second wisher move everybody
+     * else's row, making the category a race won by whoever saved last. So it
+     * is written once, when the row has none.
+     */
+    const current = await db.product.findUnique({
+      where: { id: canonicalId },
+      select: { categoryId: true },
+    });
+
     return db.product.update({
       where: { id: canonicalId },
       data: {
@@ -61,6 +92,7 @@ export async function findOrCreateProduct(input: ResolveInput) {
         description: input.description ?? undefined,
         priceCents: input.priceCents ?? undefined,
         priceBand: input.priceCents != null ? priceBand(input.priceCents) : undefined,
+        categoryId: current?.categoryId ?? input.categoryId ?? undefined,
       },
     });
   }
@@ -82,6 +114,7 @@ export async function findOrCreateProduct(input: ResolveInput) {
         priceCents: input.priceCents,
         currency: input.currency ?? 'EUR',
         priceBand: priceBand(input.priceCents),
+        categoryId: input.categoryId ?? null,
         extractedBy: input.extractedBy,
       },
     });
