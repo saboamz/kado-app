@@ -9,17 +9,34 @@
   gap: 12px;
 }
 
+/*
+ * The strip bleeds to both screen edges so it reads as scrollable.
+ *
+ * The end gutter cannot come from padding: on a flex scroll container most
+ * browsers drop the trailing padding once the content overflows, which left
+ * the last card cut off mid-word against the right edge — it looked like a
+ * layout bug rather than like more content. A pseudo-element after the last
+ * item is a real flex child, so its width survives.
+ *
+ * scroll-padding keeps snapping aligned with that same gutter.
+ */
 .birthdays {
   display: flex;
   gap: 10px;
   margin: 0;
-  padding: 0 var(--gutter) 4px;
-  /* Bleed to the screen edges on a phone so the strip reads as scrollable. */
+  padding: 0 0 4px var(--gutter);
   margin-inline: calc(var(--gutter) * -1);
+  scroll-padding-inline: var(--gutter);
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
+}
+
+.birthdays::after {
+  content: '';
+  flex: none;
+  width: var(--gutter);
 }
 
 .birthdays::-webkit-scrollbar {
@@ -31,7 +48,16 @@
   scroll-snap-align: start;
 }
 
-.birthday {
+/*
+ * `display` is declared twice on this element: .card sets block, .birthday
+ * sets flex, and which one wins depends on the order the two CSS Modules
+ * happen to be emitted in. It lost, so the avatar, the name and the delay ran
+ * inline and wrapped mid-card.
+ *
+ * Stating it on the grid item as well removes the ambiguity: the layout no
+ * longer depends on stylesheet ordering.
+ */
+.birthdays > li > .birthday {
   display: flex;
   flex-direction: column;
   gap: 8px;

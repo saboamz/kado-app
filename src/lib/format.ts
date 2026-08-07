@@ -116,3 +116,22 @@ export const PRIORITY_LABELS = [
 export function priorityLabel(priority: number): string {
   return PRIORITY_LABELS[priority] ?? '';
 }
+
+/**
+ * The occasion, unless it is just the list's name again.
+ *
+ * Most lists are named after their occasion — "Anniversaire", "Noël" — and
+ * printing both rendered the same word twice, one line under the other. It
+ * earns its line only when it says something the name does not.
+ *
+ * Shared by the list index and the list detail so the two cannot disagree
+ * about when a list looks like it has an occasion.
+ */
+export function distinctOccasion(
+  name: string,
+  occasion: string | null | undefined,
+): string | null {
+  if (!occasion) return null;
+  const same = occasion.trim().toLowerCase() === name.trim().toLowerCase();
+  return same ? null : occasion;
+}

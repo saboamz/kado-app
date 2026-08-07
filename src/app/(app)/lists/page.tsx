@@ -3,6 +3,7 @@ import { ButtonLink } from '@/components/Button';
 import { Badge, CardLink, EmptyState, Grid } from '@/components/display';
 import { GiftIcon, LockIcon, PlusIcon, UsersIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { distinctOccasion } from '@/lib/format';
 import { getListsForViewer } from '@/lib/gifts';
 import { requireUser } from '@/lib/session';
 import styles from './lists.module.css';
@@ -43,14 +44,15 @@ export default async function ListsPage() {
         <Grid>
           {lists.map((list) => {
             const { label, Icon } = VISIBILITY[list.visibility];
+            const occasion = distinctOccasion(list.name, list.occasion);
             return (
               <CardLink key={list.id} href={`/lists/${list.id}`}>
                 <div className={styles.top}>
                   <span className={styles.name}>{list.name}</span>
                   {list.isDefault && <Badge>Par défaut</Badge>}
                 </div>
-                {list.occasion && (
-                  <span className={styles.occasion}>{list.occasion}</span>
+                {occasion && (
+                  <span className={styles.occasion}>{occasion}</span>
                 )}
                 <div className={styles.meta}>
                   <span className={styles.count}>

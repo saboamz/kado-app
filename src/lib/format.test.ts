@@ -1,5 +1,6 @@
 import {
   daysUntilBirthday,
+  distinctOccasion,
   formatBirthdayCountdown,
   formatMoney,
   initials,
@@ -95,5 +96,28 @@ describe('priorityLabel', () => {
 
   it('stays empty for an unknown level', () => {
     expect(priorityLabel(9)).toBe('');
+  });
+});
+
+describe('distinctOccasion', () => {
+  it('drops the occasion when it just repeats the name', () => {
+    // The duplication this exists to stop: "Anniversaire" printed twice, one
+    // line under the other, on both the list index and the list detail.
+    expect(distinctOccasion('Anniversaire', 'Anniversaire')).toBeNull();
+    expect(distinctOccasion('Noël', 'noël')).toBeNull();
+    expect(distinctOccasion('Noël ', ' Noël')).toBeNull();
+  });
+
+  it('keeps an occasion that adds something', () => {
+    expect(distinctOccasion('Mes envies', 'Noël')).toBe('Noël');
+    expect(distinctOccasion('Nouvel appartement', 'Crémaillère')).toBe(
+      'Crémaillère',
+    );
+  });
+
+  it('treats a missing occasion as nothing to show', () => {
+    expect(distinctOccasion('Mes envies', null)).toBeNull();
+    expect(distinctOccasion('Mes envies', undefined)).toBeNull();
+    expect(distinctOccasion('Mes envies', '')).toBeNull();
   });
 });
