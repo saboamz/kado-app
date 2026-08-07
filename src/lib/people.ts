@@ -4,7 +4,6 @@ import { friendIds } from './relations';
 export type PersonResult = {
   id: string;
   name: string;
-  avatarColor: string;
   avatarUrl: string | null;
   bio: string | null;
   listCount: number;
@@ -36,7 +35,6 @@ export async function searchPeople(
     select: {
       id: true,
       name: true,
-      avatarColor: true,
       avatarUrl: true,
       bio: true,
       _count: { select: { lists: true } },
@@ -59,7 +57,6 @@ export async function suggestPeople(
     select: {
       id: true,
       name: true,
-      avatarColor: true,
       avatarUrl: true,
       bio: true,
       _count: { select: { lists: true } },
@@ -76,8 +73,7 @@ async function withRelations(
   people: {
     id: string;
     name: string;
-    avatarColor: string;
-  avatarUrl: string | null;
+    avatarUrl: string | null;
     bio: string | null;
     _count: { lists: number };
   }[],
@@ -110,7 +106,6 @@ async function withRelations(
     return {
       id: person.id,
       name: person.name,
-      avatarColor: person.avatarColor,
       avatarUrl: person.avatarUrl,
       bio: person.bio,
       listCount: person._count.lists,
@@ -140,8 +135,7 @@ export async function getFriendGroups(
         select: {
           id: true,
           name: true,
-          avatarColor: true,
-      avatarUrl: true,
+          avatarUrl: true,
           bio: true,
           _count: { select: { lists: true } },
         },
@@ -150,8 +144,7 @@ export async function getFriendGroups(
         select: {
           id: true,
           name: true,
-          avatarColor: true,
-      avatarUrl: true,
+          avatarUrl: true,
           bio: true,
           _count: { select: { lists: true } },
         },
@@ -168,7 +161,6 @@ export async function getFriendGroups(
     const entry: PersonResult = {
       id: other.id,
       name: other.name,
-      avatarColor: other.avatarColor,
       avatarUrl: other.avatarUrl,
       bio: other.bio,
       listCount: other._count.lists,

@@ -14,7 +14,6 @@ export function ProfileForm({
     name: string;
     bio: string | null;
     birthday: string;
-    avatarColor: string;
     avatarUrl: string | null;
     interests: string;
   };

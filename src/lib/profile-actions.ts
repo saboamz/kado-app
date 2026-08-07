@@ -27,21 +27,6 @@ const profileSchema = z.object({
     (v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v),
     'Date invalide.',
   ),
-  /*
-   * The avatar colour is no longer edited: an avatar's tint is derived from
-   * the name, so the picker was removed from the form. FormData.get returns
-   * null for a field that is not in the form, and `.optional()` does not
-   * accept null — without the nullish() the whole profile form failed
-   * validation silently and never redirected.
-   *
-   * Kept in the schema rather than dropped so an older client that still
-   * posts a colour is accepted rather than rejected.
-   */
-  avatarColor: z
-    .string()
-    .regex(/^#[0-9a-fA-F]{6}$/, 'Couleur invalide.')
-    .nullish()
-    .or(z.literal('')),
   interests: optionalText(200),
 });
 
@@ -55,12 +40,11 @@ export async function updateProfile(
     name: formData.get('name'),
     bio: formData.get('bio'),
     birthday: formData.get('birthday'),
-    avatarColor: formData.get('avatarColor'),
     interests: formData.get('interests'),
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
 
-  const { name, bio, birthday, avatarColor, interests } = parsed.data;
+  const { name, bio, birthday, interests } = parsed.data;
 
   const current = await db.user.findUniqueOrThrow({
     where: { id: user.id },
@@ -99,7 +83,6 @@ export async function updateProfile(
         name,
         bio: bio || null,
         birthday: birthday ? new Date(`${birthday}T00:00:00Z`) : null,
-        ...(avatarColor ? { avatarColor } : {}),
         ...(avatarUrl !== undefined ? { avatarUrl } : {}),
       },
     }),

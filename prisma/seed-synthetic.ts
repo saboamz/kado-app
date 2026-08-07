@@ -231,7 +231,6 @@ async function main() {
         name: `${first} ${last}`,
         bio: `${labels.join(', ')}.`,
         birthday: daysAgo(int(7000, 18000)),
-        avatarColor: pick(COLORS),
         profilePublic: rnd() < 0.3,
         interests: { create: labels.map((label) => ({ label })) },
       },

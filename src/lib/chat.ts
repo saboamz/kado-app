@@ -8,7 +8,6 @@ export type ChatMessageView = {
   author: {
     id: string;
     name: string;
-    avatarColor: string;
     avatarUrl: string | null;
   };
   mine: boolean;
@@ -41,7 +40,7 @@ export async function getChatForViewer(
     where: { giftId },
     include: {
       author: {
-        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+        select: { id: true, name: true, avatarUrl: true },
       },
     },
     orderBy: { createdAt: 'asc' },
