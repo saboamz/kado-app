@@ -3,7 +3,9 @@ import { ButtonLink } from '@/components/Button';
 import { EmptyState, SectionTitle, Stack } from '@/components/display';
 import { UsersIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { InviteLink } from '@/components/InviteLink';
 import { PersonCard } from '@/components/PersonCard';
+import { getOrCreateInvite } from '@/lib/invite-actions';
 import { getFriendGroups } from '@/lib/people';
 import { requireUser } from '@/lib/session';
 import styles from './friends.module.css';
@@ -13,6 +15,7 @@ export const metadata: Metadata = { title: 'Mes amis' };
 export default async function FriendsPage() {
   const user = await requireUser();
   const { friends, received, sent } = await getFriendGroups(user.id);
+  const invite = await getOrCreateInvite();
 
   return (
     <>
@@ -25,6 +28,8 @@ export default async function FriendsPage() {
           </ButtonLink>
         }
       />
+
+      <InviteLink code={invite.code} uses={invite.uses} />
 
       {received.length > 0 && (
         <section className={styles.section}>

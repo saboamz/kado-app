@@ -1,5 +1,5 @@
 import { db } from './db';
-import { linkGiftToProduct } from './gift-product-link';
+import { linkGiftToProduct, sweepUnlinkedGifts } from './gift-product-link';
 import { findOrCreateProduct } from './product-resolve';
 import { LINK_FETCH_PER_USER } from './rate-limit';
 import { cleanup, makeGift, makeList, makeUser } from '@/test/factories';
@@ -262,5 +262,57 @@ describe('outbound reads are budgeted per person', () => {
       await db.authAttempt.count({ where: { key: `link:fetch:${other.id.toLowerCase()}` } }),
     ).toBe(1);
     await cleanup([other.id]);
+  });
+});
+
+describe('the nightly sweep picks up what failed', () => {
+  afterEach(async () => {
+    await db.authAttempt.deleteMany({ where: { key: { startsWith: 'link:fetch:' } } });
+  });
+
+  it('only considers gifts that have a link and no product', async () => {
+    // A merchant can be down for an afternoon or rate-limit us — temporary,
+    // but currently permanent: the resolver runs once at save time and
+    // nothing ever tries again.
+    const withLink = await makeGift(listId, { name: 'Avec lien' });
+    await db.gift.update({
+      where: { id: withLink.id },
+      data: { url: 'https://nope-kado-sweep.invalid/p/1' },
+    });
+    await makeGift(listId, { name: 'Sans lien' });
+
+    const result = await sweepUnlinkedGifts(10, 10_000);
+
+    // The one with a URL was tried; the one without was never a candidate.
+    expect(result.attempted).toBeGreaterThanOrEqual(1);
+    expect(result.linked).toBe(0);
+  });
+
+  it('charges each attempt to the gift owner budget', async () => {
+    // Otherwise the sweep is a way around the per-person limit: a thousand
+    // unlinked gifts would mean a thousand unbudgeted outbound requests.
+    const gift = await makeGift(listId, { name: 'Balayage budget' });
+    await db.gift.update({
+      where: { id: gift.id },
+      data: { url: 'https://nope-kado-sweep.invalid/p/2' },
+    });
+
+    await sweepUnlinkedGifts(10, 10_000);
+
+    const spent = await db.authAttempt.count({
+      where: { key: `link:fetch:${owner.id.toLowerCase()}` },
+    });
+    expect(spent).toBeGreaterThan(0);
+  });
+
+  it('stops at its budget rather than being cut off mid-run', async () => {
+    // A serverless function has a hard ceiling. A sweep that tried to catch
+    // up on everything would be killed part-way with nothing recorded.
+    const started = Date.now();
+    const result = await sweepUnlinkedGifts(50, 0);
+
+    // A zero budget means it stops before the first attempt.
+    expect(result.attempted).toBe(0);
+    expect(Date.now() - started).toBeLessThan(2_000);
   });
 });

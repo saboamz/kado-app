@@ -82,8 +82,16 @@ test.describe('the app frame adapts to the viewport', () => {
   test('badges unread notifications', async ({ page }) => {
     await signIn(page);
     const nav = page.getByRole('navigation', { name: 'Navigation principale' });
+
+    // Matched by shape, not by value — the same reasoning as the test below.
+    // Pinning "2" made this fail the moment a feature added a notification of
+    // its own (invitations now do), which says nothing about the frame this
+    // spec is here to check.
+    //
+    // The accessible name is the handle: the badge element also carries a
+    // screen-reader suffix, so an exact-text match on digits finds nothing.
     await expect(
-      nav.getByRole('link', { name: /Alertes/ }).getByText('2'),
+      nav.getByRole('link', { name: /notifications non lues/ }),
     ).toBeVisible();
   });
 

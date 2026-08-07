@@ -1,0 +1,75 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 22px;
+  background: var(--acc-bg);
+  border-radius: 12px;
+}
+
+.lede {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.url {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink2);
+  /* A long origin must not push the button off the row. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 24px;
+}
+
+.copy {
+  flex: none;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: var(--acc);
+  color: var(--acc-on);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.uses {
+  font-size: 12.5px;
+  color: var(--ink2);
+}
+
+.rotate {
+  min-height: 32px;
+  font-size: 12px;
+  color: var(--ink3);
+  text-decoration: underline;
+}
+
+.rotate:hover {
+  color: var(--ink);
+}
