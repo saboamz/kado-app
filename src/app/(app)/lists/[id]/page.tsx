@@ -12,7 +12,7 @@ import { GiftIcon, PlusIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
 import { ViewpointBanner } from '@/components/Viewpoint';
 import { UploadedImage } from '@/components/UploadedImage';
-import { formatMoney } from '@/lib/format';
+import { distinctOccasion, formatMoney } from '@/lib/format';
 import { getListForViewer } from '@/lib/gifts';
 import { getCurrentUser } from '@/lib/session';
 import styles from './list.module.css';
@@ -43,6 +43,7 @@ export default async function ListPage({
 
   const isOwner = list.owner.id === user?.id;
   const gifts = list.gifts ?? [];
+  const occasion = distinctOccasion(list.name, list.occasion);
 
   return (
     <>
@@ -57,11 +58,13 @@ export default async function ListPage({
         title={list.name}
         subtitle={
           isOwner ? (
-            list.occasion
+            // Same rule as the list index: the occasion is only worth a line
+            // when it is not simply the title again.
+            occasion
           ) : (
             <>
               Liste de {list.owner.name}
-              {list.occasion ? ` · ${list.occasion}` : ''}
+              {occasion ? ` · ${occasion}` : ''}
             </>
           )
         }
