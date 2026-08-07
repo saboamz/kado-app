@@ -44,8 +44,10 @@ export function DecorationPicker({
 
             {current[slot] ? (
               <div className={styles.preview}>
+                {/* The animation, so you can see what is actually on your
+                    profile rather than a frozen frame of it. */}
                 <img
-                  src={current[slot]!.stillUrl}
+                  src={current[slot]!.gifUrl}
                   alt=""
                   className={styles.previewImage}
                 />
@@ -191,9 +193,15 @@ function Search({
                   })
                 }
               >
-                {/* The still in the grid: two dozen looping animations at
-                    once is unreadable, and costs a lot of data on a phone. */}
-                <img src={gif.stillUrl} alt={gif.title ?? ''} loading="lazy" />
+                {/*
+                  The ANIMATED preview, not the still.
+                  
+                  A grid of frozen frames asks people to choose a GIF on the
+                  strength of one frame, which is often near-empty — choosing
+                  blind. This rendition is a few tens of kilobytes, so the
+                  whole grid costs about what one full-size GIF would.
+                */}
+                <img src={gif.previewUrl} alt={gif.title ?? ''} loading="lazy" />
               </button>
             </li>
           ))}

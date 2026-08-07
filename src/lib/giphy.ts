@@ -87,27 +87,45 @@ function parseGifs(payload: unknown): GifChoice[] {
     const images = item.images as Record<string, unknown> | undefined;
     if (!images) continue;
 
-    // downsized keeps a decorative GIF from being a 10MB original; still is
-    // what a visitor who asked for reduced motion sees instead.
+    /*
+     * Three renditions, each for a different job.
+     *
+     *  - animated: what ends up on the profile. downsized rather than the
+     *    original, which can be 10MB for something shown at 300px.
+     *  - preview: the SAME animation at thumbnail size, for the search grid.
+     *    A picker that shows still frames asks people to choose a GIF on the
+     *    strength of one frame — often a near-empty one — which is choosing
+     *    blind. fixed_width_small is a few tens of kilobytes, so two dozen of
+     *    them cost roughly what one full-size GIF would.
+     *  - still: for a visitor who asked for reduced motion. Not a fallback —
+     *    for them it IS the decoration.
+     */
     const animated = images.downsized_medium ?? images.downsized ?? images.original;
+    const preview =
+      images.fixed_width_small ?? images.preview_gif ?? images.fixed_width ?? animated;
     const still = images.fixed_width_still ?? images.original_still;
     if (typeof animated !== 'object' || animated === null) continue;
+    if (typeof preview !== 'object' || preview === null) continue;
     if (typeof still !== 'object' || still === null) continue;
 
     const gifUrl = (animated as Record<string, unknown>).url;
+    const previewUrl = (preview as Record<string, unknown>).url;
     const stillUrl = (still as Record<string, unknown>).url;
     const width = Number((animated as Record<string, unknown>).width);
     const height = Number((animated as Record<string, unknown>).height);
 
     if (typeof gifUrl !== 'string' || typeof stillUrl !== 'string') continue;
+    if (typeof previewUrl !== 'string') continue;
     if (!Number.isFinite(width) || !Number.isFinite(height)) continue;
     // Same allowlist the save path applies, so a host we would refuse later
     // is never offered in the first place.
     if (!isAllowedGifUrl(gifUrl) || !isAllowedGifUrl(stillUrl)) continue;
+    if (!isAllowedGifUrl(previewUrl)) continue;
 
     gifs.push({
       id: String(item.id ?? gifUrl),
       gifUrl,
+      previewUrl,
       stillUrl,
       width,
       height,

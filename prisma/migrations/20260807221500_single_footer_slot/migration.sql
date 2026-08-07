@@ -1,0 +1,12 @@
+-- Drops decorations in the two slots that no longer exist.
+--
+-- There were three places a GIF could go: a banner, one beside the name, and
+-- one at the foot of the page. Three places to fill is three decisions before
+-- anything looks finished, and the two at the top competed with the name and
+-- the photo for the same glance.
+--
+-- Their rows would otherwise sit here forever: nothing renders them, nothing
+-- lists them, and the picker cannot reach them to offer a removal. Deleting
+-- loses no work worth keeping — the GIF was chosen from a search that takes
+-- seconds to repeat, and nothing else references these rows.
+DELETE FROM "ProfileDecoration" WHERE "slot" <> 'footer';

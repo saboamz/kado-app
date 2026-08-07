@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Button, ButtonLink } from '@/components/Button';
 import { Avatar, Badge, Card, SectionTitle, Stack } from '@/components/display';
+import { Decoration } from '@/components/Decoration';
 import { SettingsIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
 import { logout } from '@/lib/auth-actions';
@@ -17,12 +18,14 @@ export default async function ProfilePage() {
   const [profile, friends, listCount, giftCount] = await Promise.all([
     db.user.findUniqueOrThrow({
       where: { id: user.id },
-      include: { interests: true },
+      include: { interests: true, decorations: true },
     }),
     friendIds(user.id),
     db.giftList.count({ where: { ownerId: user.id } }),
     db.gift.count({ where: { list: { ownerId: user.id } } }),
   ]);
+
+  const footer = profile.decorations.find((d) => d.slot === 'footer');
 
   return (
     <>
@@ -92,6 +95,15 @@ export default async function ProfilePage() {
           </form>
         </Stack>
       </section>
+
+      {/*
+        Your own decoration, in the same place a visitor sees it.
+        
+        Without this you would be choosing something you never look at, and
+        the only way to check it was to open your public profile from another
+        account.
+      */}
+      {footer && <Decoration decoration={footer} slot="footer" />}
     </>
   );
 }
