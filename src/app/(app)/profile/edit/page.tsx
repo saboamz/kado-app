@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { DecorationPicker } from '@/components/DecorationPicker';
+import { SectionTitle } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
 import { ProfileForm } from '@/components/ProfileForm';
 import { db } from '@/lib/db';
@@ -10,8 +12,16 @@ export default async function EditProfilePage() {
   const user = await requireUser();
   const profile = await db.user.findUniqueOrThrow({
     where: { id: user.id },
-    include: { interests: { orderBy: { label: 'asc' } } },
+    include: {
+      interests: { orderBy: { label: 'asc' } },
+      decorations: true,
+    },
   });
+
+  // Keyed by slot, which is how the picker reads them.
+  const decorations = Object.fromEntries(
+    profile.decorations.map((d) => [d.slot, d]),
+  );
 
   return (
     <>
@@ -32,6 +42,11 @@ export default async function EditProfilePage() {
           interests: profile.interests.map((i) => i.label).join(', '),
         }}
       />
+
+      <section style={{ marginTop: 32 }}>
+        <SectionTitle>Décorer mon profil</SectionTitle>
+        <DecorationPicker initial={decorations} />
+      </section>
     </>
   );
 }

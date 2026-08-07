@@ -9,6 +9,7 @@ import {
   SectionTitle,
 } from '@/components/display';
 import { GiftIcon } from '@/components/icons';
+import { Decoration } from '@/components/Decoration';
 import { PageHeader } from '@/components/PageHeader';
 import { ViewpointBanner } from '@/components/Viewpoint';
 import { db } from '@/lib/db';
@@ -50,7 +51,7 @@ export default async function PersonPage({
 
   const person = await db.user.findUnique({
     where: { id },
-    include: { interests: true },
+    include: { interests: true, decorations: true },
   });
   if (!person) notFound();
 
@@ -63,6 +64,8 @@ export default async function PersonPage({
   }
 
   const days = person.birthday ? daysUntilBirthday(person.birthday) : null;
+  // Keyed by slot, so each place on the page asks for its own.
+  const decor = Object.fromEntries(person.decorations.map((d) => [d.slot, d]));
 
   return (
     <>
@@ -72,6 +75,10 @@ export default async function PersonPage({
         person={person}
         what="le profil"
       />
+
+      {decor.banner && (
+        <Decoration decoration={decor.banner} slot="banner" />
+      )}
 
       <PageHeader title={person.name} back={{ href: '/app', label: 'Accueil' }} />
 
@@ -89,6 +96,9 @@ export default async function PersonPage({
             </p>
           )}
         </div>
+        {decor.beside && (
+          <Decoration decoration={decor.beside} slot="beside" />
+        )}
       </div>
 
       {person.interests.length > 0 && (
@@ -124,6 +134,10 @@ export default async function PersonPage({
             </CardLink>
           ))}
         </Grid>
+      )}
+
+      {decor.footer && (
+        <Decoration decoration={decor.footer} slot="footer" />
       )}
     </>
   );

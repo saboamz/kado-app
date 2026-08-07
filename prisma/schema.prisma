@@ -47,6 +47,7 @@ model User {
   notifications    Notification[]
   messages         ChatMessage[]
   invites          Invite[]
+  decorations      ProfileDecoration[]
 
   @@index([email])
 }
@@ -448,4 +449,47 @@ model Invite {
   createdAt DateTime  @default(now())
 
   @@index([ownerId])
+}
+
+/// A GIF somebody put on their profile.
+///
+/// ── Why slots rather than free positioning ─────────────────────────────────
+///
+/// "Anywhere they like" means a layout editor: drag, drop, resize, touch
+/// targets, and a saved geometry that has to survive every screen width. It
+/// also means a profile can be made unreadable, and this page exists to help
+/// a friend choose a present — decoration must not get in the way of that.
+///
+/// A fixed set of slots keeps the expressiveness that matters (it is YOUR
+/// page, and it looks like you) while the layout stays something we control.
+///
+/// ── Why the GIF is copied rather than referenced ───────────────────────────
+///
+/// Only the fields we need are stored, from a source we allowlist. A raw URL
+/// from anywhere would make every visit to this profile a request to a server
+/// its owner chose — which is a visitor tracker, on a page whose whole point
+/// is that people cannot see what others are doing.
+model ProfileDecoration {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Which place on the page. One decoration per slot, per person.
+  slot     String
+  /// The animated file, on the provider's CDN.
+  gifUrl   String
+  /// A still frame, shown when the visitor asked for reduced motion.
+  stillUrl String
+  width    Int
+  height   Int
+  /// For the alt text: a GIF with no description is invisible to a screen
+  /// reader, and this one is decorative but not meaningless.
+  title    String?
+  /// Required by the provider's terms, and honest besides: the image is not
+  /// ours and the person who put it there did not make it.
+  provider String @default("giphy")
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, slot])
+  @@index([userId])
 }
