@@ -10,7 +10,7 @@ import {
   SIGNUP_PER_IP,
   clearAttempts,
   rateLimit,
-  recordFailure,
+  recordAttempt,
   retryMessage,
 } from './rate-limit';
 import { createSession, destroySession } from './session';
@@ -61,7 +61,7 @@ export async function signup(
   if (existing) {
     // Counts against the limit: probing which addresses already have an
     // account is exactly what the per-IP cap is there to slow down.
-    await recordFailure('signup:ip', ip);
+    await recordAttempt('signup:ip', ip);
     return { errors: { email: 'Un compte existe déjà avec cette adresse.' } };
   }
 
@@ -124,8 +124,8 @@ export async function login(
   // simply by being used.
   const fail = async () => {
     await Promise.all([
-      recordFailure('login:email', parsed.data.email),
-      recordFailure('login:ip', ip),
+      recordAttempt('login:email', parsed.data.email),
+      recordAttempt('login:ip', ip),
     ]);
     return invalid;
   };

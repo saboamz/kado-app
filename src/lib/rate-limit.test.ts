@@ -3,7 +3,7 @@ import {
   clearAttempts,
   purgeOldAttempts,
   rateLimit,
-  recordFailure,
+  recordAttempt,
   retryMessage,
   type Limit,
 } from './rate-limit';
@@ -29,7 +29,7 @@ describe('the rate limiter', () => {
 
     for (let i = 1; i <= LIMIT.attempts; i++) {
       expect((await rateLimit('test', key, LIMIT)).allowed).toBe(true);
-      await recordFailure('test', key);
+      await recordAttempt('test', key);
     }
 
     const refused = await rateLimit('test', key, LIMIT);
@@ -38,7 +38,7 @@ describe('the rate limiter', () => {
 
   it('says how long to wait, and the delay is inside the window', async () => {
     const key = freshKey();
-    for (let i = 0; i < LIMIT.attempts; i++) await recordFailure('test', key);
+    for (let i = 0; i < LIMIT.attempts; i++) await recordAttempt('test', key);
 
     const refused = await rateLimit('test', key, LIMIT);
     expect(refused.allowed).toBe(false);
@@ -54,7 +54,7 @@ describe('the rate limiter', () => {
     const a = freshKey();
     const b = freshKey();
 
-    for (let i = 0; i < LIMIT.attempts; i++) await recordFailure('test', a);
+    for (let i = 0; i < LIMIT.attempts; i++) await recordAttempt('test', a);
     expect((await rateLimit('test', a, LIMIT)).allowed).toBe(false);
 
     expect((await rateLimit('test', b, LIMIT)).allowed).toBe(true);
@@ -63,7 +63,7 @@ describe('the rate limiter', () => {
   it('keeps two actions on the same key in separate buckets', async () => {
     // A per-e-mail login limit and a per-IP one must not drain each other.
     const key = freshKey();
-    for (let i = 0; i < LIMIT.attempts; i++) await recordFailure('one', key);
+    for (let i = 0; i < LIMIT.attempts; i++) await recordAttempt('one', key);
 
     expect((await rateLimit('one', key, LIMIT)).allowed).toBe(false);
     expect((await rateLimit('two', key, LIMIT)).allowed).toBe(true);
@@ -72,7 +72,7 @@ describe('the rate limiter', () => {
   it('treats an address as the same bucket whatever its case', async () => {
     const key = freshKey();
     for (let i = 0; i < LIMIT.attempts; i++) {
-      await recordFailure('test', key.toUpperCase());
+      await recordAttempt('test', key.toUpperCase());
     }
     // The allowance is already spent by the upper-cased form.
     const refused = await rateLimit('test', key.toLowerCase(), LIMIT);
@@ -93,8 +93,8 @@ describe('the rate limiter', () => {
     // Someone who mistypes twice and then signs in must not carry those
     // failures into their next sign-in.
     const key = freshKey();
-    await recordFailure('login:email', key);
-    await recordFailure('login:email', key);
+    await recordAttempt('login:email', key);
+    await recordAttempt('login:email', key);
 
     await clearAttempts('login:email', key);
 
@@ -107,7 +107,7 @@ describe('the rate limiter', () => {
     // The window slides, so a limit is never permanent. Simulated by ageing
     // the rows rather than by waiting.
     const key = freshKey();
-    for (let i = 0; i < LIMIT.attempts; i++) await recordFailure('test', key);
+    for (let i = 0; i < LIMIT.attempts; i++) await recordAttempt('test', key);
     expect((await rateLimit('test', key, LIMIT)).allowed).toBe(false);
 
     await db.authAttempt.updateMany({
@@ -120,14 +120,14 @@ describe('the rate limiter', () => {
 
   it('purges rows older than a day and keeps recent ones', async () => {
     const key = freshKey();
-    await recordFailure('test', key);
+    await recordAttempt('test', key);
     await db.authAttempt.updateMany({
       where: { key: `test:${key.toLowerCase()}` },
       data: { createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000) },
     });
 
     const recent = freshKey();
-    await recordFailure('test', recent);
+    await recordAttempt('test', recent);
 
     await purgeOldAttempts();
 
