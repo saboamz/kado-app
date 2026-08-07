@@ -41,6 +41,9 @@ const ALLOWED = new Set([
   'src/lib/reservation-actions.ts',
   'src/lib/pot-actions.ts',
   'src/lib/reco.ts',
+  // Test-only: builds fixtures. It never renders anything and never runs in
+  // the app, but it lives under src/ so the walk finds it.
+  'src/test/factories.ts',
 ]);
 
 /**
@@ -75,7 +78,20 @@ const NESTED_SECRET = /\b(reservation|contributions|potContribution)\s*:\s*\{/;
  * secrecy.ts is here because giftInclude() is the canonical statement of that
  * rule; it names the tables in an include and nowhere else.
  */
-const NESTED_ALLOWED = new Set(['src/lib/gifts.ts', 'src/lib/secrecy.ts']);
+const NESTED_ALLOWED = new Set([
+  'src/lib/gifts.ts',
+  'src/lib/secrecy.ts',
+  /*
+   * pot-actions.ts reads `reservation: { select: { openedToOthers } }` to
+   * answer one question: has this gift's holder opened it to the others? A
+   * pot only exists when they have, so the contribution guard has to ask.
+   *
+   * It is a boolean about the CLAIM, not about who made it: reserverId is not
+   * selected, and nothing from this query reaches a response. The file already
+   * refuses an owner outright a few lines below.
+   */
+  'src/lib/pot-actions.ts',
+]);
 
 function sourceFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {

@@ -309,7 +309,6 @@ async function main() {
               priceCents: product.cents,
               category: product.categoryId,
               priority: int(1, 3),
-              isPot: product.cents > 15000 && rnd() < 0.25,
             },
           });
           allGifts.push({ id: gift.id, productId: product.id, ownerId: user.id, cents: product.cents });
@@ -340,10 +339,32 @@ async function main() {
     const friends = friendsOf.get(gift.ownerId) ?? [];
     if (friends.length === 0) continue;
 
-    const isPot = await db.gift.findUnique({ where: { id: gift.id }, select: { isPot: true } });
+    // Expensive gifts are the ones a friend is likely to open to the others,
+    // which is the decision the model now puts in their hands.
+    const opensToOthers = (gift.cents ?? 0) > 15000 && rnd() < 0.25;
 
-    if (isPot?.isPot) {
+    if (opensToOthers) {
       if (rnd() < 0.6) {
+        // A pot is a reservation its holder opened, so the holder has to
+        // exist before anybody can contribute — otherwise the contributions
+        // hang off a gift nobody claimed and no friend can see the pot.
+        const holder = pick(friends);
+        const openedAt = daysAgo(int(1, 120));
+        try {
+          await db.reservation.create({
+            data: {
+              giftId: gift.id,
+              reserverId: holder,
+              openedToOthers: true,
+              openedAt,
+              createdAt: openedAt,
+            },
+          });
+          reservations += 1;
+        } catch {
+          /* already reserved — fine */
+        }
+
         for (let c = 0; c < int(1, 3); c++) {
           const contributor = pick(friends);
           const amount = Math.min(gift.cents ?? 5000, int(10, 60) * 100);

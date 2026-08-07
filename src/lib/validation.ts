@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isCategory } from './taxonomy';
 
 export const emailSchema = z
   .string()
@@ -85,9 +86,23 @@ export const giftSchema = z.object({
     'Ce lien semble invalide.',
   ),
   merchant: optionalText(80),
-  category: optionalText(40),
+  /*
+   * A closed list, not free text.
+   *
+   * The recommender's content_facet tier matches on this value, so every
+   * alternative spelling — "Tech", "tech", "High-tech" — is a bucket nobody
+   * else falls into, and the tier quietly finds less as the catalogue grows.
+   * Refusing anything off the list is what keeps the data usable later.
+   *
+   * Still optional: a wish can legitimately be "un week-end en Islande" with
+   * no obvious category, and forcing a choice would push people into picking
+   * one at random, which is worse than none at all.
+   */
+  category: z
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((v) => (v ?? '').trim())
+    .refine((v) => v === '' || isCategory(v), 'Choisissez une catégorie.'),
   priority: z.coerce.number().int().min(1).max(3),
-  isPot: z.coerce.boolean().optional(),
 });
 
 export type GiftInput = z.infer<typeof giftSchema>;

@@ -3,7 +3,8 @@
 import { useActionState } from 'react';
 import type { FormState } from '@/lib/gift-actions';
 import { PRIORITY_LABELS } from '@/lib/format';
-import { Field, TextareaField } from './Field';
+import { CATEGORIES } from '@/lib/taxonomy';
+import { Field, SelectField, TextareaField } from './Field';
 import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
 import styles from './forms.module.css';
@@ -25,7 +26,6 @@ export type GiftInitial = {
   merchant: string | null;
   category: string | null;
   priority: number;
-  isPot: boolean;
   imageUrl: string | null;
 };
 
@@ -79,12 +79,13 @@ export function GiftForm({
           placeholder="Facultatif"
           error={state.errors?.price}
         />
-        <Field
+        <SelectField
           id="category"
           name="category"
           label="Catégorie"
           defaultValue={initial?.category ?? ''}
-          placeholder="Tech, Maison…"
+          options={CATEGORIES}
+          placeholder="Choisir…"
           error={state.errors?.category}
         />
       </div>
@@ -127,16 +128,12 @@ export function GiftForm({
         </div>
       </fieldset>
 
-      <label className={styles.checkbox}>
-        <input type="checkbox" name="isPot" defaultChecked={initial?.isPot} />
-        <span>
-          <span className={styles.radioLabel}>Cadeau à plusieurs</span>
-          <span className={styles.radioHint}>
-            Vos proches pourront se regrouper et participer chacun à hauteur de
-            ce qu&rsquo;ils veulent.
-          </span>
-        </span>
-      </label>
+      {/*
+        There is no "collaborative gift" checkbox any more. Whether one friend
+        buys this alone or several club together is theirs to decide once they
+        know the price and who else is interested — and the whole point of the
+        app is that the person asking never finds out either way.
+      */}
 
       <SubmitButton pendingLabel={pendingLabel}>{submitLabel}</SubmitButton>
     </form>

@@ -113,10 +113,12 @@ export default async function GiftPage({
       </div>
 
       <div className={styles.flags}>
-        {gift.isPot && <Badge tone="solid">Cadeau à plusieurs</Badge>}
         {gift.category && <Badge>{gift.category}</Badge>}
         {gift.reservation?.state === 'mine' && (
           <Badge tone="secret">Vous l&rsquo;avez réservé</Badge>
+        )}
+        {gift.reservation?.state === 'open' && (
+          <Badge tone="solid">Cadeau à plusieurs</Badge>
         )}
         {gift.reservation?.state === 'taken' && (
           <Badge tone="muted">Déjà réservé</Badge>
@@ -159,7 +161,7 @@ export default async function GiftPage({
                 : 'Le propriétaire de la liste ne voit rien de tout ceci.'}
           </SecretSeal>
 
-          {gift.reservation && !gift.isPot && (
+          {gift.reservation && (
             <ReserveButton giftId={id} reservation={gift.reservation} />
           )}
 

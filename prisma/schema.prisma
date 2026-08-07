@@ -179,8 +179,6 @@ model Gift {
   category    String?
   /// 1 = would be nice, 3 = really wants it.
   priority    Int      @default(2)
-  /// Collaborative: friends chip in rather than one person buying it.
-  isPot       Boolean  @default(false)
   listId      String
   list        GiftList @relation(fields: [listId], references: [id], onDelete: Cascade)
   /// Nullable on purpose: "Un week-end en Islande" is a real wish with no
@@ -199,16 +197,32 @@ model Gift {
   @@index([productId])
 }
 
-/// A gift claimed by one friend.
+/// A gift claimed by one friend, and possibly shared with others.
 ///
 /// This row must never reach the gift's owner. Queries that can run for an
 /// owner go through the selectors in src/lib/secrecy.ts, which strip it.
+///
+/// ── Why "collaborative" lives here and not on Gift ────────────────────────
+///
+/// It used to be Gift.isPot, set by the list's OWNER when they added the
+/// wish. That was the wrong person to ask: whether one friend buys the thing
+/// alone or four of them club together is a decision among the friends, taken
+/// once they know the price and who else is interested. The owner cannot know
+/// that, and — the point of the whole app — must not learn it either.
+///
+/// So a reservation is the single claim on a gift, and openedToOthers says
+/// whether its holder has invited the others in. One row, two states, no way
+/// for the two to disagree about who holds what.
 model Reservation {
   id         String   @id @default(cuid())
   giftId     String   @unique
   gift       Gift     @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  /// Whoever reserved it first. They stay the initiator once it is opened.
   reserverId String
   reserver   User     @relation(fields: [reserverId], references: [id], onDelete: Cascade)
+  /// Set when the holder invites the other friends to chip in.
+  openedToOthers Boolean @default(false)
+  openedAt       DateTime?
   note       String?
   createdAt  DateTime @default(now())
 

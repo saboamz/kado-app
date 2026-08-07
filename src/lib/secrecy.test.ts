@@ -15,7 +15,6 @@ const gift = (over: Partial<GiftRow> = {}): GiftRow => ({
   imageUrl: null,
   category: 'Tech',
   priority: 3,
-  isPot: false,
   listId: 'l1',
   createdAt: new Date('2026-01-01'),
   reservation: null,
@@ -26,7 +25,7 @@ const gift = (over: Partial<GiftRow> = {}): GiftRow => ({
 describe('the secrecy rule', () => {
   it('omits the reservation key entirely for an owner', () => {
     const view = viewGift(
-      gift({ reservation: { reserverId: ALICE, createdAt: new Date() } }),
+      gift({ reservation: { reserverId: ALICE, createdAt: new Date(), openedToOthers: false } }),
       'owner',
       OWNER,
     );
@@ -39,7 +38,7 @@ describe('the secrecy rule', () => {
     // two cases, because the serialised objects are byte-for-byte equal.
     const free = viewGift(gift(), 'owner', OWNER);
     const taken = viewGift(
-      gift({ reservation: { reserverId: ALICE, createdAt: new Date() } }),
+      gift({ reservation: { reserverId: ALICE, createdAt: new Date(), openedToOthers: false } }),
       'owner',
       OWNER,
     );
@@ -47,10 +46,9 @@ describe('the secrecy rule', () => {
   });
 
   it('gives an owner the identical payload whether or not a pot has money', () => {
-    const empty = viewGift(gift({ isPot: true }), 'owner', OWNER);
+    const empty = viewGift(gift({}), 'owner', OWNER);
     const funded = viewGift(
       gift({
-        isPot: true,
         contributions: [
           { contributorId: ALICE, amountCents: 5000 },
           { contributorId: BOB, amountCents: 12000 },
@@ -74,7 +72,7 @@ describe('the secrecy rule', () => {
 
   it('tells a friend when they hold the gift themselves', () => {
     const view = viewGift(
-      gift({ reservation: { reserverId: ALICE, createdAt: new Date('2026-02-02') } }),
+      gift({ reservation: { reserverId: ALICE, createdAt: new Date('2026-02-02'), openedToOthers: false } }),
       'friend',
       ALICE,
     );
@@ -83,7 +81,7 @@ describe('the secrecy rule', () => {
 
   it('tells a friend a gift is taken without naming who took it', () => {
     const view = viewGift(
-      gift({ reservation: { reserverId: BOB, createdAt: new Date() } }),
+      gift({ reservation: { reserverId: BOB, createdAt: new Date(), openedToOthers: false } }),
       'friend',
       ALICE,
     );
@@ -93,9 +91,15 @@ describe('the secrecy rule', () => {
 });
 
 describe('pot totals', () => {
+  // A pot is a reservation its holder opened, so the fixture needs one: the
+  // contributions alone no longer make a gift collaborative.
   const funded = gift({
-    isPot: true,
     priceCents: 159900,
+    reservation: {
+      reserverId: BOB,
+      createdAt: new Date('2026-01-05'),
+      openedToOthers: true,
+    },
     contributions: [
       { contributorId: ALICE, amountCents: 5000 },
       { contributorId: BOB, amountCents: 12000 },
@@ -127,7 +131,7 @@ describe('pot totals', () => {
 describe('viewReservation', () => {
   it('treats a signed-out viewer as unable to own a reservation', () => {
     expect(
-      viewReservation({ reserverId: ALICE, createdAt: new Date() }, null),
+      viewReservation({ reserverId: ALICE, createdAt: new Date(), openedToOthers: false }, null),
     ).toEqual({ state: 'taken' });
   });
 });

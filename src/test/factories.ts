@@ -30,14 +30,35 @@ export async function makeList(
 
 export async function makeGift(
   listId: string,
-  over: { name?: string; priceCents?: number; isPot?: boolean } = {},
+  over: { name?: string; priceCents?: number } = {},
 ) {
   return db.gift.create({
     data: {
       listId,
       name: over.name ?? 'Cadeau',
       priceCents: over.priceCents ?? 1000,
-      isPot: over.isPot ?? false,
+    },
+  });
+}
+
+/**
+ * Reserves a gift, optionally opening it to the other friends.
+ *
+ * A pot is a reservation its holder opened — there is no such thing as a
+ * "pot gift" any more — so a test that wants one starts here.
+ */
+export async function makeReservation(
+  giftId: string,
+  reserverId: string,
+  over: { openedToOthers?: boolean } = {},
+) {
+  const opened = over.openedToOthers ?? false;
+  return db.reservation.create({
+    data: {
+      giftId,
+      reserverId,
+      openedToOthers: opened,
+      openedAt: opened ? new Date() : null,
     },
   });
 }

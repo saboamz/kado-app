@@ -32,10 +32,19 @@ describe('the secrecy rule, against a real database', () => {
     const list = await makeList(owner.id, { name: 'Anniversaire' });
     listId = list.id;
     giftId = (await makeGift(list.id, { name: 'AirPods' })).id;
-    potId = (await makeGift(list.id, { name: 'MacBook', priceCents: 159900, isPot: true })).id;
+    potId = (await makeGift(list.id, { name: 'MacBook', priceCents: 159900 })).id;
 
     await db.reservation.create({
       data: { giftId, reserverId: other.id },
+    });
+    // The pot exists because its holder opened it to the others.
+    await db.reservation.create({
+      data: {
+        giftId: potId,
+        reserverId: other.id,
+        openedToOthers: true,
+        openedAt: new Date(),
+      },
     });
     await db.potContribution.createMany({
       data: [
@@ -79,8 +88,11 @@ describe('the secrecy rule, against a real database', () => {
   });
 
   it('gives friends a reserved count and owners none', async () => {
+    // Two gifts are spoken for: the AirPods are reserved outright, and the
+    // MacBook is held by someone who opened it to the others. An open pot is
+    // still a claim, so it counts.
     const asFriend = await getListForViewer(listId, friend.id);
-    expect(asFriend!.reservedCount).toBe(1);
+    expect(asFriend!.reservedCount).toBe(2);
     const asOwner = await getListForViewer(listId, owner.id);
     expect(asOwner!.reservedCount).toBeUndefined();
   });
@@ -102,7 +114,7 @@ describe('the secrecy rule, against a real database', () => {
     const asOwner = await getListsForViewer(owner.id, owner.id);
     expect(asOwner[0]).not.toHaveProperty('reservedCount');
     const asFriend = await getListsForViewer(owner.id, friend.id);
-    expect(asFriend[0]!.reservedCount).toBe(1);
+    expect(asFriend[0]!.reservedCount).toBe(2);
   });
 });
 
