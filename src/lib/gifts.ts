@@ -9,7 +9,7 @@ export type ListView = {
   visibility: 'PRIVATE' | 'FRIENDS' | 'PUBLIC';
   isDefault: boolean;
   allowPots: boolean;
-  owner: { id: string; name: string; avatarColor: string; avatarUrl: string | null };
+  owner: { id: string; name: string; avatarUrl: string | null };
   giftCount: number;
   /** Absent for owners: a count of taken gifts is itself a leak. */
   reservedCount?: number;
@@ -30,7 +30,7 @@ export async function getListForViewer(
     where: { id: listId },
     include: {
       owner: {
-        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+        select: { id: true, name: true, avatarUrl: true },
       },
     },
   });
@@ -73,7 +73,7 @@ type GiftReservationOnly = { reservation: { id: string } | null };
 export function listInclude(relation: ViewerRelation) {
   const base = {
     owner: {
-        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+        select: { id: true, name: true, avatarUrl: true },
       },
     _count: { select: { gifts: true } },
   };
@@ -115,7 +115,7 @@ function summarise(
     visibility: 'PRIVATE' | 'FRIENDS' | 'PUBLIC';
     isDefault: boolean;
     allowPots: boolean;
-    owner: { id: string; name: string; avatarColor: string; avatarUrl: string | null };
+    owner: { id: string; name: string; avatarUrl: string | null };
   },
   _relation: ViewerRelation,
   giftCount: number,

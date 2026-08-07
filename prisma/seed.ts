@@ -28,7 +28,6 @@ async function main() {
       name: 'Sophie Marchand',
       bio: 'Café filtre, céramique et randonnées.',
       birthday: daysFromNow(12),
-      avatarColor: '#FF6A55',
       interests: {
         create: [
           { label: 'Céramique' },
@@ -47,7 +46,6 @@ async function main() {
       name: 'Thomas Bel',
       bio: 'Vélo, cuisine et vieux synthés.',
       birthday: daysFromNow(24),
-      avatarColor: '#6C5CE7',
       interests: { create: [{ label: 'Vélo' }, { label: 'Musique' }] },
     },
   });
@@ -59,7 +57,6 @@ async function main() {
       name: 'Emma Roux',
       bio: 'Jardinage et romans policiers.',
       birthday: daysFromNow(45),
-      avatarColor: '#2F6BFF',
       interests: { create: [{ label: 'Jardinage' }, { label: 'Lecture' }] },
     },
   });
@@ -71,7 +68,6 @@ async function main() {
       name: 'Lucas Ferrand',
       bio: 'Jeux de société et photographie argentique.',
       birthday: daysFromNow(80),
-      avatarColor: '#111114',
     },
   });
 

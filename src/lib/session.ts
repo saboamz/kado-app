@@ -10,7 +10,6 @@ export type SessionUser = {
   id: string;
   email: string;
   name: string;
-  avatarColor: string;
   theme: 'LIGHT' | 'DARK' | 'SYSTEM';
 };
 
@@ -48,7 +47,6 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
           id: true,
           email: true,
           name: true,
-          avatarColor: true,
           theme: true,
         },
       },

@@ -26,8 +26,10 @@ model User {
   name          String
   bio           String?
   birthday      DateTime?
-  avatarColor   String    @default("#FF6A55")
-  /// An uploaded photo; falls back to the coloured initials when absent.
+  /// An uploaded photo. Absent, the avatar falls back to the person's
+  /// initials on a tint derived from their name — see avatarTint() in
+  /// format.ts. There is no stored colour: it was removed once nothing
+  /// rendered it.
   avatarUrl     String?
   theme         Theme     @default(SYSTEM)
   profilePublic Boolean   @default(false)

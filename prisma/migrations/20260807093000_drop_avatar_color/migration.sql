@@ -1,0 +1,13 @@
+-- Drops the stored avatar colour.
+--
+-- The redesign derives an avatar's tint from the person's name — a light
+-- background with dark text of the same hue, see avatarTint() in format.ts.
+-- The stored values could not be used for that: they are saturated hexes from
+-- the previous palette, one of them near-black, and none of them carries dark
+-- text legibly.
+--
+-- The picker that edited this column was removed with the redesign, and no
+-- code has read it since. Dropping data is not reversible, but the values are
+-- of a palette the app no longer uses; a colour is re-derived from the name on
+-- every render, so nobody's avatar changes because of this migration.
+ALTER TABLE "User" DROP COLUMN "avatarColor";

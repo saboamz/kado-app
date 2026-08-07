@@ -41,7 +41,6 @@ export default async function AppHomePage() {
       select: {
         id: true,
         name: true,
-        avatarColor: true,
         avatarUrl: true,
         birthday: true,
       },
@@ -50,7 +49,7 @@ export default async function AppHomePage() {
       where: { ownerId: { in: friends } },
       include: {
         owner: {
-          select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+          select: { id: true, name: true, avatarUrl: true },
         },
         _count: { select: { gifts: true } },
       },

@@ -27,7 +27,6 @@ export default async function BirthdaysPage() {
     select: {
       id: true,
       name: true,
-      avatarColor: true,
       avatarUrl: true,
       birthday: true,
       _count: { select: { lists: true } },
@@ -94,7 +93,6 @@ function PersonRow({
   person: {
     id: string;
     name: string;
-    avatarColor: string;
     avatarUrl: string | null;
     days: number;
     _count: { lists: number };
