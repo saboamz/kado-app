@@ -4,8 +4,18 @@ generator client {
 }
 
 datasource db {
-  provider   = "postgresql"
+  provider = "postgresql"
+  /// The pooled connection, used by the running app. On Neon this is the
+  /// `-pooler` host; every serverless instance goes through PgBouncer rather
+  /// than opening its own connection to Postgres.
   url        = env("DATABASE_URL")
+  /// The direct connection, used by migrations only.
+  ///
+  /// DDL and advisory locks need session state that PgBouncer in transaction
+  /// mode does not carry, so `prisma migrate deploy` must bypass the pooler.
+  /// Required: Prisma has no implicit fallback. Locally and in CI it is set to
+  /// the same URL as above, since a local Postgres has no pooler in front.
+  directUrl  = env("DIRECT_URL")
   extensions = [vector]
 }
 
@@ -366,4 +376,22 @@ model ChatMessage {
   createdAt DateTime @default(now())
 
   @@index([giftId, createdAt])
+}
+
+/// One recorded attempt at something that must not be brute-forced.
+///
+/// Kept in Postgres rather than in Redis on purpose: the database is already
+/// there, and adding a second datastore for this would mean a second account,
+/// a second set of credentials and a second thing that can be down while the
+/// app is up. The write is one indexed insert on a path that already does
+/// several queries.
+///
+/// `key` is what is being limited (an e-mail, an IP), prefixed by the action,
+/// so two different limits never share a bucket.
+model AuthAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
 }

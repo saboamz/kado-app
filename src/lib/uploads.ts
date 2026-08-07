@@ -1,21 +1,19 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import sharp from 'sharp';
-import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { MAX_UPLOAD_BYTES } from './upload-limits';
+import { MAX_UPLOAD_BYTES, type UploadKind } from './upload-limits';
+import { UPLOAD_DIR, putImage, removeImage } from './upload-store';
 
 /**
- * Where uploaded files live.
+ * Validating and normalising an uploaded image.
  *
- * Deliberately outside .next and outside public/: Next serves public/ from
- * the build output, which a running container cannot write to, and anything
- * written there would be lost on the next deploy. This directory is a Docker
- * volume in production and a gitignored folder in development.
+ * Where the bytes end up is upload-store.ts's problem — local disk in
+ * development, Vercel Blob in production. Everything here runs identically
+ * either way, so the security properties do not depend on the backend.
  */
-export const UPLOAD_DIR =
-  process.env.UPLOAD_DIR ?? join(process.cwd(), '.uploads');
-
+export { UPLOAD_DIR };
 export { MAX_UPLOAD_BYTES } from './upload-limits';
+export type { UploadKind } from './upload-limits';
 
 /**
  * The formats we accept, keyed by the magic bytes that actually start the
@@ -75,9 +73,6 @@ const NORMALISED = {
 export type UploadResult =
   | { ok: true; path: string }
   | { ok: false; error: string };
-
-/** The kind of thing being uploaded, which decides where the file lands. */
-export type UploadKind = 'gifts' | 'avatars';
 
 export function detectImageType(bytes: Buffer) {
   return SIGNATURES.find((s) => s.match(bytes)) ?? null;
@@ -143,16 +138,7 @@ export async function storeUpload(
     return { ok: false, error: 'Cette image semble illisible.' };
   }
 
-  const dir = join(UPLOAD_DIR, kind);
-  await mkdir(dir, { recursive: true });
-
-  // A random name, not the uploader's: their filename may collide, contain
-  // path separators, or leak something they did not mean to share.
-  // Everything is WebP once stored, whatever arrived.
-  const name = `${randomUUID()}.webp`;
-  await writeFile(join(dir, name), normalised);
-
-  return { ok: true, path: `/uploads/${kind}/${name}` };
+  return { ok: true, path: await putImage(normalised, kind) };
 }
 
 /**
@@ -160,18 +146,7 @@ export async function storeUpload(
  * ours — an external URL, or a file already gone.
  */
 export async function deleteUpload(path: string | null): Promise<void> {
-  if (!path) return;
-  const match = /^\/uploads\/(gifts|avatars)\/([A-Za-z0-9_-]+\.\w+)$/.exec(path);
-  if (!match) return;
-
-  const resolved = resolveUploadPath(match[1]!, match[2]!);
-  if (!resolved) return;
-
-  try {
-    await unlink(resolved);
-  } catch {
-    // Already gone is the outcome we wanted.
-  }
+  await removeImage(path);
 }
 
 /** A stable cache key so a replaced image is not served from a stale cache. */

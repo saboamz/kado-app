@@ -58,6 +58,48 @@ npm run dev
 never see. They are documented as such in
 [`prisma/schema.prisma`](prisma/schema.prisma).
 
+## Deploying to Vercel
+
+Free tier throughout: Vercel (Hobby), Neon (Free), Vercel Blob (Hobby).
+
+**Neon rather than a plain Postgres** because the schema requires `pgvector`
+(`Product.embedding`), and because its pooler is what keeps a serverless
+deployment from exhausting the connection limit.
+
+1. **Database.** Create a Neon project. Take both connection strings:
+   - `DATABASE_URL` — the **pooled** one (`...-pooler.<region>.aws.neon.tech`),
+     with `?sslmode=require&pgbouncer=true&connection_limit=1` appended.
+     Every function instance holds its own pool, so each needs the smallest
+     one that works, with PgBouncer multiplexing in front.
+   - `DIRECT_URL` — the same host **without** `-pooler`. Migrations run through
+     this: PgBouncer in transaction mode cannot carry the session state that
+     DDL and advisory locks need.
+
+2. **Image storage.** `vercel blob store add`, then set the
+   `BLOB_READ_WRITE_TOKEN` it prints. Its presence is what switches storage
+   from the local disk to Blob — on Vercel the function filesystem is
+   ephemeral and unshared, so a locally-written file is gone on the next
+   request and was never visible to another instance.
+
+3. **Secrets.** Set `AUTH_SECRET` and `CRON_SECRET`, each 32 random bytes:
+   ```
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+
+4. **Deploy.** Vercel runs `vercel-build`, which generates the Prisma client,
+   applies migrations and builds. Nothing else to configure.
+
+The nightly cron (`vercel.json`, 03:00) recomputes product popularity and the
+item-item similarity matrix, and purges expired rate-limit rows. Embeddings
+stay a manual `npm run embed`: the encoder is a 400 MB model that does not fit
+a serverless function.
+
+### Deploying with Docker instead
+
+Unchanged and still supported. The `Dockerfile` builds a standalone server and
+a separate migration stage; `UPLOAD_DIR` points at a mounted volume, and with
+no `BLOB_READ_WRITE_TOKEN` set the app writes images there.
+
 ## Contributing
 
 `main` is protected; every change lands through a pull request.

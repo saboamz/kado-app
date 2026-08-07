@@ -26,6 +26,8 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://kado:kado@localhost:5432/kado_test?schema=public
+      # No pooler in CI; migrations and the app share one connection string.
+      DIRECT_URL: postgresql://kado:kado@localhost:5432/kado_test?schema=public
       AUTH_SECRET: ci-secret-not-used-in-production-000000000000
 
     steps:
