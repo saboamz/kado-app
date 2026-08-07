@@ -40,6 +40,21 @@ export const LOGIN_PER_IP: Limit = { attempts: 30, windowSeconds: 15 * 60 };
 /** Sign-up is per IP only — there is no account yet to key on. */
 export const SIGNUP_PER_IP: Limit = { attempts: 10, windowSeconds: 60 * 60 };
 
+/**
+ * Outbound page reads, per signed-in person.
+ *
+ * Saving a gift with a link makes our server fetch a URL the user chose. Left
+ * unbounded that is a free relay: a loop of saves becomes a burst of requests
+ * from our address to a target of their choosing, and on a metered plan it
+ * spends the function quota too.
+ *
+ * Keyed on the user rather than the IP because the action already requires a
+ * session, and a household sharing an address should not share this budget.
+ * Generous enough that nobody adding wishes by hand will ever meet it — forty
+ * links in an hour is far past what a person does.
+ */
+export const LINK_FETCH_PER_USER: Limit = { attempts: 40, windowSeconds: 60 * 60 };
+
 export type LimitResult = { allowed: true } | { allowed: false; retryAfter: number };
 
 /** Lower-cased and namespaced, so two limits never share a bucket. */
@@ -48,14 +63,19 @@ function bucketFor(action: string, key: string): string {
 }
 
 /**
- * Records one FAILED attempt.
+ * Records one attempt against a bucket.
  *
- * Only failures count. Counting successes too would make a shared address —
- * a household, an office, a school — throttle itself simply by using the app,
- * and the limit is meant to slow guessing, not use. It also made the e2e suite
- * lock itself out after thirty sign-ins from one address.
+ * WHICH attempts get recorded is the caller's decision, and the two callers
+ * differ on purpose:
+ *
+ *  - sign-in records only FAILURES. Counting successes would make a shared
+ *    address — a household, an office, a school — throttle itself simply by
+ *    using the app, and the limit is meant to slow guessing, not use.
+ *  - the link resolver records EVERY attempt, because there the cost being
+ *    limited is the outbound request itself, and a successful fetch costs
+ *    exactly as much as a failed one.
  */
-export async function recordFailure(action: string, key: string): Promise<void> {
+export async function recordAttempt(action: string, key: string): Promise<void> {
   await db.authAttempt.create({ data: { key: bucketFor(action, key) } });
 }
 

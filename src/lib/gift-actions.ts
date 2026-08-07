@@ -168,6 +168,7 @@ export async function createGift(
     gift.id,
     gift.url,
     gift.category,
+    user.id,
   );
 
   await logEvent({
@@ -188,7 +189,7 @@ export async function updateGift(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const { gift } = await requireOwnedGift(giftId);
+  const { user, gift } = await requireOwnedGift(giftId);
 
   const parsed = parseGiftForm(formData);
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
@@ -222,7 +223,7 @@ export async function updateGift(
   });
 
   if (urlChanged) {
-    await linkGiftToProduct(giftId, next.url, next.category);
+    await linkGiftToProduct(giftId, next.url, next.category, user.id);
   }
 
   revalidatePath(`/lists/${gift.listId}`);

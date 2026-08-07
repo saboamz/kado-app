@@ -1,6 +1,7 @@
 import { db } from './db';
 import { linkGiftToProduct } from './gift-product-link';
 import { findOrCreateProduct } from './product-resolve';
+import { LINK_FETCH_PER_USER } from './rate-limit';
 import { cleanup, makeGift, makeList, makeUser } from '@/test/factories';
 
 /**
@@ -37,7 +38,7 @@ describe('a link we cannot resolve leaves the gift alone', () => {
 
     // The wish with no link is not a failure mode, it is the normal case for
     // anything that is not a product.
-    expect(await linkGiftToProduct(gift.id, null, 'Voyage')).toBeNull();
+    expect(await linkGiftToProduct(gift.id, null, 'Voyage', owner.id)).toBeNull();
 
     const after = await db.gift.findUnique({ where: { id: gift.id } });
     expect(after?.productId).toBeNull();
@@ -55,7 +56,7 @@ describe('a link we cannot resolve leaves the gift alone', () => {
       'http://localhost:3000/admin',
       'file:///etc/passwd',
     ]) {
-      await expect(linkGiftToProduct(gift.id, url, null)).resolves.toBeNull();
+      await expect(linkGiftToProduct(gift.id, url, null, owner.id)).resolves.toBeNull();
     }
 
     expect((await db.gift.findUnique({ where: { id: gift.id } }))?.productId).toBeNull();
@@ -70,6 +71,7 @@ describe('a link we cannot resolve leaves the gift alone', () => {
       gift.id,
       'https://this-host-does-not-exist-kado-test.invalid/p/1',
       'Tech',
+      owner.id,
     );
 
     expect(linked).toBeNull();
@@ -184,9 +186,81 @@ describe('an existing link is not overwritten', () => {
       gift.id,
       'https://this-host-does-not-exist-kado-test.invalid/p/2',
       'Tech',
+      owner.id,
     );
 
     const after = await db.gift.findUnique({ where: { id: gift.id } });
     expect(after?.productId).toBe(product!.id);
+  });
+});
+
+describe('outbound reads are budgeted per person', () => {
+  afterEach(async () => {
+    await db.authAttempt.deleteMany({ where: { key: { startsWith: 'link:fetch:' } } });
+  });
+
+  it('stops fetching once the hourly budget is spent', async () => {
+    // Saving a gift with a link makes OUR server fetch a URL somebody else
+    // chose. Unbounded, a loop of saves turns the app into a relay pointed
+    // wherever they like, and spends the function quota doing it.
+    const gift = await makeGift(listId, { name: 'Budget' });
+    const key = `link:fetch:${owner.id.toLowerCase()}`;
+
+    await db.authAttempt.createMany({
+      data: Array.from({ length: LINK_FETCH_PER_USER.attempts }, () => ({ key })),
+    });
+
+    const before = await db.authAttempt.count({ where: { key } });
+    const linked = await linkGiftToProduct(
+      gift.id,
+      'https://this-host-does-not-exist-kado-test.invalid/p/3',
+      'Tech',
+      owner.id,
+    );
+
+    expect(linked).toBeNull();
+    // Refused before the request, so nothing more was recorded either.
+    expect(await db.authAttempt.count({ where: { key } })).toBe(before);
+  });
+
+  it('counts a successful read as well as a failed one', async () => {
+    // Unlike the sign-in limiter, where only failures count: there the thing
+    // being limited is guessing, here it is the request itself, and a
+    // successful fetch costs exactly as much as a failed one.
+    const gift = await makeGift(listId, { name: 'Compte' });
+    const key = `link:fetch:${owner.id.toLowerCase()}`;
+
+    await linkGiftToProduct(
+      gift.id,
+      'https://this-host-does-not-exist-kado-test.invalid/p/4',
+      'Tech',
+      owner.id,
+    );
+
+    expect(await db.authAttempt.count({ where: { key } })).toBe(1);
+  });
+
+  it('gives each person their own budget', async () => {
+    // One person exhausting theirs must not stop everybody else adding wishes.
+    const other = await makeUser('Autre Personne');
+    const gift = await makeGift(listId, { name: 'Séparé' });
+    const mine = `link:fetch:${owner.id.toLowerCase()}`;
+
+    await db.authAttempt.createMany({
+      data: Array.from({ length: LINK_FETCH_PER_USER.attempts }, () => ({ key: mine })),
+    });
+
+    // Theirs is untouched, so their attempt is recorded rather than refused.
+    await linkGiftToProduct(
+      gift.id,
+      'https://this-host-does-not-exist-kado-test.invalid/p/5',
+      'Tech',
+      other.id,
+    );
+
+    expect(
+      await db.authAttempt.count({ where: { key: `link:fetch:${other.id.toLowerCase()}` } }),
+    ).toBe(1);
+    await cleanup([other.id]);
   });
 });
