@@ -12,21 +12,27 @@
  * you) while the layout stays something the app controls.
  */
 
-export const SLOTS = ['banner', 'beside', 'footer'] as const;
+/*
+ * One slot, at the foot of the page.
+ *
+ * There were three — a banner, one beside the name, one at the bottom. Three
+ * places to fill is three decisions before anything looks finished, and the
+ * two at the top competed with the name and the photo for the same glance.
+ * The one at the bottom sits after the lists, where it reads as a signature
+ * rather than as chrome: you have already seen what the person wants, and
+ * this is them.
+ *
+ * The array is kept rather than collapsed to a constant because the storage,
+ * the picker and the pages are all written against a set. Adding a second
+ * place later is one entry here, not a reshape.
+ */
+export const SLOTS = ['footer'] as const;
 export type Slot = (typeof SLOTS)[number];
 
 /** What each slot is, in the words shown to the person choosing. */
 export const SLOT_LABELS: Record<Slot, { name: string; hint: string }> = {
-  banner: {
-    name: 'Bandeau',
-    hint: 'En haut de votre profil, sur toute la largeur.',
-  },
-  beside: {
-    name: 'À côté de votre nom',
-    hint: 'Un petit GIF posé près de votre photo.',
-  },
   footer: {
-    name: 'En bas de page',
+    name: 'En bas de votre profil',
     hint: 'Après vos listes, comme une signature.',
   },
 };
@@ -40,6 +46,14 @@ export type GifChoice = {
   /** The provider's id, so the same GIF is recognisable across searches. */
   id: string;
   gifUrl: string;
+  /**
+   * A small ANIMATED rendition, for the search grid.
+   *
+   * Not stored: it exists so somebody can see what a GIF actually does before
+   * picking it. Judging an animation by one still frame — often a near-empty
+   * one — is choosing blind.
+   */
+  previewUrl: string;
   stillUrl: string;
   width: number;
   height: number;

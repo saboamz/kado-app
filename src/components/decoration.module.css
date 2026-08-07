@@ -18,29 +18,9 @@
   display: block;
 }
 
-/* Full width, letterbox — a cover photo. */
-.banner {
-  aspect-ratio: 3 / 1;
-  margin: calc(var(--gutter) * -1) calc(var(--gutter) * -1) var(--gutter);
-  border-radius: 0;
-}
-
-/* A small square beside the name, sized like a large avatar. */
-.beside {
-  width: 72px;
-  height: 72px;
-  flex: none;
-  border-radius: var(--radius-lg);
-}
-
 /* A signature at the end of the page. */
 .footer {
   aspect-ratio: 4 / 1;
   margin-top: var(--gutter);
 }
 
-@media (min-width: 900px) {
-  .banner {
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  }
-}

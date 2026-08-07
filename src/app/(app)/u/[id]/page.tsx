@@ -76,10 +76,6 @@ export default async function PersonPage({
         what="le profil"
       />
 
-      {decor.banner && (
-        <Decoration decoration={decor.banner} slot="banner" />
-      )}
-
       <PageHeader title={person.name} back={{ href: '/app', label: 'Accueil' }} />
 
       <div className={styles.identity}>
@@ -96,9 +92,6 @@ export default async function PersonPage({
             </p>
           )}
         </div>
-        {decor.beside && (
-          <Decoration decoration={decor.beside} slot="beside" />
-        )}
       </div>
 
       {person.interests.length > 0 && (
