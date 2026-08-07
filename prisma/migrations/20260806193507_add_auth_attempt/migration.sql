@@ -1,0 +1,14 @@
+-- DropIndex
+DROP INDEX "Product_embedding_hnsw";
+
+-- CreateTable
+CREATE TABLE "AuthAttempt" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AuthAttempt_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "AuthAttempt_key_createdAt_idx" ON "AuthAttempt"("key", "createdAt");
