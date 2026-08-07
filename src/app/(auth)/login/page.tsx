@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { login } from '@/lib/auth-actions';
 import { Field } from '@/components/Field';
@@ -9,6 +10,7 @@ import styles from '../auth.module.css';
 
 export default function LoginPage() {
   const [state, action] = useActionState(login, {});
+  const invite = useSearchParams().get('invite');
 
   return (
     <>
@@ -20,6 +22,7 @@ export default function LoginPage() {
       </div>
 
       <form action={action} className={styles.form} noValidate>
+        {invite && <input type="hidden" name="invite" value={invite} />}
         {state.errors?.form && (
           <p className={styles.formError} role="alert">
             {state.errors.form}

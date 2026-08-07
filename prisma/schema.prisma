@@ -46,6 +46,7 @@ model User {
   receivedRequests Friendship[]      @relation("Addressee")
   notifications    Notification[]
   messages         ChatMessage[]
+  invites          Invite[]
 
   @@index([email])
 }
@@ -410,4 +411,41 @@ model AuthAttempt {
   createdAt DateTime @default(now())
 
   @@index([key, createdAt])
+}
+
+/// A shareable link that turns into a friendship.
+///
+/// ── Why this exists ────────────────────────────────────────────────────────
+///
+/// Kado is worthless alone: a reservation needs somebody to hide it from, and
+/// the whole product is what friends do behind your back. But joining took
+/// five steps — get the URL by some other means, sign up, search for a name,
+/// send a request, wait for it to be accepted. Most people stop somewhere in
+/// the middle, and the app stays empty.
+///
+/// One link collapses that to: click, sign up, you are friends.
+///
+/// ── Why it is reusable and long-lived ──────────────────────────────────────
+///
+/// A single-use token would mean generating one per person, which is the
+/// awkwardness this removes: the point is to paste ONE link into a family
+/// group chat. So a code is a standing invitation to become friends with its
+/// owner, and it can be revoked when they are done with it.
+model Invite {
+  id        String    @id @default(cuid())
+  /// The URL-safe code. Random, not derived from the owner: a guessable code
+  /// would let anyone befriend anyone by enumeration.
+  code      String    @unique
+  ownerId   String
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  /// Set when the owner turns it off. Kept rather than deleted so a stale
+  /// link says "this invitation is closed" instead of "not found", which is
+  /// what somebody arriving late needs to be told.
+  revokedAt DateTime?
+  /// How many friendships it has produced. Displayed to the owner, and the
+  /// only reason to keep a count at all.
+  uses      Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([ownerId])
 }

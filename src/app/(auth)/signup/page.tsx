@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { signup } from '@/lib/auth-actions';
 import { Field } from '@/components/Field';
@@ -9,6 +10,10 @@ import styles from '../auth.module.css';
 
 export default function SignupPage() {
   const [state, action] = useActionState(signup, {});
+  // Carried from an invitation link. A hidden field rather than a cookie:
+  // the value only has to survive this one form post, and a cookie would
+  // outlive the visit and befriend them on some later sign-up.
+  const invite = useSearchParams().get('invite');
 
   return (
     <>
@@ -20,6 +25,7 @@ export default function SignupPage() {
       </div>
 
       <form action={action} className={styles.form} noValidate>
+        {invite && <input type="hidden" name="invite" value={invite} />}
         {state.errors?.form && (
           <p className={styles.formError} role="alert">
             {state.errors.form}

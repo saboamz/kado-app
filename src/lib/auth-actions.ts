@@ -13,6 +13,7 @@ import {
   recordAttempt,
   retryMessage,
 } from './rate-limit';
+import { acceptInvite } from './invite-actions';
 import { createSession, destroySession } from './session';
 import { fieldErrors, loginSchema, signupSchema } from './validation';
 
@@ -76,7 +77,32 @@ export async function signup(
   });
 
   await createSession(user.id);
+
+  /*
+   * An invitation rides along from the link they followed.
+   *
+   * Applied here so the friendship exists before they see the app for the
+   * first time: arriving to an empty Kado and having to search for the person
+   * who invited you is precisely the friction the link removes.
+   *
+   * Failures are swallowed on purpose. The account is created and the session
+   * is live; a revoked or malformed code must not turn that into an error
+   * page. They land signed in, simply without the friendship.
+   */
+  await applyInvite(formData);
+
   redirect('/app');
+}
+
+/** Consumes an invite code carried through an auth form, if there is one. */
+async function applyInvite(formData: FormData): Promise<void> {
+  const code = formData.get('invite');
+  if (typeof code !== 'string' || !code) return;
+  try {
+    await acceptInvite(code);
+  } catch {
+    // Never at the cost of the sign-in itself.
+  }
 }
 
 export async function login(
@@ -144,6 +170,7 @@ export async function login(
   await clearAttempts('login:email', parsed.data.email);
 
   await createSession(user.id);
+  await applyInvite(formData);
   redirect('/app');
 }
 

@@ -103,3 +103,60 @@ export async function linkGiftToProduct(
 
   return product.id;
 }
+
+/**
+ * Retries the links that never resolved.
+ *
+ * A merchant can be down for an afternoon, rate-limit us, or answer a
+ * timeout — all temporary, and all currently permanent: the resolver runs
+ * once when the gift is saved and nothing ever tries again. Those wishes stay
+ * unlinked forever, and the recommender never sees them.
+ *
+ * Run from the nightly cron, which is why it takes a budget: a serverless
+ * function has a hard ceiling, and a sweep that tries to catch up on a
+ * thousand gifts in one run would be cut off mid-way with nothing recorded.
+ * Whatever is left is simply picked up tomorrow.
+ *
+ * The oldest first, so a gift is not passed over indefinitely by newer
+ * arrivals.
+ */
+export async function sweepUnlinkedGifts(
+  limit = 25,
+  budgetMs = 30_000,
+): Promise<{ attempted: number; linked: number }> {
+  const candidates = await db.gift.findMany({
+    where: { productId: null, url: { not: null } },
+    select: {
+      id: true,
+      url: true,
+      category: true,
+      list: { select: { ownerId: true } },
+    },
+    orderBy: { createdAt: 'asc' },
+    take: limit,
+  });
+
+  const startedAt = Date.now();
+  let attempted = 0;
+  let linked = 0;
+
+  for (const gift of candidates) {
+    // Stop before the function does, rather than being killed part-way.
+    // `>=` so a zero budget does no work at all: strictly-greater let the
+    // first attempt through, since no time has elapsed yet.
+    if (Date.now() - startedAt >= budgetMs) break;
+
+    attempted += 1;
+    // Charged to the gift's owner, like a save would be: the sweep must not
+    // become a way around the per-person budget.
+    const productId = await linkGiftToProduct(
+      gift.id,
+      gift.url,
+      gift.category,
+      gift.list.ownerId,
+    );
+    if (productId) linked += 1;
+  }
+
+  return { attempted, linked };
+}

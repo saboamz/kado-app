@@ -25,10 +25,50 @@ const lora = Lora({
   display: 'swap',
 });
 
+const DESCRIPTION =
+  'Ajoutez ce qui vous ferait plaisir. Vos proches réservent en secret — vous ne voyez jamais qui a pris quoi.';
+
 export const metadata: Metadata = {
+  /*
+   * metadataBase makes the relative OG image below resolve to an absolute
+   * URL, which is the only kind a scraper can fetch. Without it Next warns
+   * and the preview silently loses its image.
+   *
+   * VERCEL_PROJECT_PRODUCTION_URL is the stable production hostname, unlike
+   * VERCEL_URL which changes on every deployment — a preview card pointing at
+   * a superseded deployment breaks as soon as the next one ships.
+   */
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : 'http://localhost:3000'),
+  ),
   title: { default: 'Kado', template: '%s · Kado' },
-  description: 'Des listes de souhaits que vos proches remplissent en secret.',
+  description: DESCRIPTION,
   applicationName: 'Kado',
+  /*
+   * What a pasted link looks like in a group chat.
+   *
+   * This app spreads by somebody sharing a link with their family, so the
+   * card that appears there is not decoration — it is the first thing anyone
+   * sees of Kado, and a bare URL converts far worse than a title and an
+   * image.
+   */
+  openGraph: {
+    type: 'website',
+    siteName: 'Kado',
+    locale: 'fr_FR',
+    title: 'Kado — des listes de souhaits que vos proches remplissent en secret',
+    description: DESCRIPTION,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Kado' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kado — des listes de souhaits que vos proches remplissent en secret',
+    description: DESCRIPTION,
+    images: ['/opengraph-image'],
+  },
 };
 
 export const viewport: Viewport = {

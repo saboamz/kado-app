@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { buildItemSimilarity } from '@/lib/cf';
+import { sweepUnlinkedGifts } from '@/lib/gift-product-link';
 import { purgeOldAttempts } from '@/lib/rate-limit';
 import { refreshPopularity } from '@/lib/reco';
 
@@ -59,11 +60,22 @@ export async function GET(request: Request) {
   // anything older than a day is dead weight.
   const attemptsPurged = await purgeOldAttempts();
 
+  /*
+   * Retry the links that never resolved.
+   *
+   * Last, and with a budget: it makes outbound requests to third parties, so
+   * it is the only job here whose duration we do not control. The two
+   * aggregates above matter more and have already finished by this point.
+   */
+  const sweep = await sweepUnlinkedGifts();
+
   return NextResponse.json({
     ok: true,
     popularityRowsUpdated: popularity,
     similarityPairsWritten: similarity,
     attemptsPurged,
+    giftsRetried: sweep.attempted,
+    giftsLinked: sweep.linked,
     ms: Date.now() - startedAt,
   });
 }
