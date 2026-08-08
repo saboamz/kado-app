@@ -16,7 +16,22 @@ import styles from './onboardingCard.module.css';
  * somewhere. Ticked rows stay, dimmed, and stop being links — there is
  * nothing left to do on them.
  */
-export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
+export type OnboardingLabels = {
+  title: string;
+  progress: string;
+  dismiss: string;
+  done: string;
+};
+
+export function OnboardingCard({
+  onboarding,
+  labels,
+}: {
+  onboarding: Onboarding;
+  /** Translated by the page: this is a client component and cannot read the
+      request's locale. */
+  labels: OnboardingLabels;
+}) {
   const { steps, doneCount } = onboarding;
   const [dismissing, startDismiss] = useTransition();
 
@@ -25,11 +40,9 @@ export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
       <div className={styles.head}>
         <div>
           <h2 id="onboarding-title" className={styles.title}>
-            Pour bien commencer
+            {labels.title}
           </h2>
-          <p className={styles.progress}>
-            {doneCount} sur {steps.length} — quelques minutes, pas plus.
-          </p>
+          <p className={styles.progress}>{labels.progress}</p>
         </div>
 
         <button
@@ -38,7 +51,7 @@ export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
           disabled={dismissing}
           onClick={() => startDismiss(() => void dismissOnboarding())}
         >
-          {dismissing ? '…' : 'Masquer'}
+          {dismissing ? '…' : labels.dismiss}
         </button>
       </div>
 
@@ -62,7 +75,7 @@ export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
             <div className={styles.text}>
               <span className={styles.stepTitle}>
                 {step.title}
-                {step.done && <span className="srOnly"> — terminé</span>}
+                {step.done && <span className="srOnly"> — {labels.done}</span>}
               </span>
               {!step.done && <span className={styles.body}>{step.body}</span>}
             </div>

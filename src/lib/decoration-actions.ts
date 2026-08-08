@@ -47,15 +47,15 @@ export async function setDecoration(
 ): Promise<DecorationResult> {
   const user = await requireUser();
 
-  if (!isSlot(slot)) return { error: 'Emplacement inconnu.' };
+  if (!isSlot(slot)) return { error: 'error.unknownSlot' };
   if (!isAllowedGifUrl(choice.gifUrl) || !isAllowedGifUrl(choice.stillUrl)) {
-    return { error: 'Cette image ne vient pas d’une source autorisée.' };
+    return { error: 'error.imageNotAllowed' };
   }
 
   const width = Math.round(Number(choice.width));
   const height = Math.round(Number(choice.height));
   if (!Number.isFinite(width) || !Number.isFinite(height) || width < 1 || height < 1) {
-    return { error: 'Cette image est illisible.' };
+    return { error: 'error.imageUnreadable' };
   }
 
   // Upsert on (userId, slot): choosing a second GIF for the same place
@@ -89,7 +89,7 @@ export async function setDecoration(
 /** Empties one slot. Scoped to the caller: you can only clear your own. */
 export async function clearDecoration(slot: string): Promise<DecorationResult> {
   const user = await requireUser();
-  if (!isSlot(slot)) return { error: 'Emplacement inconnu.' };
+  if (!isSlot(slot)) return { error: 'error.unknownSlot' };
 
   await db.profileDecoration.deleteMany({ where: { userId: user.id, slot } });
 

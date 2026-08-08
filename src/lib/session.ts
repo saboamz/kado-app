@@ -11,6 +11,9 @@ export type SessionUser = {
   email: string;
   name: string;
   theme: 'LIGHT' | 'DARK' | 'SYSTEM';
+  /** Which language to render in. Carried here so resolving it costs no
+      extra query — every page already loads the session user. */
+  locale: string;
 };
 
 /** Issues a session row and sets its httpOnly cookie. */
@@ -75,6 +78,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
       email: true,
       name: true,
       theme: true,
+      locale: true,
     },
   });
 });

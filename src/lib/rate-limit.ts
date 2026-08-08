@@ -1,4 +1,5 @@
 import { db } from './db';
+import type { TFunction } from './i18n/t';
 
 /**
  * A sliding-window limiter for the endpoints that must not be brute-forced.
@@ -132,11 +133,8 @@ export async function clearAttempts(action: string, key: string): Promise<void> 
 }
 
 /** A human sentence for a refusal, in the app's language. */
-export function retryMessage(seconds: number): string {
-  const minutes = Math.ceil(seconds / 60);
-  return minutes <= 1
-    ? 'Trop de tentatives. Réessayez dans une minute.'
-    : `Trop de tentatives. Réessayez dans ${minutes} minutes.`;
+export function retryMessage(seconds: number, t: TFunction): string {
+  return t('error.retryMinutes', { count: Math.ceil(seconds / 60) });
 }
 
 /**

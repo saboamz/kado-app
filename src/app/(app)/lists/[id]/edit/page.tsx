@@ -6,15 +6,20 @@ import { PageHeader } from '@/components/PageHeader';
 import { db } from '@/lib/db';
 import { updateList } from '@/lib/list-actions';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from '@/components/forms.module.css';
 
-export const metadata: Metadata = { title: 'Modifier la liste' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('lists.editTitle') };
+}
 
 export default async function EditListPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getT();
   const { id } = await params;
   const user = await requireUser();
 
@@ -27,18 +32,18 @@ export default async function EditListPage({
   return (
     <>
       <PageHeader
-        title="Modifier la liste"
+        title={t('lists.editTitle')}
         back={{ href: `/lists/${id}`, label: list.name }}
       />
       <ListForm
         action={action}
         initial={list}
-        submitLabel="Enregistrer"
-        pendingLabel="Enregistrement…"
+        submitLabel={t('common.save')}
+        pendingLabel={t('action.saving')}
       />
 
       <div className={styles.danger}>
-        <p className={styles.dangerTitle}>Supprimer cette liste</p>
+        <p className={styles.dangerTitle}>{t('lists.deleteList')}</p>
         <p className={styles.dangerBody}>
           La liste et ses envies seront définitivement supprimées, ainsi que les
           réservations que vos proches y ont faites.

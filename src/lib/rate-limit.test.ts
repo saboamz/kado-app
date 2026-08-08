@@ -1,4 +1,7 @@
 import { db } from './db';
+import { en } from './i18n/en';
+import { fr } from './i18n/fr';
+import { translator } from './i18n/t';
 import {
   clearAttempts,
   purgeOldAttempts,
@@ -141,9 +144,19 @@ describe('the rate limiter', () => {
 });
 
 describe('the refusal message', () => {
+  const inFrench = translator('fr', fr);
+  const inEnglish = translator('en', en);
+
   it('speaks in minutes, rounded up', () => {
-    expect(retryMessage(30)).toContain('une minute');
-    expect(retryMessage(61)).toContain('2 minutes');
-    expect(retryMessage(15 * 60)).toContain('15 minutes');
+    expect(retryMessage(30, inFrench)).toContain('une minute');
+    expect(retryMessage(61, inFrench)).toContain('2 minutes');
+    expect(retryMessage(15 * 60, inFrench)).toContain('15 minutes');
+  });
+
+  it('says the same in English', () => {
+    // The singular/plural split is Intl.PluralRules', not a hand-written
+    // `> 1 ? 's' : ''` — which is why one dictionary entry covers both.
+    expect(retryMessage(30, inEnglish)).toContain('in a minute');
+    expect(retryMessage(61, inEnglish)).toContain('2 minutes');
   });
 });

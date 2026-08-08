@@ -1,4 +1,6 @@
 import { fieldErrors, loginSchema, signupSchema } from './validation';
+import { en } from './i18n/en';
+import { fr } from './i18n/fr';
 
 describe('signup validation', () => {
   it('accepts a valid signup', () => {
@@ -23,7 +25,12 @@ describe('signup validation', () => {
     });
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
-      expect(fieldErrors(parsed.error).password).toMatch(/8 caractères/);
+      // A KEY, not a sentence: schemas are built at import, before any
+      // request, so they cannot know the reader's language. The key is
+      // turned into text where the form renders it — see i18n/t.ts.
+      expect(fieldErrors(parsed.error).password).toBe('error.passwordShort');
+      expect(fr['error.passwordShort']).toMatch(/8 caractères/);
+      expect(en['error.passwordShort']).toMatch(/8 characters/);
     }
   });
 

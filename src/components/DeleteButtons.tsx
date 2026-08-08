@@ -2,6 +2,7 @@
 
 import { deleteList } from '@/lib/list-actions';
 import { deleteGift } from '@/lib/gift-actions';
+import { useT } from '@/lib/i18n/client';
 import { Button } from './Button';
 
 /**
@@ -18,13 +19,14 @@ export function DeleteListButton({
   listId: string;
   listName: string;
 }) {
+  const t = useT();
   return (
     <form
       action={deleteList.bind(null, listId)}
       onSubmit={(e) => {
         if (
           !confirm(
-            `Supprimer la liste « ${listName} » et toutes ses envies ? Cette action est définitive.`,
+            t('delete.listConfirm', { name: listName }),
           )
         ) {
           e.preventDefault();
@@ -32,7 +34,7 @@ export function DeleteListButton({
       }}
     >
       <Button variant="danger" type="submit">
-        Supprimer la liste
+        {t('delete.list')}
       </Button>
     </form>
   );
@@ -45,17 +47,18 @@ export function DeleteGiftButton({
   giftId: string;
   giftName: string;
 }) {
+  const t = useT();
   return (
     <form
       action={deleteGift.bind(null, giftId)}
       onSubmit={(e) => {
-        if (!confirm(`Supprimer « ${giftName} » de votre liste ?`)) {
+        if (!confirm(t('delete.giftConfirm', { name: giftName }))) {
           e.preventDefault();
         }
       }}
     >
       <Button variant="danger" type="submit">
-        Supprimer cette envie
+        {t('delete.gift')}
       </Button>
     </form>
   );

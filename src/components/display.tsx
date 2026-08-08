@@ -2,6 +2,7 @@ import { UploadedImage } from './UploadedImage';
 import Link from 'next/link';
 import type { ComponentProps, ReactNode } from 'react';
 import { avatarTint, initials, priorityLabel } from '@/lib/format';
+import type { TFunction } from '@/lib/i18n/t';
 import styles from './display.module.css';
 
 export function Card({
@@ -128,12 +129,16 @@ export function Badge({
 export function Priority({
   priority,
   compact = false,
+  t,
 }: {
   priority: number;
   compact?: boolean;
+  /** Handed down from the page: this renders on the server, where the
+      request's translator has already been resolved. */
+  t: TFunction;
 }) {
   const filled = Math.max(0, Math.min(3, priority));
-  const label = priorityLabel(filled);
+  const label = priorityLabel(filled, t);
 
   return (
     <span className={styles.priority}>

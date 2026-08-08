@@ -15,6 +15,8 @@ import { canViewList, relationTo } from '@/lib/relations';
 import { getChatForViewer } from '@/lib/chat';
 import { giftInclude, viewGift } from '@/lib/secrecy';
 import { getCurrentUser } from '@/lib/session';
+import { categoryName } from '@/lib/i18n/categories';
+import { getLocale, getT } from '@/lib/i18n/server';
 import styles from './gift.module.css';
 
 export async function generateMetadata({
@@ -35,6 +37,8 @@ export default async function GiftPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getT();
+  const locale = await getLocale();
   const { id } = await params;
   const viewer = await getCurrentUser();
   const viewerId = viewer?.id ?? null;
@@ -95,7 +99,7 @@ export default async function GiftPage({
         actions={
           isOwner && (
             <ButtonLink href={`/gifts/${id}/edit`} variant="secondary">
-              Modifier
+              {t('action.edit')}
             </ButtonLink>
           )
         }
@@ -109,19 +113,19 @@ export default async function GiftPage({
         <span className={styles.price}>
           {formatMoney(gift.priceCents, gift.currency)}
         </span>
-        <Priority priority={gift.priority} />
+        <Priority priority={gift.priority} t={t} />
       </div>
 
       <div className={styles.flags}>
-        {gift.category && <Badge>{gift.category}</Badge>}
+        {gift.category && <Badge>{categoryName(gift.category, locale)}</Badge>}
         {gift.reservation?.state === 'mine' && (
           <Badge tone="secret">Vous l&rsquo;avez réservé</Badge>
         )}
         {gift.reservation?.state === 'open' && (
-          <Badge tone="solid">Cadeau à plusieurs</Badge>
+          <Badge tone="solid">{t('gift.sharedGift')}</Badge>
         )}
         {gift.reservation?.state === 'taken' && (
-          <Badge tone="muted">Déjà réservé</Badge>
+          <Badge tone="muted">{t('gift.alreadyReserved')}</Badge>
         )}
       </div>
 
@@ -153,12 +157,12 @@ export default async function GiftPage({
       */}
       {hasSecretZone && (
         <SecretZone>
-          <SecretSeal title="Côté amis">
+          <SecretSeal title={t('gift.friendsSide')}>
             {gift.pot
               ? `${ownerFirstName} ne voit ni le total, ni les participants, ni même l’existence de cette cagnotte.`
               : gift.reservation?.state === 'free'
-                ? 'Si vous le réservez, cela restera invisible pour le propriétaire de la liste.'
-                : 'Le propriétaire de la liste ne voit rien de tout ceci.'}
+                ? t('gift.hiddenIfYouReserve')
+                : t('gift.ownerSeesNothing')}
           </SecretSeal>
 
           {gift.reservation && (

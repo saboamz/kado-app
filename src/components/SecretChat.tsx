@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { deleteChatMessage, postChatMessage } from '@/lib/chat-actions';
 import type { ChatMessageView } from '@/lib/chat';
 import { formatRelative } from '@/lib/format';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import { Avatar } from './display';
 import { Button } from './Button';
 import { LockIcon } from './icons';
@@ -22,6 +23,8 @@ export function SecretChat({
   giftId: string;
   messages: ChatMessageView[];
 }) {
+  const t = useT();
+  const errorText = useErrorText();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
@@ -43,7 +46,7 @@ export function SecretChat({
   const speakers = new Set(messages.map((m) => m.author.id)).size;
 
   return (
-    <section className={styles.chat} aria-label="Discussion secrète">
+    <section className={styles.chat} aria-label={t('chat.title')}>
       {/*
         The visible title counts the people who have actually spoken, as the
         design does ("Entre vous 3"). The section keeps a fixed accessible
@@ -53,7 +56,7 @@ export function SecretChat({
       */}
       <h2 className={styles.heading}>
         <LockIcon size={14} />
-        {speakers > 1 ? `Entre vous ${speakers}` : 'Discussion secrète'}
+        {speakers > 1 ? `Entre vous ${speakers}` : t('chat.title')}
       </h2>
 
       <p className={styles.intro}>
@@ -63,7 +66,7 @@ export function SecretChat({
 
       {messages.length === 0 ? (
         <p className={styles.empty}>
-          Aucun message. Lancez la conversation.
+          {t('chat.empty')}
         </p>
       ) : (
         <ul className={styles.messages}>
@@ -100,7 +103,7 @@ export function SecretChat({
                       })
                     }
                   >
-                    Supprimer
+                    {t('common.delete')}
                   </button>
                 )}
               </div>
@@ -111,13 +114,13 @@ export function SecretChat({
 
       <div className={styles.compose}>
         <label className="srOnly" htmlFor="chat-message">
-          Votre message
+          {t('chat.yourMessage')}
         </label>
         <textarea
           id="chat-message"
           className={styles.input}
           rows={2}
-          placeholder="Je peux mettre 50 €…"
+          placeholder={t('chat.placeholder')}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
@@ -129,7 +132,7 @@ export function SecretChat({
           }}
         />
         <Button disabled={pending || !draft.trim()} onClick={send}>
-          {pending ? 'Envoi…' : 'Envoyer'}
+          {pending ? t('chat.sending') : t('chat.send')}
         </Button>
       </div>
 
@@ -139,7 +142,7 @@ export function SecretChat({
 
       {error && (
         <p className={styles.error} role="alert">
-          {error}
+          {errorText(error)}
         </p>
       )}
     </section>

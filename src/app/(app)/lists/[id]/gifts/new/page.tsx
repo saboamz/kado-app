@@ -5,14 +5,19 @@ import { PageHeader } from '@/components/PageHeader';
 import { db } from '@/lib/db';
 import { createGift } from '@/lib/gift-actions';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 
-export const metadata: Metadata = { title: 'Ajouter une envie' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('gift.addTitle') };
+}
 
 export default async function NewGiftPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getT();
   const { id } = await params;
   const user = await requireUser();
 
@@ -22,14 +27,14 @@ export default async function NewGiftPage({
   return (
     <>
       <PageHeader
-        title="Ajouter une envie"
+        title={t('gift.addTitle')}
         subtitle={`Dans « ${list.name} »`}
         back={{ href: `/lists/${id}`, label: list.name }}
       />
       <GiftForm
         action={createGift.bind(null, id)}
-        submitLabel="Ajouter à ma liste"
-        pendingLabel="Ajout…"
+        submitLabel={t('gift.addCta')}
+        pendingLabel={t('gift.adding')}
       />
     </>
   );

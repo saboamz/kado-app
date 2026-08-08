@@ -13,13 +13,31 @@ import {
 } from './icons';
 import styles from './AppShell.module.css';
 
+/**
+ * The five destinations, in order.
+ *
+ * Labels arrive from the server layout rather than being read here: this is a
+ * client component, so it has no access to the request's locale, and shipping
+ * a dictionary to the browser to translate five words would be worse than
+ * passing five words.
+ */
 const TABS = [
-  { href: '/app', label: 'Accueil', Icon: HomeIcon },
-  { href: '/lists', label: 'Mes listes', Icon: GiftIcon },
-  { href: '/search', label: 'Rechercher', Icon: SearchIcon },
-  { href: '/notifications', label: 'Alertes', Icon: BellIcon },
-  { href: '/profile', label: 'Profil', Icon: UserIcon },
-];
+  { href: '/app', key: 'home', Icon: HomeIcon },
+  { href: '/lists', key: 'lists', Icon: GiftIcon },
+  { href: '/search', key: 'search', Icon: SearchIcon },
+  { href: '/notifications', key: 'alerts', Icon: BellIcon },
+  { href: '/profile', key: 'profile', Icon: UserIcon },
+] as const;
+
+export type NavLabels = {
+  main: string;
+  home: string;
+  lists: string;
+  search: string;
+  alerts: string;
+  profile: string;
+  unread: string;
+};
 
 /**
  * The application frame.
@@ -31,23 +49,27 @@ export function AppShell({
   children,
   unreadCount = 0,
   user,
+  labels,
 }: {
   children: ReactNode;
   unreadCount?: number;
   /** Shown at the far right of the desktop bar; absent on a phone. */
   user?: { name: string; avatarUrl?: string | null };
+  /** Translated in the layout, which can read the locale. */
+  labels: NavLabels;
 }) {
   const pathname = usePathname();
 
   return (
     <div className={styles.shell}>
       <div className={styles.body}>
-        <nav className={styles.nav} aria-label="Navigation principale">
+        <nav className={styles.nav} aria-label={labels.main}>
           <Link href="/app" className={styles.brand}>
             Kado
           </Link>
 
-          {TABS.map(({ href, label, Icon }) => {
+          {TABS.map(({ href, key, Icon }) => {
+            const label = labels[key];
             // `/app` must not light up for every route beneath it.
             const active =
               href === '/app' ? pathname === '/app' : pathname.startsWith(href);
@@ -71,7 +93,7 @@ export function AppShell({
                   {showBadge && (
                     <span className={styles.navBadge}>
                       {unreadCount > 9 ? '9+' : unreadCount}
-                      <span className="srOnly"> notifications non lues</span>
+                      <span className="srOnly"> {labels.unread}</span>
                     </span>
                   )}
                 </span>

@@ -5,27 +5,27 @@ export const emailSchema = z
   .string()
   .trim()
   .toLowerCase()
-  .min(1, 'Renseignez votre adresse e-mail.')
-  .email('Cette adresse e-mail semble invalide.');
+  .min(1, 'error.emailRequired')
+  .email('error.emailInvalid');
 
 export const passwordSchema = z
   .string()
-  .min(8, 'Le mot de passe doit contenir au moins 8 caractères.')
-  .max(200, 'Le mot de passe est trop long.');
+  .min(8, 'error.passwordShort')
+  .max(200, 'error.passwordLong');
 
 export const signupSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Renseignez votre nom.')
-    .max(80, 'Ce nom est trop long.'),
+    .min(1, 'error.nameRequired')
+    .max(80, 'error.nameLong'),
   email: emailSchema,
   password: passwordSchema,
 });
 
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, 'Renseignez votre mot de passe.'),
+  password: z.string().min(1, 'error.passwordRequired'),
 });
 
 /** Turns a ZodError into `{ field: message }` for rendering next to inputs. */
@@ -42,12 +42,12 @@ export const listSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Donnez un nom à votre liste.')
-    .max(60, 'Ce nom est trop long.'),
+    .min(1, 'error.listNameRequired')
+    .max(60, 'error.nameLong'),
   occasion: z
     .union([z.string(), z.null(), z.undefined()])
     .transform((v) => (v ?? '').trim())
-    .pipe(z.string().max(60, 'Ce texte est trop long.')),
+    .pipe(z.string().max(60, 'error.textLong')),
   visibility: z.enum(['PRIVATE', 'FRIENDS', 'PUBLIC']),
 });
 
@@ -71,14 +71,14 @@ const optionalText = (max: number) =>
   z
     .union([z.string(), z.null(), z.undefined()])
     .transform((v) => (v ?? '').trim())
-    .pipe(z.string().max(max, 'Ce texte est trop long.'));
+    .pipe(z.string().max(max, 'error.textLong'));
 
 export const giftSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Donnez un nom à cette envie.')
-    .max(140, 'Ce nom est trop long.'),
+    .min(1, 'error.giftNameRequired')
+    .max(140, 'error.nameLong'),
   description: optionalText(1000),
   price: optionalText(40),
   url: optionalText(2000).refine(
@@ -101,7 +101,7 @@ export const giftSchema = z.object({
   category: z
     .union([z.string(), z.null(), z.undefined()])
     .transform((v) => (v ?? '').trim())
-    .refine((v) => v === '' || isCategory(v), 'Choisissez une catégorie.'),
+    .refine((v) => v === '' || isCategory(v), 'error.categoryRequired'),
   priority: z.coerce.number().int().min(1).max(3),
 });
 

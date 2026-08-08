@@ -1,3 +1,6 @@
+import { en } from './i18n/en';
+import { fr } from './i18n/fr';
+import { translator } from './i18n/t';
 import {
   daysUntilBirthday,
   distinctOccasion,
@@ -7,6 +10,10 @@ import {
   parseMoney,
   priorityLabel,
 } from './format';
+
+/* One translator per language, shared by every case below. */
+const inFrench = translator('fr', fr);
+const inEnglish = translator('en', en);
 
 describe('formatMoney', () => {
   it('drops the decimals on a round amount', () => {
@@ -65,13 +72,22 @@ describe('daysUntilBirthday', () => {
 
 describe('formatBirthdayCountdown', () => {
   it.each([
-    [0, "c'est aujourd'hui"],
+    [0, 'c’est aujourd’hui'],
     [1, 'demain'],
     [12, 'dans 12 jours'],
     [30, 'dans 30 jours'],
     [60, 'dans 2 mois'],
   ])('renders %i days as %s', (days, expected) => {
-    expect(formatBirthdayCountdown(days)).toBe(expected);
+    expect(formatBirthdayCountdown(days, inFrench)).toBe(expected);
+  });
+
+  it.each([
+    [0, 'it’s today'],
+    [1, 'tomorrow'],
+    [12, 'in 12 days'],
+    [60, 'in 2 months'],
+  ])('renders %i days as %s in English', (days, expected) => {
+    expect(formatBirthdayCountdown(days, inEnglish)).toBe(expected);
   });
 });
 
@@ -87,15 +103,24 @@ describe('initials', () => {
 });
 
 describe('priorityLabel', () => {
+
   it('names each level', () => {
     // Wording comes from the design system: written from the wisher's side
     // rather than as a rank.
-    expect(priorityLabel(3)).toBe('Ça me ferait très plaisir');
-    expect(priorityLabel(1)).toBe('Une idée, sans plus');
+    expect(priorityLabel(3, inFrench)).toBe('Ça me ferait très plaisir');
+    expect(priorityLabel(1, inFrench)).toBe('Une idée, sans plus');
+  });
+
+  it('names each level in English too', () => {
+    // The labels used to live in a module-level array, which is evaluated
+    // once at import — so it could only ever hold one language, whichever
+    // loaded first.
+    expect(priorityLabel(3, inEnglish)).toBe('I’d love it');
+    expect(priorityLabel(1, inEnglish)).toBe('A passing idea');
   });
 
   it('stays empty for an unknown level', () => {
-    expect(priorityLabel(9)).toBe('');
+    expect(priorityLabel(9, inFrench)).toBe('');
   });
 });
 

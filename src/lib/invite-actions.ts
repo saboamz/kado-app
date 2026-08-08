@@ -134,10 +134,10 @@ export async function acceptInvite(code: string): Promise<InviteResult> {
     where: { code },
     select: { id: true, ownerId: true, revokedAt: true },
   });
-  if (!invite) return { error: 'Cette invitation n’existe pas.' };
-  if (invite.revokedAt) return { error: 'Cette invitation a été fermée.' };
+  if (!invite) return { error: 'error.inviteUnknown' };
+  if (invite.revokedAt) return { error: 'error.inviteClosed' };
   if (invite.ownerId === user.id) {
-    return { error: 'C’est votre propre lien d’invitation.' };
+    return { error: 'error.ownInviteLink' };
   }
 
   const existing = await db.friendship.findFirst({
@@ -152,7 +152,7 @@ export async function acceptInvite(code: string): Promise<InviteResult> {
   if (existing?.status === 'BLOCKED') {
     // Says nothing about why: a blocked person learning they are blocked is
     // information the blocker did not choose to give.
-    return { error: 'Impossible pour le moment.' };
+    return { error: 'error.tryLater' };
   }
 
   if (existing) {

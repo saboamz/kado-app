@@ -7,11 +7,16 @@ import { PageHeader } from '@/components/PageHeader';
 import { db } from '@/lib/db';
 import { formatRelative } from '@/lib/format';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './notifications.module.css';
 
-export const metadata: Metadata = { title: 'Notifications' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('notifications.title') };
+}
 
 export default async function NotificationsPage() {
+  const t = await getT();
   const user = await requireUser();
 
   const notifications = await db.notification.findMany({
@@ -24,15 +29,15 @@ export default async function NotificationsPage() {
   return (
     <>
       <PageHeader
-        title="Notifications"
+        title={t('notifications.title')}
         actions={unread > 0 && <MarkAllRead />}
       />
 
       {notifications.length === 0 ? (
         <EmptyState
           icon={<BellIcon size={24} />}
-          title="Rien de neuf"
-          body="Les anniversaires, nouvelles listes et demandes d'amis apparaîtront ici."
+          title={t('notifications.emptyTitle')}
+          body={t('notifications.emptyBody')}
         />
       ) : (
         <ul className={styles.list}>
@@ -52,7 +57,7 @@ export default async function NotificationsPage() {
                 className={styles.item}
                 data-unread={n.read ? undefined : ''}
               >
-                {!n.read && <span className={styles.dot} aria-label="Non lue" />}
+                {!n.read && <span className={styles.dot} aria-label={t('notifications.unread')} />}
                 {n.href ? (
                   <Link href={n.href} className={styles.link}>
                     {body}

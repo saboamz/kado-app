@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { signup } from '@/lib/auth-actions';
+import { useT } from '@/lib/i18n/client';
 import { Field } from '@/components/Field';
 import { SubmitButton } from '@/components/SubmitButton';
 import styles from '../auth.module.css';
 
 export default function SignupPage() {
+  const t = useT();
   const [state, action] = useActionState(signup, {});
   // Carried from an invitation link. A hidden field rather than a cookie:
   // the value only has to survive this one form post, and a cookie would
@@ -18,9 +20,9 @@ export default function SignupPage() {
   return (
     <>
       <div>
-        <h1 className={styles.title}>Créez votre compte.</h1>
+        <h1 className={styles.title}>{t('auth.createYours')}</h1>
         <p className={styles.subtitle}>
-          Vos listes, vos amis, et des surprises qui le restent vraiment.
+          {t('auth.signupLede')}
         </p>
       </div>
 
@@ -34,7 +36,7 @@ export default function SignupPage() {
         <Field
           id="name"
           name="name"
-          label="Nom"
+          label={t('auth.name')}
           autoComplete="name"
           required
           error={state.errors?.name}
@@ -43,7 +45,7 @@ export default function SignupPage() {
           id="email"
           name="email"
           type="email"
-          label="Adresse e-mail"
+          label={t('auth.email')}
           autoComplete="email"
           inputMode="email"
           required
@@ -53,17 +55,17 @@ export default function SignupPage() {
           id="password"
           name="password"
           type="password"
-          label="Mot de passe"
+          label={t('auth.password')}
           autoComplete="new-password"
           required
-          hint="Au moins 8 caractères."
+          hint={t('auth.passwordHint')}
           error={state.errors?.password}
         />
-        <SubmitButton pendingLabel="Création…">Créer mon compte</SubmitButton>
+        <SubmitButton pendingLabel={t('action.creating')}>{t('auth.signUp')}</SubmitButton>
       </form>
 
       <p className={styles.footer}>
-        Vous avez déjà un compte ? <Link href="/login">Se connecter</Link>
+        Vous avez déjà un compte ? <Link href="/login">{t('auth.signIn')}</Link>
       </p>
     </>
   );

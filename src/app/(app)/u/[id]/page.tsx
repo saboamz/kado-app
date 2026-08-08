@@ -20,6 +20,7 @@ import {
 import { getListsForViewer } from '@/lib/gifts';
 import { relationTo } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './person.module.css';
 
 export async function generateMetadata({
@@ -40,6 +41,7 @@ export default async function PersonPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getT();
   const { id } = await params;
   const viewer = await requireUser();
 
@@ -88,7 +90,7 @@ export default async function PersonPage({
           {person.bio && <p className={styles.bio}>{person.bio}</p>}
           {days !== null && (
             <p className={styles.birthday}>
-              Anniversaire {formatBirthdayCountdown(days)}
+              Anniversaire {formatBirthdayCountdown(days, t)}
             </p>
           )}
         </div>
@@ -102,14 +104,14 @@ export default async function PersonPage({
         </div>
       )}
 
-      <SectionTitle>Ses listes</SectionTitle>
+      <SectionTitle>{t('lists.theirLists')}</SectionTitle>
       {lists.length === 0 ? (
         <EmptyState
           icon={<GiftIcon size={24} />}
-          title="Aucune liste visible"
+          title={t('lists.noVisibleLists')}
           body={
             relation === 'friend'
-              ? "Cette personne n'a pas encore de liste à partager."
+              ? t('profile.noListsToShare')
               : 'Devenez amis pour voir ses listes.'
           }
         />
@@ -119,9 +121,9 @@ export default async function PersonPage({
             <CardLink key={list.id} href={`/lists/${list.id}`}>
               <span className={styles.listName}>{list.name}</span>
               <span className={styles.listMeta}>
-                {list.giftCount} envie{list.giftCount > 1 ? 's' : ''}
+                {t('common.wishes', { count: list.giftCount })}
                 {list.reservedCount !== undefined && list.reservedCount > 0 && (
-                  <> · {list.reservedCount} réservée{list.reservedCount > 1 ? 's' : ''}</>
+                  <> · {t('common.reserved', { count: list.reservedCount })}</>
                 )}
               </span>
             </CardLink>

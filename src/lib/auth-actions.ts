@@ -14,6 +14,7 @@ import {
   retryMessage,
 } from './rate-limit';
 import { acceptInvite } from './invite-actions';
+import { getLocale, getT } from './i18n/server';
 import { createSession, destroySession } from './session';
 import { fieldErrors, loginSchema, signupSchema } from './validation';
 
@@ -38,6 +39,15 @@ export async function signup(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  /*
+   * Nobody is signed in yet, so getLocale() falls back to Accept-Language —
+   * which is exactly the guess we want here. It seeds the account's language
+   * AND the name of the list created below, so an English speaker does not
+   * arrive to a list called "Mes envies".
+   */
+  const locale = await getLocale();
+  const t = await getT();
+
   const parsed = signupSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
@@ -50,7 +60,7 @@ export async function signup(
   const ip = await clientIp();
   const throttled = await rateLimit('signup:ip', ip, SIGNUP_PER_IP);
   if (!throttled.allowed) {
-    return { errors: { form: retryMessage(throttled.retryAfter) } };
+    return { errors: { form: retryMessage(throttled.retryAfter, t) } };
   }
 
   const { name, email, password } = parsed.data;
@@ -63,7 +73,7 @@ export async function signup(
     // Counts against the limit: probing which addresses already have an
     // account is exactly what the per-IP cap is there to slow down.
     await recordAttempt('signup:ip', ip);
-    return { errors: { email: 'Un compte existe déjà avec cette adresse.' } };
+    return { errors: { email: 'error.emailTaken' } };
   }
 
   const user = await db.user.create({
@@ -71,8 +81,9 @@ export async function signup(
       name,
       email,
       passwordHash: await hashPassword(password),
+      locale,
       // Everyone gets a default list, so the app is never empty on arrival.
-      lists: { create: { name: 'Mes envies', isDefault: true } },
+      lists: { create: { name: t('lists.defaultName'), isDefault: true } },
     },
   });
 
@@ -109,6 +120,7 @@ export async function login(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const t = await getT();
   const parsed = loginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
@@ -133,7 +145,7 @@ export async function login(
       byEmail.allowed ? 0 : byEmail.retryAfter,
       byIp.allowed ? 0 : byIp.retryAfter,
     );
-    return { errors: { form: retryMessage(retryAfter) } };
+    return { errors: { form: retryMessage(retryAfter, t) } };
   }
 
   const user = await db.user.findUnique({
@@ -143,7 +155,7 @@ export async function login(
 
   // Same message whether the account is missing or the password is wrong:
   // distinguishing them tells an attacker which addresses are registered.
-  const invalid = { errors: { form: 'E-mail ou mot de passe incorrect.' } };
+  const invalid = { errors: { form: 'error.badCredentials' } };
 
   // Only a failure is recorded, against both buckets. A correct password
   // consumes nobody's allowance, so a shared address does not throttle itself

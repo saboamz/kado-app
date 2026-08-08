@@ -5,10 +5,15 @@ import { PageHeader } from '@/components/PageHeader';
 import { ProfileForm } from '@/components/ProfileForm';
 import { db } from '@/lib/db';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 
-export const metadata: Metadata = { title: 'Modifier mon profil' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('profile.editTitle') };
+}
 
 export default async function EditProfilePage() {
+  const t = await getT();
   const user = await requireUser();
   const profile = await db.user.findUniqueOrThrow({
     where: { id: user.id },
@@ -26,8 +31,8 @@ export default async function EditProfilePage() {
   return (
     <>
       <PageHeader
-        title="Modifier mon profil"
-        subtitle="Ce que vos proches voient de vous."
+        title={t('profile.editTitle')}
+        subtitle={t('profile.editSubtitle')}
         back={{ href: '/profile', label: 'Profil' }}
       />
       <ProfileForm
@@ -44,7 +49,7 @@ export default async function EditProfilePage() {
       />
 
       <section style={{ marginTop: 32 }}>
-        <SectionTitle>Décorer mon profil</SectionTitle>
+        <SectionTitle>{t('profile.decorate')}</SectionTitle>
         <DecorationPicker initial={decorations} />
       </section>
     </>

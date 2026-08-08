@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { formatMoney } from '@/lib/format';
 import { contribute, withdrawContribution } from '@/lib/pot-actions';
 import type { PotView } from '@/lib/secrecy';
+import { useErrorText, useLocale, useT } from '@/lib/i18n/client';
 import { Button } from './Button';
 import styles from './pot.module.css';
 
@@ -17,6 +18,9 @@ const QUICK_AMOUNTS = [10, 20, 50, 100];
  * PotView at all.
  */
 export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
+  const t = useT();
+  const locale = useLocale();
+  const errorText = useErrorText();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
@@ -51,15 +55,15 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
   return (
     <section className={styles.pot} aria-labelledby="pot-heading">
       <h2 id="pot-heading" className={styles.heading}>
-        Cagnotte
+        {t('pot.heading')}
       </h2>
 
       <p className={styles.amounts}>
-        <span className={styles.raised}>{formatMoney(pot.raisedCents)}</span>
+        <span className={styles.raised}>{formatMoney(pot.raisedCents, undefined, locale)}</span>
         {target && (
           <span className={styles.target}>
             {' '}
-            réunis sur {formatMoney(target)}
+            {t('pot.raisedOf', { target: formatMoney(target, undefined, locale) })}
           </span>
         )}
       </p>
@@ -71,7 +75,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
           aria-valuemin={0}
           aria-valuemax={target}
           aria-valuenow={pot.raisedCents}
-          aria-label={`Cagnotte à ${percent} %`}
+          aria-label={t('pot.progress', { percent })}
         >
           <span className={styles.fill} style={{ width: `${othersPercent}%` }} />
           <span className={styles.fillMine} style={{ width: `${minePercent}%` }} />
@@ -94,21 +98,18 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
         )}
         <span>
           {pot.contributorCount === 0
-            ? 'Personne n’a encore participé.'
-            : `${pot.contributorCount} ${
-                pot.contributorCount > 1
-                  ? 'personnes participent'
-                  : 'personne participe'
-              }`}
+            ? t('pot.nobodyYet')
+            : t('pot.participants', { count: pot.contributorCount })}
           {remaining !== null && remaining > 0 && (
-            <> · il reste {formatMoney(remaining)}</>
+            <> · {t('pot.remaining', { amount: formatMoney(remaining, undefined, locale) })}</>
           )}
         </span>
       </p>
 
       {pot.myContributionCents > 0 && (
         <p className={styles.mine}>
-          Votre part : <strong>{formatMoney(pot.myContributionCents)}</strong>
+          {t('pot.yourShare')}{' '}
+          <strong>{formatMoney(pot.myContributionCents, undefined, locale)}</strong>
         </p>
       )}
 
@@ -119,7 +120,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
         </p>
       ) : (
         <>
-          <div className={styles.quick} role="group" aria-label="Montants rapides">
+          <div className={styles.quick} role="group" aria-label={t('pot.quickAmounts')}>
             {QUICK_AMOUNTS.map((value) => (
               <button
                 key={value}
@@ -140,7 +141,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
               id="pot-amount"
               className={styles.input}
               inputMode="decimal"
-              placeholder="Montant"
+              placeholder={t('pot.amount')}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
@@ -149,7 +150,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
               aria-busy={pending}
               onClick={() => run(() => contribute(giftId, amount))}
             >
-              {pending ? 'Envoi…' : 'Participer'}
+              {pending ? t('chat.sending') : t('pot.contribute')}
             </Button>
           </div>
         </>
@@ -168,7 +169,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
 
       {error && (
         <p className={styles.error} role="alert">
-          {error}
+          {errorText(error)}
         </p>
       )}
 

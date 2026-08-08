@@ -5,6 +5,7 @@ import { ButtonLink } from '@/components/Button';
 import { Avatar } from '@/components/display';
 import { readInvite } from '@/lib/invite-actions';
 import { getCurrentUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './invite.module.css';
 
 /**
@@ -29,18 +30,19 @@ export default async function InvitePage({
 }: {
   params: Promise<{ code: string }>;
 }) {
+  const t = await getT();
   const { code } = await params;
   const viewer = await getCurrentUser();
   const invite = await readInvite(code, viewer?.id ?? null);
 
   if (invite.state === 'invalid') {
     return (
-      <Frame title="Cette invitation n’existe pas">
+      <Frame title={t('invite.unknownTitle')}>
         <p className={styles.body}>
           Le lien est peut-être incomplet. Demandez-en un nouveau à la personne
           qui vous a invité.
         </p>
-        <ButtonLink href="/">Aller à l’accueil</ButtonLink>
+        <ButtonLink href="/">{t('invite.goHome')}</ButtonLink>
       </Frame>
     );
   }
@@ -49,11 +51,11 @@ export default async function InvitePage({
 
   if (invite.state === 'revoked') {
     return (
-      <Frame title="Cette invitation a été fermée">
+      <Frame title={t('invite.closedTitle')}>
         <p className={styles.body}>
           {firstName} n’utilise plus ce lien. Demandez-lui le nouveau.
         </p>
-        <ButtonLink href="/">Aller à l’accueil</ButtonLink>
+        <ButtonLink href="/">{t('invite.goHome')}</ButtonLink>
       </Frame>
     );
   }
@@ -68,7 +70,7 @@ export default async function InvitePage({
         <p className={styles.body}>
           Vous voyez déjà ses listes, et {firstName} voit les vôtres.
         </p>
-        <ButtonLink href="/friends">Voir mes amis</ButtonLink>
+        <ButtonLink href="/friends">{t('invite.seeFriends')}</ButtonLink>
       </Frame>
     );
   }
@@ -97,7 +99,7 @@ export default async function InvitePage({
               start again.
             */}
             <ButtonLink href={`/signup?invite=${encodeURIComponent(code)}`} block>
-              Créer mon compte
+              {t('landing.createAccount')}
             </ButtonLink>
             <ButtonLink
               href={`/login?invite=${encodeURIComponent(code)}`}

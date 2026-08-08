@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Libre_Franklin, Lora } from 'next/font/google';
+import { I18nProvider } from '@/lib/i18n/client';
+import { en } from '@/lib/i18n/en';
+import { fr } from '@/lib/i18n/fr';
+import { getLocale } from '@/lib/i18n/server';
 import { getCurrentUser } from '@/lib/session';
 import './globals.css';
 
@@ -91,14 +95,22 @@ export default async function RootLayout({
   // attribute off so the prefers-color-scheme media query applies.
   const user = await getCurrentUser();
   const theme = user?.theme === 'SYSTEM' ? undefined : user?.theme.toLowerCase();
+  const locale = await getLocale();
 
   return (
     <html
-      lang="fr"
+      /* Follows the reader, not the app's origin: a screen reader uses this
+         to choose a voice, and English read with French pronunciation is
+         close to unintelligible. */
+      lang={locale}
       data-theme={theme}
       className={`${libreFranklin.variable} ${lora.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <I18nProvider locale={locale} dict={locale === 'en' ? en : fr}>
+          {children}
+        </I18nProvider>
+      </body>
     </html>
   );
 }

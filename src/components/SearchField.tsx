@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './ui.module.css';
+import { useT } from '@/lib/i18n/client';
 
 /**
  * Search box that pushes the query into the URL.
@@ -11,6 +12,7 @@ import styles from './ui.module.css';
  * URL so a search can be shared, bookmarked and survive a reload.
  */
 export function SearchField({ defaultValue = '' }: { defaultValue?: string }) {
+  const t = useT();
   const router = useRouter();
   const params = useSearchParams();
   const [value, setValue] = useState(defaultValue);
@@ -38,7 +40,7 @@ export function SearchField({ defaultValue = '' }: { defaultValue?: string }) {
         id="people-search"
         className={styles.input}
         type="search"
-        placeholder="Nom ou adresse e-mail"
+        placeholder={t('search.placeholder')}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         autoComplete="off"

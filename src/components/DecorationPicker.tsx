@@ -9,6 +9,7 @@ import {
   setDecoration,
 } from '@/lib/decoration-actions';
 import { SLOTS, SLOT_LABELS, type GifChoice, type Slot } from '@/lib/decorations';
+import { useT } from '@/lib/i18n/client';
 import type { DecorationView } from './Decoration';
 import styles from './decorationPicker.module.css';
 
@@ -24,6 +25,7 @@ export function DecorationPicker({
 }: {
   initial: Record<string, DecorationView>;
 }) {
+  const t = useT();
   const [current, setCurrent] = useState(initial);
   const [editing, setEditing] = useState<Slot | null>(null);
 
@@ -63,7 +65,7 @@ export function DecorationPicker({
                 />
               </div>
             ) : (
-              <span className={styles.empty}>Rien pour l’instant</span>
+              <span className={styles.empty}>{t('action.nothingYet')}</span>
             )}
 
             <button
@@ -72,10 +74,10 @@ export function DecorationPicker({
               onClick={() => setEditing(editing === slot ? null : slot)}
             >
               {editing === slot
-                ? 'Fermer'
+                ? t('gif.close')
                 : current[slot]
-                  ? 'Changer'
-                  : 'Choisir un GIF'}
+                  ? t('gif.change')
+                  : t('onboarding.decorationCta')}
             </button>
 
             {editing === slot && (
@@ -103,6 +105,7 @@ export function DecorationPicker({
 }
 
 function RemoveButton({ slot, onDone }: { slot: Slot; onDone: () => void }) {
+  const t = useT();
   const [pending, startTransition] = useTransition();
   return (
     <button
@@ -116,7 +119,7 @@ function RemoveButton({ slot, onDone }: { slot: Slot; onDone: () => void }) {
         })
       }
     >
-      {pending ? '…' : 'Retirer'}
+      {pending ? '…' : t('gif.remove')}
     </button>
   );
 }
@@ -128,6 +131,7 @@ function Search({
   slot: Slot;
   onPick: (gif: GifChoice) => void;
 }) {
+  const t = useT();
   const [query, setQuery] = useState('');
   const [gifs, setGifs] = useState<GifChoice[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'unconfigured' | 'failed'>(
@@ -161,7 +165,7 @@ function Search({
       <input
         id={`gif-search-${slot}`}
         className={styles.input}
-        placeholder="Chercher : chat, merci, anniversaire…"
+        placeholder={t('gif.placeholder')}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -176,7 +180,7 @@ function Search({
           La recherche n’a pas répondu. Réessayez dans un instant.
         </p>
       )}
-      {status === 'loading' && <p className={styles.notice}>Recherche…</p>}
+      {status === 'loading' && <p className={styles.notice}>{t('action.searching')}</p>}
 
       {gifs.length > 0 && (
         <ul className={styles.grid}>

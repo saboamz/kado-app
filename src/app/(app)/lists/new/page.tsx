@@ -2,21 +2,26 @@ import type { Metadata } from 'next';
 import { ListForm } from '@/components/ListForm';
 import { PageHeader } from '@/components/PageHeader';
 import { createList } from '@/lib/list-actions';
+import { getT } from '@/lib/i18n/server';
 
-export const metadata: Metadata = { title: 'Nouvelle liste' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('lists.newTitle') };
+}
 
-export default function NewListPage() {
+export default async function NewListPage() {
+  const t = await getT();
   return (
     <>
       <PageHeader
-        title="Nouvelle liste"
-        subtitle="Une liste par occasion : anniversaire, Noël, ou vos envies du moment."
-        back={{ href: '/lists', label: 'Mes listes' }}
+        title={t('lists.newTitle')}
+        subtitle={t('lists.newSubtitle')}
+        back={{ href: '/lists', label: t('lists.title') }}
       />
       <ListForm
         action={createList}
-        submitLabel="Créer la liste"
-        pendingLabel="Création…"
+        submitLabel={t('lists.create')}
+        pendingLabel={t('action.creating')}
       />
     </>
   );

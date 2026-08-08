@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { db } from './db';
+import { LOCALES } from './i18n/locales';
 import { requireUser } from './session';
 import { deleteUpload, storeUpload } from './uploads';
 import { fieldErrors } from './validation';
@@ -14,14 +15,14 @@ const optionalText = (max: number) =>
   z
     .union([z.string(), z.null(), z.undefined()])
     .transform((v) => (v ?? '').trim())
-    .pipe(z.string().max(max, 'Ce texte est trop long.'));
+    .pipe(z.string().max(max, 'error.textLong'));
 
 const profileSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Renseignez votre nom.')
-    .max(80, 'Ce nom est trop long.'),
+    .min(1, 'error.nameRequired')
+    .max(80, 'error.nameLong'),
   bio: optionalText(280),
   birthday: optionalText(10).refine(
     (v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v),
@@ -99,6 +100,9 @@ export async function updateProfile(
 
 const settingsSchema = z.object({
   theme: z.enum(['LIGHT', 'DARK', 'SYSTEM']),
+  /* Validated against the closed list rather than taken as free text: an
+     unknown value would render the app in no language at all. */
+  locale: z.enum(LOCALES),
   profilePublic: z.coerce.boolean().optional(),
   currency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'CAD']),
 });
@@ -113,6 +117,7 @@ export async function updateSettings(
     theme: formData.get('theme') ?? 'SYSTEM',
     profilePublic: formData.get('profilePublic') === 'on',
     currency: formData.get('currency') ?? 'EUR',
+    locale: formData.get('locale') ?? 'fr',
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
 
@@ -122,10 +127,12 @@ export async function updateSettings(
       theme: parsed.data.theme,
       profilePublic: !!parsed.data.profilePublic,
       currency: parsed.data.currency,
+      locale: parsed.data.locale,
     },
   });
 
-  // The theme lives on <html>, set from the session in the root layout.
+  // The theme and the language both live on <html>, set from the session in
+  // the root layout — so the whole tree has to be revalidated, not this page.
   revalidatePath('/', 'layout');
   return { saved: true };
 }

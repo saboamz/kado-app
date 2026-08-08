@@ -8,6 +8,7 @@ import {
   reserveGift,
 } from '@/lib/reservation-actions';
 import type { ReservationView } from '@/lib/secrecy';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import { Button } from './Button';
 import styles from './reserve.module.css';
 
@@ -24,6 +25,8 @@ export function ReserveButton({
   giftId: string;
   reservation: ReservationView;
 }) {
+  const t = useT();
+  const errorText = useErrorText();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +61,7 @@ export function ReserveButton({
           aria-busy={pending}
           onClick={() => run(() => openToOthers(giftId))}
         >
-          {pending ? 'Ouverture…' : 'Inviter d’autres à participer'}
+          {pending ? 'Ouverture…' : t('reserve.openToOthers')}
         </Button>
         <p className={styles.note}>
           Vous avez réservé ce cadeau. Si le prix est élevé, ouvrez-le aux
@@ -71,11 +74,11 @@ export function ReserveButton({
           disabled={pending}
           onClick={() => run(() => releaseGift(giftId))}
         >
-          Annuler ma réservation
+          {t('reserve.cancel')}
         </button>
         {error && (
           <p className={styles.error} role="alert">
-            {error}
+            {errorText(error)}
           </p>
         )}
       </div>
@@ -94,8 +97,8 @@ export function ReserveButton({
       <div className={styles.wrap}>
         <p className={styles.note}>
           {reservation.mine
-            ? 'Vous avez ouvert ce cadeau aux autres invités. Participez à la cagnotte ci-dessous.'
-            : 'Un proche a ouvert ce cadeau à plusieurs. Vous pouvez participer à la cagnotte ci-dessous.'}
+            ? t('reserve.youOpened')
+            : t('reserve.someoneOpened')}
         </p>
         {reservation.mine && (
           <button
@@ -109,7 +112,7 @@ export function ReserveButton({
         )}
         {error && (
           <p className={styles.error} role="alert">
-            {error}
+            {errorText(error)}
           </p>
         )}
       </div>
@@ -124,7 +127,7 @@ export function ReserveButton({
         aria-busy={pending}
         onClick={() => run(() => reserveGift(giftId))}
       >
-        {pending ? 'Réservation…' : 'Je réserve ce cadeau'}
+        {pending ? t('reserve.pending') : t('reserve.cta')}
       </Button>
       <p className={styles.note}>
         Les autres invités verront qu&rsquo;il est pris, sans savoir par qui. Le
@@ -132,7 +135,7 @@ export function ReserveButton({
       </p>
       {error && (
         <p className={styles.error} role="alert">
-          {error}
+          {errorText(error)}
         </p>
       )}
     </div>
