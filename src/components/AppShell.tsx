@@ -61,7 +61,13 @@ export function AppShell({
                 aria-current={active ? 'page' : undefined}
               >
                 <span className={styles.navIcon}>
-                  <Icon />
+                  {/*
+                    Sized explicitly. The icons default to 22px while .navIcon
+                    is a smaller grid cell, so an unsized <Icon /> overflowed
+                    its box and pulled its optical centre below the label's —
+                    which is what made the desktop bar look misaligned.
+                  */}
+                  <Icon size={20} />
                   {showBadge && (
                     <span className={styles.navBadge}>
                       {unreadCount > 9 ? '9+' : unreadCount}
@@ -69,7 +75,7 @@ export function AppShell({
                     </span>
                   )}
                 </span>
-                {label}
+                <span className={styles.navLabel}>{label}</span>
               </Link>
             );
           })}
