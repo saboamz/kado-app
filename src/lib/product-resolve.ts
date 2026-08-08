@@ -1,3 +1,4 @@
+import { judge } from './catalogue-quality';
 import { db } from './db';
 import { normalizeUrl, priceBand, titleKey, urlHash } from './catalogue';
 import type { Extracted } from './extract';
@@ -97,11 +98,36 @@ export async function findOrCreateProduct(input: ResolveInput) {
     });
   }
 
-  if (!input.title) return null; // a product with no name is not a product
+  /*
+   * The quality gate, applied only on CREATION.
+   *
+   * An existing row is not re-judged: it may already have been promoted by a
+   * better read, and demoting it here would undo that on every weak revisit.
+   * Promotion is the sweep's job — see promoteQuarantined().
+   */
+  const verdict = judge({
+    title: input.title ?? null,
+    brand: input.brand ?? null,
+    description: input.description ?? null,
+    imageUrl: input.imageUrl ?? null,
+    gtin: input.gtin ?? null,
+    priceCents: input.priceCents ?? null,
+    currency: input.currency ?? null,
+    extractedBy: input.extractedBy ?? null,
+  });
+  // Narrowing for the compiler: judge() already refuses a missing title with
+  // reason 'no-title', so this is unreachable — it is what tells TypeScript so.
+  if (verdict.kind === 'reject' || !input.title) return null;
 
   try {
     return await db.product.create({
       data: {
+        /*
+         * Quarantined rows exist but are not recommendable: every tier
+         * filters on status: 'active'. A title with no price and no image is
+         * a real gift often enough to keep — and too thin to suggest.
+         */
+        status: verdict.kind === 'quarantine' ? 'stale' : 'active',
         title: input.title,
         brand: input.brand,
         description: input.description,
