@@ -36,25 +36,43 @@
   border-top: 1px solid var(--line);
 }
 
+/*
+ * On a phone: icons only.
+ *
+ * Five labels at 10px across 392px are unreadable anyway, and the icons carry
+ * the meaning on their own — this is the pattern every native app on the
+ * device already uses, so it is what people expect here.
+ */
 .navItem {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 6px 2px 4px;
+  justify-content: center;
   border-radius: 10px;
   min-height: 52px;
   color: var(--ink3);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  line-height: 1.1;
-  text-align: center;
   text-decoration: none;
   transition:
     color 0.16s ease,
     background 0.16s ease;
+}
+
+/*
+ * Hidden, not removed.
+ *
+ * A link whose only content is a decorative SVG has no accessible name: a
+ * screen reader announces "link" and nothing else, which makes the whole bar
+ * unusable. The text stays in the document and stays out of sight.
+ */
+.navLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .navItem:hover {
@@ -68,12 +86,14 @@
   font-weight: 600;
 }
 
+/* Matches the icon it holds, so nothing overflows and the box centres on
+   the same point the glyph does. */
 .navIcon {
   position: relative;
   display: grid;
   place-items: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
 .navBadge {
@@ -132,16 +152,32 @@
     border-bottom: 1px solid var(--line);
   }
 
+  /* On a desktop there is room for the words, so they come back. */
   .navItem {
     flex: none;
-    flex-direction: row;
-    align-items: center;
     gap: 8px;
     min-height: 40px;
     padding: 9px 13px;
     border-radius: 9px;
     font-size: 13.5px;
-    text-align: left;
+  }
+
+  .navLabel {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    /*
+     * The label's own line box does the aligning.
+     *
+     * align-items: center on the row centres each child's BOX, and a text
+     * node's box is its line-height — which rarely shares a centre with a
+     * 20px square. Giving the label the icon's height makes the two boxes
+     * identical, so centring them centres what you actually see.
+     */
+    line-height: 20px;
   }
 
   .navItem[aria-current='page'] {
@@ -157,8 +193,8 @@
   }
 
   .navIcon {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 
   .main {
