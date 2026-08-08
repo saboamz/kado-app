@@ -21,10 +21,10 @@ export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
   const [dismissing, startDismiss] = useTransition();
 
   return (
-    <section className={styles.card} aria-labelledby='onboarding-title'>
+    <section className={styles.card} aria-labelledby="onboarding-title">
       <div className={styles.head}>
         <div>
-          <h2 id='onboarding-title' className={styles.title}>
+          <h2 id="onboarding-title" className={styles.title}>
             Pour bien commencer
           </h2>
           <p className={styles.progress}>
@@ -33,7 +33,7 @@ export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
         </div>
 
         <button
-          type='button'
+          type="button"
           className={styles.dismiss}
           disabled={dismissing}
           onClick={() => startDismiss(() => void dismissOnboarding())}
@@ -62,7 +62,7 @@ export function OnboardingCard({ onboarding }: { onboarding: Onboarding }) {
             <div className={styles.text}>
               <span className={styles.stepTitle}>
                 {step.title}
-                {step.done && <span className='srOnly'> — terminé</span>}
+                {step.done && <span className="srOnly"> — terminé</span>}
               </span>
               {!step.done && <span className={styles.body}>{step.body}</span>}
             </div>
