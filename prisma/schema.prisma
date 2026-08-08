@@ -33,6 +33,12 @@ model User {
   avatarUrl     String?
   theme         Theme     @default(SYSTEM)
   profilePublic Boolean   @default(false)
+  /// When the getting-started checklist was dismissed.
+  ///
+  /// The only part of it that cannot be derived: whether each step is DONE is
+  /// a question the data already answers, but "I have seen this and do not
+  /// want it any more" is a decision, and nothing else records it.
+  onboardingDismissedAt DateTime?
   currency      String    @default("EUR")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

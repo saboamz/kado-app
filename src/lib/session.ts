@@ -39,18 +39,26 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const id = store.get(COOKIE)?.value;
   if (!id) return null;
 
+  /*
+   * The user is fetched separately, NOT through the relation.
+   *
+   * Prisma resolves a relation as a second query, and on a REQUIRED one it
+   * asserts that query cannot come back empty — `include` and `select` alike
+   * throw "Inconsistent query result: Field user is required" when it does.
+   * Deleting an account opens exactly that window: the session row has been
+   * read, the cascade removes its user, and the relation query then finds
+   * nothing.
+   *
+   * The result is a 500 on the landing page for anyone who deletes their
+   * account with a second tab open, and an intermittent e2e failure whenever
+   * the account-deletion spec overlaps another spec loading a page.
+   *
+   * Two independent reads have no such assertion: a missing user is null,
+   * which is the answer this function already knows how to give.
+   */
   const session = await db.session.findUnique({
     where: { id },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          theme: true,
-        },
-      },
-    },
+    select: { expiresAt: true, userId: true },
   });
   if (!session) return null;
 
@@ -60,7 +68,15 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     return null;
   }
 
-  return session.user;
+  return db.user.findUnique({
+    where: { id: session.userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      theme: true,
+    },
+  });
 });
 
 /** The signed-in user, or a thrown redirect to the sign-in page. */

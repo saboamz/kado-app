@@ -10,6 +10,7 @@ import {
   Stack,
 } from '@/components/display';
 import { GiftIcon, UsersIcon } from '@/components/icons';
+import { OnboardingCard } from '@/components/OnboardingCard';
 import { PageHeader } from '@/components/PageHeader';
 import { db } from '@/lib/db';
 import {
@@ -17,6 +18,7 @@ import {
   formatBirthdayCountdown,
   formatRelative,
 } from '@/lib/format';
+import { getOnboarding } from '@/lib/onboarding';
 import { friendIds } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
 import styles from './home.module.css';
@@ -27,7 +29,8 @@ export default async function AppHomePage() {
   const user = await requireUser();
   const friends = await friendIds(user.id);
 
-  const [myLists, upcoming, activity] = await Promise.all([
+  const [onboarding, myLists, upcoming, activity] = await Promise.all([
+    getOnboarding(user.id),
     db.giftList.findMany({
       where: { ownerId: user.id },
       include: { _count: { select: { gifts: true } } },
@@ -69,6 +72,11 @@ export default async function AppHomePage() {
         title={`Bonjour ${user.name.split(' ')[0]}`}
         subtitle="Vos listes, et ce que préparent vos proches."
       />
+
+      {/* Above everything: it is the only thing here that tells a newcomer
+          what to do, and below the fold it would never be read. It returns
+          null once the four steps are done or the card is dismissed. */}
+      {onboarding && <OnboardingCard onboarding={onboarding} />}
 
       {birthdays.length > 0 && (
         <section className={styles.section}>
@@ -139,8 +147,16 @@ export default async function AppHomePage() {
           <EmptyState
             icon={<UsersIcon size={24} />}
             title="Pas encore d'amis"
-            body="Trouvez vos proches pour voir leurs listes et savoir quoi leur offrir."
-            action={<ButtonLink href="/search">Chercher des amis</ButtonLink>}
+            body="Invitez vos proches pour voir leurs listes et savoir quoi leur offrir."
+            /*
+             * The invitation link, not search.
+             *
+             * Search only finds people already signed up, and it sat directly
+             * under a checklist step telling the same person to send their
+             * link — two instructions on one screen, of which only one works
+             * for somebody whose friends are not here yet.
+             */
+            action={<ButtonLink href="/friends">Inviter mes proches</ButtonLink>}
           />
         ) : (
           <Stack>

@@ -1,0 +1,212 @@
+/*
+ * The getting-started card.
+ *
+ * Tinted with --acc rather than sitting on plain --card: it is the one thing
+ * on the home page asking to be acted on, and it has to win against a screen
+ * of white cards without shouting. --acc is the app's action colour
+ * throughout, so this reads as "things to do" and not as a warning.
+ */
+.card {
+  margin-bottom: 28px;
+  padding: 18px;
+  border: 1px solid var(--acc-bg);
+  border-radius: var(--radius-lg);
+  background: var(--acc-bg);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.progress {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink2);
+}
+
+.dismiss {
+  flex: none;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink2);
+  cursor: pointer;
+}
+
+.dismiss:hover:not(:disabled) {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/*
+ * A native <progress>, restyled.
+ *
+ * The two pseudo-elements below are the WebKit and Firefox halves of the same
+ * bar; neither browser understands the other's, so both must be written out.
+ */
+.bar {
+  width: 100%;
+  height: 5px;
+  margin: 14px 0 4px;
+  border: 0;
+  border-radius: 3px;
+  /*
+   * The track is --card, not --line2.
+   *
+   * --line2 is close enough to the card's own tint that an empty bar
+   * disappeared — at 0 of 4, the one moment the bar has something to say, it
+   * read as a hairline rule. White holds its shape against the tint whether
+   * the value is zero or four.
+   */
+  background: var(--card);
+  appearance: none;
+}
+
+.bar::-webkit-progress-bar {
+  border-radius: 3px;
+  background: var(--card);
+}
+
+.bar::-webkit-progress-value {
+  border-radius: 3px;
+  background: var(--acc);
+  transition: width 0.3s ease;
+}
+
+.bar::-moz-progress-bar {
+  border-radius: 3px;
+  background: var(--acc);
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line2);
+}
+
+.step:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Done steps stay put but stop competing for attention. */
+.step[data-done] {
+  opacity: 0.55;
+}
+
+.marker {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink2);
+}
+
+.step[data-done] .marker {
+  background: var(--acc);
+  color: var(--acc-on);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stepTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.step[data-done] .stepTitle {
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.body {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink2);
+}
+
+/*
+ * Pushed to the far right, and never allowed to wrap: on a narrow phone the
+ * body text takes the remaining width instead, which is the thing that should
+ * be squeezed.
+ */
+.cta {
+  flex: none;
+  margin-left: auto;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--acc);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--acc-on);
+  text-decoration: none;
+}
+
+.cta:hover {
+  text-decoration: none;
+  filter: brightness(1.08);
+}
+
+/*
+ * On a phone the button drops under the text — but ONLY the button.
+ *
+ * Letting the whole row wrap put the number on a line of its own above the
+ * title, which cost about 60px per step and made a four-step card fill the
+ * entire first screen. The marker and the text stay on one line; the CTA is
+ * the only thing given a row of its own, indented to line up under the title.
+ */
+@media (max-width: 460px) {
+  .step {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    column-gap: 12px;
+    row-gap: 8px;
+    align-items: start;
+  }
+
+  .marker {
+    /* Optically centred against the title's first line rather than the top
+       of the grid row. */
+    margin-top: 1px;
+  }
+
+  .cta {
+    grid-column: 2;
+    margin-left: 0;
+    justify-self: start;
+  }
+}
