@@ -114,10 +114,19 @@ export function judge(extracted: Extracted): Verdict {
    *
    * json-ld, Open Graph and microdata are markup a merchant wrote ON PURPOSE
    * to describe a product. A page that carries it is a product page, and its
-   * <title> is then just decoration. Only the fallback — where the title is
-   * ALL we have — gets second-guessed.
+   * <title> is then just decoration. Only the fallbacks — where the title is
+   * ALL we have — get second-guessed.
+   *
+   * 'reader' belongs here with 'title'. It carries a name and nothing else by
+   * design, so the same two questions apply: is this a page state rather than
+   * a product, and is one bare string enough to put in front of somebody as a
+   * suggestion. Left out, a proxy rendering of a captcha page would sail in
+   * as active — which is the exact failure this file was written to end.
    */
-  const weak = extracted.extractedBy === 'title' || extracted.extractedBy === null;
+  const weak =
+    extracted.extractedBy === 'title' ||
+    extracted.extractedBy === 'reader' ||
+    extracted.extractedBy === null;
 
   if (weak && isNonProductTitle(extracted.title)) {
     return { kind: 'reject', reason: 'non-product-title' };

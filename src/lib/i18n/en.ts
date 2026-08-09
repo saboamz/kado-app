@@ -162,7 +162,7 @@ export const en: Dictionary = {
   'form.link': 'Link',
   'form.linkPlaceholder': 'Optional — paste the shop’s link',
   'form.linkHint':
-    'The shop, the photo and the price will be taken from the page if we can read it.',
+    'The shop, the photo and the price will be taken from the page if we can read it. If it refuses us, an outside reading service is asked for its name.',
   'form.price': 'Price',
   'form.optional': 'Optional',
   'form.category': 'Category',
@@ -334,6 +334,8 @@ export const en: Dictionary = {
   'gift.potHiddenFromOwner': '{name} sees neither the total, nor who chipped in, nor that this pot exists at all.',
 
   'gift.estimatedNoteOwn': 'Price read from the shop, as a guide — you did not give one.',
+
+  'gift.linkUnread': 'We could not read this page — some shops refuse robots. Add the price yourself if you like.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',

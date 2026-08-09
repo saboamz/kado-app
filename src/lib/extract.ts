@@ -19,10 +19,17 @@ export type Extracted = {
   priceCents: number | null;
   currency: string | null;
   /** Which layer produced this, so a bad row can be traced back. */
-  extractedBy: 'json-ld' | 'open-graph' | 'microdata' | 'title' | null;
+  /**
+   * Which layer produced this, so a bad row can be traced back months later.
+   *
+   * 'reader' is the odd one out: it did not come from parsing the page's own
+   * markup at all, but from a proxy's rendering of it after the merchant
+   * refused us. Those rows carry a title and nothing else, on purpose.
+   */
+  extractedBy: 'json-ld' | 'open-graph' | 'microdata' | 'title' | 'reader' | null;
 };
 
-const EMPTY: Extracted = {
+export const EMPTY: Extracted = {
   title: null,
   brand: null,
   description: null,

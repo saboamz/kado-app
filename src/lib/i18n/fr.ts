@@ -164,7 +164,7 @@ export const fr = {
   'form.link': 'Lien',
   'form.linkPlaceholder': 'Facultatif — collez le lien de la boutique',
   'form.linkHint':
-    'La boutique, la photo et le prix seront repris de la page si nous arrivons à la lire.',
+    'La boutique, la photo et le prix seront repris de la page si nous arrivons à la lire. Si elle nous refuse, un service de lecture externe est sollicité pour en récupérer le nom.',
   'form.price': 'Prix',
   'form.optional': 'Facultatif',
   'form.category': 'Catégorie',
@@ -340,6 +340,8 @@ export const fr = {
   'gift.potHiddenFromOwner': '{name} ne voit ni le total, ni les participants, ni même l’existence de cette cagnotte.',
 
   'gift.estimatedNoteOwn': 'Prix relevé sur la boutique, à titre indicatif — vous ne l’avez pas renseigné.',
+
+  'gift.linkUnread': 'Nous n’avons pas pu lire cette page — certaines boutiques refusent les robots. Ajoutez le prix vous-même si vous le souhaitez.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
