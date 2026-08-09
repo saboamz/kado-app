@@ -35,14 +35,7 @@ export const fr = {
   'common.results': { one: '{count} résultat', other: '{count} résultats' },
 
   // ── Landing ──────────────────────────────────────────────────────────────
-  'landing.title': 'Des listes de souhaits que vos proches remplissent en secret.',
-  'landing.lede':
-    'Ajoutez ce qui vous ferait plaisir. Vos amis réservent, se regroupent pour les gros cadeaux, et vous ne voyez jamais qui a pris quoi. La surprise est garantie par l’application, pas par leur discrétion.',
   'landing.createAccount': 'Créer mon compte',
-  'landing.signIn': 'J’ai déjà un compte',
-  'landing.point1': 'Le secret est structurel.',
-  'landing.point2': 'À plusieurs pour les gros cadeaux.',
-  'landing.point3': 'Rien ne se perd.',
 
   // ── Sign in / sign up ────────────────────────────────────────────────────
   'auth.welcomeBack': 'Content de vous revoir.',
@@ -380,6 +373,30 @@ export const fr = {
   'pot.undo': 'Finalement, je ne l’ai pas acheté',
   'pot.undoing': 'Annulation…',
   'pot.reopenNote': 'Vous pouvez revenir en arrière : la cagnotte se rouvrira et les autres pourront à nouveau participer.',
+
+  // ── Landing, for somebody who has never heard of this ────────────────────
+  'landing.tagline': 'Listes de cadeaux, entre proches',
+  'landing.h1': 'Dites ce qui vous ferait plaisir. Vos proches s’organisent sans que vous le sachiez.',
+  'landing.intro':
+    'Kado est une liste de cadeaux en ligne. Vous y notez vos envies ; vos proches y réservent ce qu’ils comptent offrir, se regroupent pour les gros cadeaux, et discutent entre eux. Vous, vous ne voyez rien de tout ça.',
+  'landing.step1Title': 'Vous notez vos envies',
+  'landing.step1Body': 'Un lien de boutique, un prix, ou juste une idée. Le nom suffit.',
+  'landing.step2Title': 'Vos proches réservent',
+  'landing.step2Body':
+    'Chacun voit ce qui est déjà pris, sans savoir par qui. Plus de doublons, plus de coups de fil gênés.',
+  'landing.step3Title': 'Vous êtes surpris',
+  'landing.step3Body':
+    'Le jour venu, vous découvrez le cadeau. L’application ne vous a rien laissé deviner.',
+  'landing.secretTitle': 'Le secret n’est pas une politesse, c’est la structure',
+  'landing.secretBody':
+    'Sur une liste partagée, il suffit d’un onglet ouvert au mauvais moment pour tout gâcher. Ici, les réservations ne sont jamais chargées quand c’est vous qui regardez : il n’y a rien à laisser filer, même par accident.',
+  'landing.demoOwner': 'Ce que vous voyez, vous',
+  'landing.demoFriend': 'Ce que voient vos proches',
+  'landing.demoGift': 'Théière en fonte',
+  'landing.demoNothing': 'Aucune information de réservation sur cette page.',
+  'landing.demoTaken': 'Déjà réservé par un proche',
+  'landing.demoPot': '45 € réunis sur 60 €',
+  'landing.free': 'Gratuit, sans publicité.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',

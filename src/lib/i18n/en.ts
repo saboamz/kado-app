@@ -37,14 +37,7 @@ export const en: Dictionary = {
   'common.results': { one: '{count} result', other: '{count} results' },
 
   // ── Landing ──────────────────────────────────────────────────────────────
-  'landing.title': 'Wishlists your friends fill in secret.',
-  'landing.lede':
-    'Add what you would love to receive. Your friends claim gifts, club together for the big ones, and you never see who took what. The surprise is guaranteed by the app, not by how good they are at keeping quiet.',
   'landing.createAccount': 'Create my account',
-  'landing.signIn': 'I already have an account',
-  'landing.point1': 'The secret is structural.',
-  'landing.point2': 'Club together for the big gifts.',
-  'landing.point3': 'Nothing gets lost.',
 
   // ── Sign in / sign up ────────────────────────────────────────────────────
   'auth.welcomeBack': 'Good to see you again.',
@@ -374,6 +367,30 @@ export const en: Dictionary = {
   'pot.undo': 'Actually, I did not buy it',
   'pot.undoing': 'Undoing…',
   'pot.reopenNote': 'You can undo this: the pot reopens and the others can chip in again.',
+
+  // ── Landing, for somebody who has never heard of this ────────────────────
+  'landing.tagline': 'Gift lists, among friends',
+  'landing.h1': 'Say what would make you happy. Your friends sort it out without you knowing.',
+  'landing.intro':
+    'Kado is an online gift list. You write down what you would like; your friends claim what they mean to give, club together for the big ones, and talk it over between themselves. You see none of it.',
+  'landing.step1Title': 'You write down your wishes',
+  'landing.step1Body': 'A shop link, a price, or just an idea. The name is enough.',
+  'landing.step2Title': 'Your friends claim them',
+  'landing.step2Body':
+    'Everyone sees what is already taken, without knowing by whom. No more duplicates, no more awkward phone calls.',
+  'landing.step3Title': 'You are surprised',
+  'landing.step3Body':
+    'On the day, you discover the gift. The app let you guess nothing.',
+  'landing.secretTitle': 'The secret is not good manners, it is the structure',
+  'landing.secretBody':
+    'On a shared list, one tab open at the wrong moment ruins it. Here, reservations are never loaded when you are the one looking: there is nothing to let slip, even by accident.',
+  'landing.demoOwner': 'What you see',
+  'landing.demoFriend': 'What your friends see',
+  'landing.demoGift': 'Cast iron teapot',
+  'landing.demoNothing': 'No reservation information on this page.',
+  'landing.demoTaken': 'Already claimed by a friend',
+  'landing.demoPot': '45 € raised of 60 €',
+  'landing.free': 'Free, and no advertising.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',

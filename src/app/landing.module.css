@@ -1,16 +1,43 @@
 .page {
+  /*
+   * Scrolls now rather than centring one screenful.
+   *
+   * The old page was a single block, vertically centred — which works for a
+   * short pitch and fights everything longer. There is a demo and a set of
+   * steps below the fold on purpose: somebody arriving cold needs to see the
+   * thing, and that does not fit above it.
+   */
   min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: clamp(24px, 6vw, 64px) var(--gutter);
+  padding: clamp(28px, 6vw, 72px) var(--gutter) clamp(48px, 10vw, 96px);
 }
 
 .inner {
   width: 100%;
-  max-width: 640px;
+  max-width: 680px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 4px;
+}
+
+/* Says what kind of product this is before the headline has to. */
+.tagline {
+  font-size: 13px;
+  color: var(--ink3);
+}
+
+.free {
+  margin: -8px 0 0;
+  font-size: 12.5px;
+  color: var(--ink3);
 }
 
 .brand {
@@ -60,25 +87,182 @@
   flex: 1 1 180px;
 }
 
-.points {
+/*
+ * The product in one look: the same gift, seen twice.
+ *
+ * Side by side on anything wide enough, stacked on a phone — where the order
+ * matters, because "what you see" first and "what they see" second is the
+ * order the sentence above reads in.
+ */
+.demo {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 4px;
+}
+
+@media (min-width: 620px) {
+  .demo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.demoPane {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demoLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Each card is as tall as what it holds. The owner's side having LESS to
+     show is the point being made, and stretching it to match hides that. */
+  align-self: start;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+/* The friends' side carries the ochre of everything an owner cannot see —
+   the same signal the real app uses, so the page teaches its own colour. */
+.cardSecret {
+  border-color: var(--sec-bg);
+  background: var(--sec-bg);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cardPrice {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/*
+ * What an owner gets instead of reservation data: a statement of absence.
+ *
+ * Not pushed to the bottom of the card. Equal-height panes made the owner's
+ * side stretch to match the friends' side, and `margin-top: auto` then
+ * dropped this line to the floor, leaving a hole in the middle that read as
+ * a rendering fault rather than as emptiness.
+ */
+.cardQuiet {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink3);
+}
+
+.cardBadge {
+  align-self: flex-start;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--sec);
+  color: var(--sec-on);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.cardPot {
+  font-size: 12.5px;
+  color: var(--ink2);
+}
+
+.cardBar {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.cardBarFill {
+  display: block;
+  width: 75%;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--sec);
+}
+
+/* Three steps, told as a sequence rather than a feature list. */
+.steps {
   margin: 12px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
+  gap: 14px;
+  counter-reset: step;
+}
+
+.steps li {
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
 }
 
-.points li {
-  padding: 16px;
-  border-radius: var(--radius-lg);
-  background: var(--bg);
-  border: 1px solid var(--line);
+.stepNumber {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--acc-bg);
+  color: var(--acc);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.stepText {
   font-size: 14px;
   line-height: 1.55;
   color: var(--ink2);
   text-wrap: pretty;
 }
 
-.points strong {
+.stepText strong {
+  display: block;
   color: var(--ink);
 }
+
+.secret {
+  margin-top: 8px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+}
+
+.secretTitle {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.secretBody {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
