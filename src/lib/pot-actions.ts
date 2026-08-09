@@ -29,7 +29,7 @@ async function requirePotGift(giftId: string) {
       reservation: { select: { openedToOthers: true } },
     },
   });
-  if (!gift) return { error: 'Cadeau introuvable' } as const;
+  if (!gift) return { error: 'error.giftNotFound' } as const;
   if (!gift.reservation?.openedToOthers) {
     return {
       error: "Ce cadeau n'est pas ouvert à plusieurs.",
@@ -39,7 +39,7 @@ async function requirePotGift(giftId: string) {
   const relation = await relationTo(user.id, gift.list.ownerId);
   if (relation === 'owner') {
     return {
-      error: 'Vous ne pouvez pas participer à une cagnotte de votre liste.',
+      error: 'error.cannotContributeOwn',
     } as const;
   }
   if (relation === 'stranger') {
@@ -58,9 +58,9 @@ export async function contribute(
   const { user, gift } = found;
 
   const cents = parseMoney(amount);
-  if (cents === null) return { error: 'Ce montant semble invalide.' };
-  if (cents < MIN_CENTS) return { error: 'Le minimum est de 1 €.' };
-  if (cents > MAX_CENTS) return { error: 'Ce montant est trop élevé.' };
+  if (cents === null) return { error: 'error.amountInvalid' };
+  if (cents < MIN_CENTS) return { error: 'error.amountMinimum' };
+  if (cents > MAX_CENTS) return { error: 'error.amountTooHigh' };
 
   // Overshooting the target helps nobody: the extra would have to be refunded
   // by hand. Cap the contribution at what is still needed.
@@ -71,7 +71,7 @@ export async function contribute(
     });
     const remaining = gift.priceCents - (raised._sum.amountCents ?? 0);
     if (remaining <= 0) {
-      return { error: 'La cagnotte est déjà complète. Merci !' };
+      return { error: 'error.potComplete' };
     }
     if (cents > remaining) {
       return {

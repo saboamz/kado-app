@@ -2,9 +2,28 @@
  * Money is stored as integer cents and only ever becomes a decimal here.
  * Floats would accumulate rounding errors across pot contributions.
  */
-export function formatMoney(cents: number | null, currency = 'EUR'): string {
+
+import type { TFunction } from './i18n/t';
+
+/**
+ * How a number, a date or an amount is written.
+ *
+ * Defaulted to French rather than made a required argument: these are called
+ * from a dozen places, and a default keeps the change to the ones that
+ * actually have a locale to hand. Every call site inside the app passes one —
+ * the default is for tests and for the odd server-side caller with no request.
+ */
+export type FormatLocale = 'fr' | 'en';
+
+const BCP47: Record<FormatLocale, string> = { fr: 'fr-FR', en: 'en-GB' };
+
+export function formatMoney(
+  cents: number | null,
+  currency = 'EUR',
+  locale: FormatLocale = 'fr',
+): string {
   if (cents === null) return '—';
-  return new Intl.NumberFormat('fr-FR', {
+  return new Intl.NumberFormat(BCP47[locale], {
     style: 'currency',
     currency,
     maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
@@ -20,21 +39,32 @@ export function parseMoney(input: string): number | null {
   return Math.round(value * 100);
 }
 
-const RELATIVE = new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' });
+const RELATIVE: Record<FormatLocale, Intl.RelativeTimeFormat> = {
+  fr: new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' }),
+  en: new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' }),
+};
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
-export function formatRelative(date: Date | string): string {
+export function formatRelative(
+  date: Date | string,
+  locale: FormatLocale = 'fr',
+  t?: TFunction,
+): string {
   const then = typeof date === 'string' ? new Date(date) : date;
   const diff = then.getTime() - Date.now();
   const abs = Math.abs(diff);
+  const relative = RELATIVE[locale];
 
-  if (abs < MINUTE) return "à l'instant";
-  if (abs < HOUR) return RELATIVE.format(Math.round(diff / MINUTE), 'minute');
-  if (abs < DAY) return RELATIVE.format(Math.round(diff / HOUR), 'hour');
-  if (abs < 30 * DAY) return RELATIVE.format(Math.round(diff / DAY), 'day');
-  return new Intl.DateTimeFormat('fr-FR', {
+  // Intl has no unit below a minute, so this one phrase comes from the
+  // dictionary. Without a translator it stays French, which is the default
+  // this function has always had.
+  if (abs < MINUTE) return t ? t('time.justNow') : 'à l’instant';
+  if (abs < HOUR) return relative.format(Math.round(diff / MINUTE), 'minute');
+  if (abs < DAY) return relative.format(Math.round(diff / HOUR), 'hour');
+  if (abs < 30 * DAY) return relative.format(Math.round(diff / DAY), 'day');
+  return new Intl.DateTimeFormat(BCP47[locale], {
     day: 'numeric',
     month: 'long',
   }).format(then);
@@ -55,12 +85,12 @@ export function daysUntilBirthday(
   return Math.round((next.getTime() - today.getTime()) / DAY);
 }
 
-export function formatBirthdayCountdown(days: number): string {
-  if (days === 0) return "c'est aujourd'hui";
-  if (days === 1) return 'demain';
-  if (days < 31) return `dans ${days} jours`;
+export function formatBirthdayCountdown(days: number, t: TFunction): string {
+  if (days === 0) return t('time.today');
+  if (days === 1) return t('time.tomorrow');
+  if (days < 31) return t('time.inDays', { count: days });
   const months = Math.round(days / 30);
-  return months <= 1 ? 'dans un mois' : `dans ${months} mois`;
+  return months <= 1 ? t('time.inOneMonth') : t('time.inMonths', { count: months });
 }
 
 /** Initials for the avatar fallback. */
@@ -102,19 +132,18 @@ export function avatarTint(name: string): { bg: string; fg: string } {
 /**
  * Priority labels, in the design's wording.
  *
- * Written from the wisher's side — "Ça me ferait très plaisir" rather than a
- * rank — because the person reading them is choosing what to buy for someone
- * they like, not sorting a backlog.
+ * Written from the wisher's side — "I'd love it" rather than a rank — because
+ * the person reading them is choosing what to buy for someone they like, not
+ * sorting a backlog.
+ *
+ * Takes the translator rather than reading a module-level array: that array
+ * was evaluated at import, so it could only ever hold one language.
  */
-export const PRIORITY_LABELS = [
-  '',
-  'Une idée, sans plus',
-  "J'aimerais bien",
-  'Ça me ferait très plaisir',
-] as const;
-
-export function priorityLabel(priority: number): string {
-  return PRIORITY_LABELS[priority] ?? '';
+export function priorityLabel(priority: number, t: TFunction): string {
+  if (priority === 1) return t('priority.1');
+  if (priority === 2) return t('priority.2');
+  if (priority === 3) return t('priority.3');
+  return '';
 }
 
 /**

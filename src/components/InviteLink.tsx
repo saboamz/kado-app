@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { rotateInvite } from '@/lib/invite-actions';
+import { useT } from '@/lib/i18n/client';
 import styles from './inviteLink.module.css';
 
 /**
@@ -12,6 +13,7 @@ import styles from './inviteLink.module.css';
  * and it is where these get shared.
  */
 export function InviteLink({ code, uses }: { code: string; uses: number }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -59,14 +61,14 @@ export function InviteLink({ code, uses }: { code: string; uses: number }) {
       <div className={styles.row}>
         <code className={styles.url}>{url || `…/i/${code}`}</code>
         <button type="button" className={styles.copy} onClick={share}>
-          {copied ? 'Copié' : 'Partager'}
+          {copied ? t('action.copied') : 'Partager'}
         </button>
       </div>
 
       <div className={styles.footer}>
         <span className={styles.uses}>
           {uses === 0
-            ? 'Personne ne l’a encore utilisé.'
+            ? t('invite.unused')
             : uses === 1
               ? '1 personne vous a rejoint par ce lien.'
               : `${uses} personnes vous ont rejoint par ce lien.`}
@@ -77,7 +79,7 @@ export function InviteLink({ code, uses }: { code: string; uses: number }) {
           disabled={pending}
           onClick={() => startTransition(() => void rotateInvite())}
         >
-          {pending ? 'Un instant…' : 'Générer un nouveau lien'}
+          {pending ? 'Un instant…' : t('invite.rotate')}
         </button>
       </div>
     </div>

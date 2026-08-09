@@ -18,19 +18,24 @@ import {
   formatBirthdayCountdown,
   formatRelative,
 } from '@/lib/format';
+import { getT } from '@/lib/i18n/server';
 import { getOnboarding } from '@/lib/onboarding';
 import { friendIds } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
 import styles from './home.module.css';
 
-export const metadata: Metadata = { title: 'Accueil' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('nav.home') };
+}
 
 export default async function AppHomePage() {
   const user = await requireUser();
+  const t = await getT();
   const friends = await friendIds(user.id);
 
   const [onboarding, myLists, upcoming, activity] = await Promise.all([
-    getOnboarding(user.id),
+    getOnboarding(user.id, t),
     db.giftList.findMany({
       where: { ownerId: user.id },
       include: { _count: { select: { gifts: true } } },
@@ -69,21 +74,34 @@ export default async function AppHomePage() {
   return (
     <>
       <PageHeader
-        title={`Bonjour ${user.name.split(' ')[0]}`}
-        subtitle="Vos listes, et ce que préparent vos proches."
+        title={t('home.greeting', { name: user.name.split(' ')[0] ?? user.name })}
+        subtitle={t('home.subtitle')}
       />
 
       {/* Above everything: it is the only thing here that tells a newcomer
           what to do, and below the fold it would never be read. It returns
           null once the four steps are done or the card is dismissed. */}
-      {onboarding && <OnboardingCard onboarding={onboarding} />}
+      {onboarding && (
+        <OnboardingCard
+          onboarding={onboarding}
+          labels={{
+            title: t('onboarding.title'),
+            progress: t('onboarding.progress', {
+              done: onboarding.doneCount,
+              total: onboarding.steps.length,
+            }),
+            dismiss: t('onboarding.dismiss'),
+            done: t('onboarding.done'),
+          }}
+        />
+      )}
 
       {birthdays.length > 0 && (
         <section className={styles.section}>
           <div className={styles.sectionHead}>
-            <SectionTitle>Anniversaires</SectionTitle>
+            <SectionTitle>{t('home.birthdays')}</SectionTitle>
             <ButtonLink href="/birthdays" variant="ghost">
-              Tout voir
+              {t('common.seeAll')}
             </ButtonLink>
           </div>
           <ul className={styles.birthdays}>
@@ -100,7 +118,7 @@ export default async function AppHomePage() {
                     className={styles.birthdayWhen}
                     data-soon={b.days <= 14 ? '' : undefined}
                   >
-                    {formatBirthdayCountdown(b.days)}
+                    {formatBirthdayCountdown(b.days, t)}
                   </span>
                 </CardLink>
               </li>
@@ -111,18 +129,18 @@ export default async function AppHomePage() {
 
       <section className={styles.section}>
         <div className={styles.sectionHead}>
-          <SectionTitle>Mes listes</SectionTitle>
+          <SectionTitle>{t('home.myLists')}</SectionTitle>
           <ButtonLink href="/lists" variant="ghost">
-            Tout voir
+            {t('common.seeAll')}
           </ButtonLink>
         </div>
 
         {myLists.length === 0 ? (
           <EmptyState
             icon={<GiftIcon size={24} />}
-            title="Aucune liste pour l'instant"
-            body="Créez une liste et ajoutez ce qui vous ferait plaisir. Vos proches sauront quoi offrir."
-            action={<ButtonLink href="/lists/new">Créer une liste</ButtonLink>}
+            title={t('home.noListsTitle')}
+            body={t('home.noListsBody')}
+            action={<ButtonLink href="/lists/new">{t('home.createList')}</ButtonLink>}
           />
         ) : (
           <Grid>
@@ -130,10 +148,10 @@ export default async function AppHomePage() {
               <CardLink key={list.id} href={`/lists/${list.id}`}>
                 <div className={styles.listTop}>
                   <span className={styles.listName}>{list.name}</span>
-                  {list.isDefault && <Badge>Par défaut</Badge>}
+                  {list.isDefault && <Badge>{t('common.default')}</Badge>}
                 </div>
                 <span className={styles.listMeta}>
-                  {list._count.gifts} envie{list._count.gifts > 1 ? 's' : ''}
+                  {t('common.wishes', { count: list._count.gifts })}
                 </span>
               </CardLink>
             ))}
@@ -142,12 +160,12 @@ export default async function AppHomePage() {
       </section>
 
       <section className={styles.section}>
-        <SectionTitle>Chez vos proches</SectionTitle>
+        <SectionTitle>{t('home.aroundYou')}</SectionTitle>
         {activity.length === 0 ? (
           <EmptyState
             icon={<UsersIcon size={24} />}
-            title="Pas encore d'amis"
-            body="Invitez vos proches pour voir leurs listes et savoir quoi leur offrir."
+            title={t('home.noFriendsTitle')}
+            body={t('home.noFriendsBody')}
             /*
              * The invitation link, not search.
              *
@@ -156,7 +174,9 @@ export default async function AppHomePage() {
              * link — two instructions on one screen, of which only one works
              * for somebody whose friends are not here yet.
              */
-            action={<ButtonLink href="/friends">Inviter mes proches</ButtonLink>}
+            action={
+              <ButtonLink href="/friends">{t('home.inviteFriends')}</ButtonLink>
+            }
           />
         ) : (
           <Stack>
@@ -173,8 +193,7 @@ export default async function AppHomePage() {
                       <strong>{list.owner.name}</strong> · {list.name}
                     </p>
                     <p className={styles.activityMeta}>
-                      {list._count.gifts} envie
-                      {list._count.gifts > 1 ? 's' : ''} ·{' '}
+                      {t('common.wishes', { count: list._count.gifts })} ·{' '}
                       {formatRelative(list.updatedAt)}
                     </p>
                   </div>

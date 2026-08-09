@@ -15,6 +15,7 @@ import { UploadedImage } from '@/components/UploadedImage';
 import { distinctOccasion, formatMoney } from '@/lib/format';
 import { getListForViewer } from '@/lib/gifts';
 import { getCurrentUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './list.module.css';
 
 export async function generateMetadata({
@@ -33,6 +34,7 @@ export default async function ListPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getT();
   const { id } = await params;
   const user = await getCurrentUser();
   const list = await getListForViewer(id, user?.id ?? null);
@@ -70,7 +72,7 @@ export default async function ListPage({
         }
         back={
           isOwner
-            ? { href: '/lists', label: 'Mes listes' }
+            ? { href: '/lists', label: t('lists.title') }
             : { href: `/u/${list.owner.id}`, label: list.owner.name }
         }
         actions={
@@ -78,10 +80,10 @@ export default async function ListPage({
             <>
               <ButtonLink href={`/lists/${id}/gifts/new`}>
                 <PlusIcon size={18} />
-                Ajouter
+                {t('action.add')}
               </ButtonLink>
               <ButtonLink href={`/lists/${id}/edit`} variant="secondary">
-                Modifier
+                {t('action.edit')}
               </ButtonLink>
             </>
           )
@@ -89,7 +91,7 @@ export default async function ListPage({
       />
 
       <p className={styles.summary}>
-        {gifts.length} envie{gifts.length > 1 ? 's' : ''}
+        {t('common.wishes', { count: gifts.length })}
         {/*
           Only a friend sees how many are spoken for. Telling the owner
           "2 réservées" gives away most of the surprise without naming anybody.
@@ -99,7 +101,7 @@ export default async function ListPage({
         {list.reservedCount !== undefined && list.reservedCount > 0 && (
           <span className={styles.reserved}>
             {' · '}
-            {list.reservedCount} déjà réservée{list.reservedCount > 1 ? 's' : ''}
+            {t('common.reserved', { count: list.reservedCount })}
           </span>
         )}
       </p>
@@ -107,16 +109,16 @@ export default async function ListPage({
       {gifts.length === 0 ? (
         <EmptyState
           icon={<GiftIcon size={24} />}
-          title="Cette liste est vide"
+          title={t('lists.emptyListTitle')}
           body={
             isOwner
-              ? 'Ajoutez une envie : un lien, un prix, ou simplement une idée.'
+              ? t('lists.emptyListHint')
               : "Rien à offrir ici pour l'instant."
           }
           action={
             isOwner && (
               <ButtonLink href={`/lists/${id}/gifts/new`}>
-                Ajouter une envie
+                {t('gift.addTitle')}
               </ButtonLink>
             )
           }
@@ -134,7 +136,7 @@ export default async function ListPage({
 
               <div className={styles.giftTop}>
                 <span className={styles.giftName}>{gift.name}</span>
-                <Priority priority={gift.priority} compact />
+                <Priority priority={gift.priority} compact t={t} />
               </div>
 
               <div className={styles.giftMeta}>
@@ -148,17 +150,17 @@ export default async function ListPage({
 
               <div className={styles.flags}>
                 {gift.reservation?.state === 'open' && (
-                  <Badge tone="solid">Cagnotte</Badge>
+                  <Badge tone="solid">{t('gift.pot')}</Badge>
                 )}
                 {/*
                   gift.reservation is undefined for the owner — not "free",
                   undefined. There is nothing here to render for them.
                 */}
                 {gift.reservation?.state === 'mine' && (
-                  <Badge tone="secret">Réservé par vous</Badge>
+                  <Badge tone="secret">{t('gift.reservedByYou')}</Badge>
                 )}
                 {gift.reservation?.state === 'taken' && (
-                  <Badge tone="muted">Déjà réservé</Badge>
+                  <Badge tone="muted">{t('gift.alreadyReserved')}</Badge>
                 )}
               </div>
             </CardLink>

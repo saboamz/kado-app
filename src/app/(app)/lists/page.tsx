@@ -6,9 +6,13 @@ import { PageHeader } from '@/components/PageHeader';
 import { distinctOccasion } from '@/lib/format';
 import { getListsForViewer } from '@/lib/gifts';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './lists.module.css';
 
-export const metadata: Metadata = { title: 'Mes listes' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('lists.title') };
+}
 
 const VISIBILITY = {
   PRIVATE: { label: 'Privée', Icon: LockIcon },
@@ -17,14 +21,15 @@ const VISIBILITY = {
 } as const;
 
 export default async function ListsPage() {
+  const t = await getT();
   const user = await requireUser();
   const lists = await getListsForViewer(user.id, user.id);
 
   return (
     <>
       <PageHeader
-        title="Mes listes"
-        subtitle="Ce que vous aimeriez recevoir, rangé par occasion."
+        title={t('lists.title')}
+        subtitle={t('lists.subtitle')}
         actions={
           <ButtonLink href="/lists/new">
             <PlusIcon size={18} />
@@ -36,9 +41,9 @@ export default async function ListsPage() {
       {lists.length === 0 ? (
         <EmptyState
           icon={<GiftIcon size={24} />}
-          title="Aucune liste pour l'instant"
-          body="Créez une liste — anniversaire, Noël, ou simplement vos envies du moment."
-          action={<ButtonLink href="/lists/new">Créer une liste</ButtonLink>}
+          title={t('home.noListsTitle')}
+          body={t('lists.emptyBody')}
+          action={<ButtonLink href="/lists/new">{t('home.createList')}</ButtonLink>}
         />
       ) : (
         <Grid>
@@ -49,14 +54,14 @@ export default async function ListsPage() {
               <CardLink key={list.id} href={`/lists/${list.id}`}>
                 <div className={styles.top}>
                   <span className={styles.name}>{list.name}</span>
-                  {list.isDefault && <Badge>Par défaut</Badge>}
+                  {list.isDefault && <Badge>{t('common.default')}</Badge>}
                 </div>
                 {occasion && (
                   <span className={styles.occasion}>{occasion}</span>
                 )}
                 <div className={styles.meta}>
                   <span className={styles.count}>
-                    {list.giftCount} envie{list.giftCount > 1 ? 's' : ''}
+                    {t('common.wishes', { count: list.giftCount })}
                   </span>
                   <span className={styles.visibility}>
                     <Icon size={14} />

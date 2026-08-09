@@ -4,18 +4,21 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { login } from '@/lib/auth-actions';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import { Field } from '@/components/Field';
 import { SubmitButton } from '@/components/SubmitButton';
 import styles from '../auth.module.css';
 
 export default function LoginPage() {
+  const t = useT();
+  const errorText = useErrorText();
   const [state, action] = useActionState(login, {});
   const invite = useSearchParams().get('invite');
 
   return (
     <>
       <div>
-        <h1 className={styles.title}>Content de vous revoir.</h1>
+        <h1 className={styles.title}>{t('auth.welcomeBack')}</h1>
         <p className={styles.subtitle}>
           Connectez-vous pour retrouver vos listes et celles de vos proches.
         </p>
@@ -25,14 +28,16 @@ export default function LoginPage() {
         {invite && <input type="hidden" name="invite" value={invite} />}
         {state.errors?.form && (
           <p className={styles.formError} role="alert">
-            {state.errors.form}
+            {/* A key, like every other action error — Field does this for
+                the fields, and a form-level error has no Field to do it. */}
+            {errorText(state.errors.form)}
           </p>
         )}
         <Field
           id="email"
           name="email"
           type="email"
-          label="Adresse e-mail"
+          label={t('auth.email')}
           autoComplete="email"
           inputMode="email"
           required
@@ -42,16 +47,16 @@ export default function LoginPage() {
           id="password"
           name="password"
           type="password"
-          label="Mot de passe"
+          label={t('auth.password')}
           autoComplete="current-password"
           required
           error={state.errors?.password}
         />
-        <SubmitButton pendingLabel="Connexion…">Se connecter</SubmitButton>
+        <SubmitButton pendingLabel={t('action.signingIn')}>{t('auth.signIn')}</SubmitButton>
       </form>
 
       <p className={styles.footer}>
-        Pas encore de compte ? <Link href="/signup">Créer un compte</Link>
+        Pas encore de compte ? <Link href="/signup">{t('auth.createAccount')}</Link>
       </p>
 
       <p className={styles.demo}>

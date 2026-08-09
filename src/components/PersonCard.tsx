@@ -8,12 +8,15 @@ import {
   requestFriendship,
 } from '@/lib/friend-actions';
 import type { PersonResult } from '@/lib/people';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import { Avatar } from './display';
 import { Button } from './Button';
 import styles from './person.module.css';
 
 /** One person, with whatever action their current relation allows. */
 export function PersonCard({ person }: { person: PersonResult }) {
+  const t = useT();
+  const errorText = useErrorText();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +39,7 @@ export function PersonCard({ person }: { person: PersonResult }) {
         <span className={styles.text}>
           <span className={styles.name}>{person.name}</span>
           <span className={styles.meta}>
-            {person.listCount} liste{person.listCount > 1 ? 's' : ''}
+            {t('common.lists', { count: person.listCount })}
             {person.bio ? ` · ${person.bio}` : ''}
           </span>
         </span>
@@ -49,12 +52,12 @@ export function PersonCard({ person }: { person: PersonResult }) {
             disabled={pending}
             onClick={() => run(() => requestFriendship(person.id))}
           >
-            Ajouter
+            {t('friend.add')}
           </Button>
         )}
 
         {person.relation === 'pending-sent' && (
-          <span className={styles.pendingLabel}>Demande envoyée</span>
+          <span className={styles.pendingLabel}>{t('friend.requestSent')}</span>
         )}
 
         {person.relation === 'pending-received' && person.friendshipId && (
@@ -63,14 +66,14 @@ export function PersonCard({ person }: { person: PersonResult }) {
               disabled={pending}
               onClick={() => run(() => acceptFriendship(person.friendshipId!))}
             >
-              Accepter
+              {t('friend.accept')}
             </Button>
             <Button
               variant="ghost"
               disabled={pending}
               onClick={() => run(() => removeFriendship(person.friendshipId!))}
             >
-              Refuser
+              {t('friend.decline')}
             </Button>
           </>
         )}
@@ -81,14 +84,14 @@ export function PersonCard({ person }: { person: PersonResult }) {
             disabled={pending}
             onClick={() => run(() => removeFriendship(person.friendshipId!))}
           >
-            Retirer
+            {t('friend.remove')}
           </Button>
         )}
       </div>
 
       {error && (
         <p className={styles.error} role="alert">
-          {error}
+          {errorText(error)}
         </p>
       )}
     </div>

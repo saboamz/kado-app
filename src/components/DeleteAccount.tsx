@@ -1,16 +1,18 @@
 'use client';
 
 import { deleteAccount } from '@/lib/profile-actions';
+import { useT } from '@/lib/i18n/client';
 import { Button } from './Button';
 
 export function DeleteAccount() {
+  const t = useT();
   return (
     <form
       action={deleteAccount}
       onSubmit={(e) => {
         if (
           !confirm(
-            'Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.',
+            t('account.confirmDelete'),
           )
         ) {
           e.preventDefault();
@@ -18,7 +20,7 @@ export function DeleteAccount() {
       }}
     >
       <Button variant="danger" type="submit">
-        Supprimer mon compte
+        {t('settings.deleteAccount')}
       </Button>
     </form>
   );

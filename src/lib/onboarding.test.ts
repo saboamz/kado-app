@@ -1,4 +1,6 @@
 import { db } from './db';
+import { fr } from './i18n/fr';
+import { translator } from './i18n/t';
 import { getOnboarding } from './onboarding';
 import {
   cleanup,
@@ -18,6 +20,16 @@ import {
  */
 const users: string[] = [];
 
+/*
+ * A real translator, not a stub returning the key.
+ *
+ * The steps carry text a person reads, so the assertions below stay about
+ * structure — which step, where it points, whether it is done — and never
+ * about the French wording, which now lives in the dictionary and is free to
+ * change without breaking this file.
+ */
+const t = translator('fr', fr);
+
 /**
  * The checklist for somebody, asserted to exist.
  *
@@ -26,7 +38,7 @@ const users: string[] = [];
  * than about null-checking.
  */
 const stepsFor = async (userId: string) => {
-  const onboarding = await getOnboarding(userId);
+  const onboarding = await getOnboarding(userId, t);
   if (!onboarding) throw new Error('expected a checklist');
   return onboarding.steps;
 };
@@ -46,7 +58,7 @@ describe('the getting-started checklist', () => {
   it('opens with everything still to do', async () => {
     const user = await newcomer();
 
-    const onboarding = await getOnboarding(user.id);
+    const onboarding = await getOnboarding(user.id, t);
 
     expect(onboarding).not.toBeNull();
     expect(onboarding!.doneCount).toBe(0);
@@ -65,7 +77,7 @@ describe('the getting-started checklist', () => {
     const user = await newcomer();
     const list = await makeList(user.id);
 
-    const onboarding = await getOnboarding(user.id);
+    const onboarding = await getOnboarding(user.id, t);
 
     expect(onboarding!.steps[0]!.href).toBe(`/lists/${list.id}/gifts/new`);
   });
@@ -73,7 +85,7 @@ describe('the getting-started checklist', () => {
   it('falls back to the index when there is no list to aim at', async () => {
     const user = await newcomer();
 
-    const onboarding = await getOnboarding(user.id);
+    const onboarding = await getOnboarding(user.id, t);
 
     expect(onboarding!.steps[0]!.href).toBe('/lists');
   });
@@ -83,7 +95,7 @@ describe('the getting-started checklist', () => {
     // route that actually produces a friend.
     const user = await newcomer();
 
-    const onboarding = await getOnboarding(user.id);
+    const onboarding = await getOnboarding(user.id, t);
 
     expect(onboarding!.steps[1]!.href).toBe('/friends');
   });
@@ -93,7 +105,7 @@ describe('the getting-started checklist', () => {
     const list = await makeList(user.id);
     await makeGift(list.id);
 
-    const onboarding = await getOnboarding(user.id);
+    const onboarding = await getOnboarding(user.id, t);
 
     expect(onboarding!.steps[0]!.done).toBe(true);
     expect(onboarding!.doneCount).toBe(1);
@@ -175,7 +187,7 @@ describe('the getting-started checklist', () => {
       },
     });
 
-    expect(await getOnboarding(user.id)).toBeNull();
+    expect(await getOnboarding(user.id, t)).toBeNull();
   });
 
   it('stays hidden once dismissed, even with steps left', async () => {
@@ -185,6 +197,6 @@ describe('the getting-started checklist', () => {
       data: { onboardingDismissedAt: new Date() },
     });
 
-    expect(await getOnboarding(user.id)).toBeNull();
+    expect(await getOnboarding(user.id, t)).toBeNull();
   });
 });

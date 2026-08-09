@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import { updateProfile } from '@/lib/profile-actions';
+import { useT } from '@/lib/i18n/client';
 import { Field, TextareaField } from './Field';
 import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
@@ -18,13 +19,14 @@ export function ProfileForm({
     interests: string;
   };
 }) {
+  const t = useT();
   const [state, action] = useActionState(updateProfile, {});
 
   return (
     <form action={action} className={styles.form} noValidate>
       <ImageUpload
         name="avatar"
-        label="Photo de profil"
+        label={t('form.avatar')}
         initialUrl={initial.avatarUrl}
         shape="circle"
         serverError={state.errors?.avatar}
@@ -33,7 +35,7 @@ export function ProfileForm({
       <Field
         id="name"
         name="name"
-        label="Nom"
+        label={t('auth.name')}
         defaultValue={initial.name}
         required
         error={state.errors?.name}
@@ -42,9 +44,9 @@ export function ProfileForm({
       <TextareaField
         id="bio"
         name="bio"
-        label="À propos"
+        label={t('form.about')}
         defaultValue={initial.bio ?? ''}
-        placeholder="Ce que vous aimez, en une phrase."
+        placeholder={t('form.aboutPlaceholder')}
         error={state.errors?.bio}
       />
 
@@ -52,19 +54,19 @@ export function ProfileForm({
         id="birthday"
         name="birthday"
         type="date"
-        label="Date de naissance"
+        label={t('form.birthday')}
         defaultValue={initial.birthday}
-        hint="Vos amis verront le jour, jamais l'année."
+        hint={t('form.birthdayHint')}
         error={state.errors?.birthday}
       />
 
       <Field
         id="interests"
         name="interests"
-        label="Centres d'intérêt"
+        label={t('form.interests')}
         defaultValue={initial.interests}
-        placeholder="Café, céramique, randonnée"
-        hint="Séparés par des virgules — de quoi inspirer vos proches."
+        placeholder={t('form.interestsPlaceholder')}
+        hint={t('form.interestsHint')}
         error={state.errors?.interests}
       />
 
@@ -75,7 +77,7 @@ export function ProfileForm({
         pre-existing data, not this change's to drop.
       */}
 
-      <SubmitButton pendingLabel="Enregistrement…">Enregistrer</SubmitButton>
+      <SubmitButton pendingLabel={t('action.saving')}>{t('common.save')}</SubmitButton>
     </form>
   );
 }

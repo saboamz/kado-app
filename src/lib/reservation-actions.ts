@@ -38,11 +38,11 @@ async function requireReservableGift(giftId: string) {
       list: { select: { ownerId: true, visibility: true } },
     },
   });
-  if (!gift) return { error: 'Cadeau introuvable' } as const;
+  if (!gift) return { error: 'error.giftNotFound' } as const;
 
   const relation = await relationTo(user.id, gift.list.ownerId);
   if (relation === 'owner') {
-    return { error: 'Vous ne pouvez pas réserver un cadeau de votre liste.' } as const;
+    return { error: 'error.cannotReserveOwn' } as const;
   }
   if (relation === 'stranger') {
     return { error: "Vous n'avez pas accès à cette liste." } as const;

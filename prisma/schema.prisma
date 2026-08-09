@@ -32,6 +32,12 @@ model User {
   /// rendered it.
   avatarUrl     String?
   theme         Theme     @default(SYSTEM)
+  /// Which language this person reads the app in.
+  ///
+  /// A preference rather than a URL prefix: theme and currency already work
+  /// this way, and a /fr /en split would move every route and break links
+  /// already shared — invitations included.
+  locale        String    @default("fr")
   profilePublic Boolean   @default(false)
   /// When the getting-started checklist was dismissed.
   ///

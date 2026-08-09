@@ -29,7 +29,7 @@ export async function postChatMessage(
     where: { id: giftId },
     select: { listId: true, list: { select: { ownerId: true } } },
   });
-  if (!gift) return { error: 'Cadeau introuvable' };
+  if (!gift) return { error: 'error.giftNotFound' };
 
   const relation = await relationTo(user.id, gift.list.ownerId);
   if (relation === 'owner') {
@@ -60,7 +60,7 @@ export async function deleteChatMessage(
     select: { giftId: true, authorId: true },
   });
   if (!message || message.authorId !== user.id) {
-    return { error: 'Message introuvable.' };
+    return { error: 'error.messageNotFound' };
   }
 
   await db.chatMessage.delete({ where: { id: messageId } });

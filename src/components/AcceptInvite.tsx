@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { acceptInvite } from '@/lib/invite-actions';
+import { useErrorText } from '@/lib/i18n/client';
 import { Button } from './Button';
 import styles from './acceptInvite.module.css';
 
@@ -15,6 +16,7 @@ import styles from './acceptInvite.module.css';
  * crawlers live.
  */
 export function AcceptInvite({ code, name }: { code: string; name: string }) {
+  const errorText = useErrorText();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -41,7 +43,7 @@ export function AcceptInvite({ code, name }: { code: string; name: string }) {
 
       {error && (
         <p className={styles.error} role="alert">
-          {error}
+          {errorText(error)}
         </p>
       )}
     </div>

@@ -6,14 +6,19 @@ import { PersonCard } from '@/components/PersonCard';
 import { SearchField } from '@/components/SearchField';
 import { searchPeople, suggestPeople } from '@/lib/people';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 
-export const metadata: Metadata = { title: 'Rechercher' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('search.title') };
+}
 
 export default async function SearchPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  const t = await getT();
   const { q } = await searchParams;
   const user = await requireUser();
   const query = q?.trim() ?? '';
@@ -24,8 +29,8 @@ export default async function SearchPage({
   return (
     <>
       <PageHeader
-        title="Rechercher"
-        subtitle="Trouvez vos proches pour voir leurs listes."
+        title={t('search.title')}
+        subtitle={t('search.subtitle')}
       />
 
       <SearchField defaultValue={query} />
@@ -33,13 +38,13 @@ export default async function SearchPage({
       {query ? (
         <>
           <SectionTitle>
-            {results.length} résultat{results.length > 1 ? 's' : ''}
+            {t('common.results', { count: results.length })}
           </SectionTitle>
           {results.length === 0 ? (
             <EmptyState
               icon={<SearchIcon size={24} />}
-              title="Personne trouvée"
-              body="Essayez un autre nom, ou l'adresse e-mail exacte de la personne."
+              title={t('search.nobodyTitle')}
+              body={t('search.nobodyBody')}
             />
           ) : (
             <Stack>
@@ -51,12 +56,12 @@ export default async function SearchPage({
         </>
       ) : (
         <>
-          <SectionTitle>Suggestions</SectionTitle>
+          <SectionTitle>{t('search.suggestions')}</SectionTitle>
           {suggestions.length === 0 ? (
             <EmptyState
               icon={<SearchIcon size={24} />}
-              title="Personne à suggérer"
-              body="Cherchez vos proches par nom ou par adresse e-mail."
+              title={t('search.noSuggestionsTitle')}
+              body={t('search.noSuggestionsBody')}
             />
           ) : (
             <Stack>

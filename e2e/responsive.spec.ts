@@ -91,7 +91,7 @@ test.describe('the app frame adapts to the viewport', () => {
     // The accessible name is the handle: the badge element also carries a
     // screen-reader suffix, so an exact-text match on digits finds nothing.
     await expect(
-      nav.getByRole('link', { name: /notifications non lues/ }),
+      nav.getByRole('link', { name: /notifications? non lues?/ }),
     ).toBeVisible();
   });
 

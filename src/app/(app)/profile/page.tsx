@@ -8,11 +8,16 @@ import { logout } from '@/lib/auth-actions';
 import { db } from '@/lib/db';
 import { friendIds } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './profile.module.css';
 
-export const metadata: Metadata = { title: 'Profil' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('profile.title') };
+}
 
 export default async function ProfilePage() {
+  const t = await getT();
   const user = await requireUser();
 
   const [profile, friends, listCount, giftCount] = await Promise.all([
@@ -30,7 +35,7 @@ export default async function ProfilePage() {
   return (
     <>
       <PageHeader
-        title="Profil"
+        title={t('profile.title')}
         actions={
           <ButtonLink href="/settings" variant="secondary">
             <SettingsIcon size={18} />
@@ -55,21 +60,21 @@ export default async function ProfilePage() {
       <dl className={styles.stats}>
         <div>
           <dd>{listCount}</dd>
-          <dt>Listes</dt>
+          <dt>{t('profile.lists')}</dt>
         </div>
         <div>
           <dd>{giftCount}</dd>
-          <dt>Envies</dt>
+          <dt>{t('profile.wishes')}</dt>
         </div>
         <div>
           <dd>{friends.length}</dd>
-          <dt>Amis</dt>
+          <dt>{t('profile.friends')}</dt>
         </div>
       </dl>
 
       {profile.interests.length > 0 && (
         <section className={styles.section}>
-          <SectionTitle>Centres d&rsquo;intérêt</SectionTitle>
+          <SectionTitle>{t('profile.interests')}</SectionTitle>
           <ul className={styles.interests}>
             {profile.interests.map((i) => (
               <li key={i.id}>
@@ -83,10 +88,10 @@ export default async function ProfilePage() {
       <section className={styles.section}>
         <Stack>
           <ButtonLink href="/friends" variant="secondary" block>
-            Mes amis ({friends.length})
+            {t('profile.friendsCount', { count: friends.length })}
           </ButtonLink>
           <ButtonLink href="/profile/edit" variant="secondary" block>
-            Modifier mon profil
+            {t('profile.editTitle')}
           </ButtonLink>
           <form action={logout}>
             <Button variant="danger" type="submit" block>

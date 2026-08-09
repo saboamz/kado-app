@@ -59,7 +59,7 @@ async function requireOwnedGift(giftId: string) {
     },
   });
   if (!gift || gift.list.ownerId !== user.id) {
-    throw new Error('Cadeau introuvable');
+    throw new Error('error.giftNotFound');
   }
   return { user, gift };
 }
@@ -131,7 +131,7 @@ export async function createGift(
 
   // A price that was typed but could not be read is an error, not a silent null.
   if (parsed.data.price && parseMoney(parsed.data.price) === null) {
-    return { errors: { price: 'Ce montant semble invalide.' } };
+    return { errors: { price: 'error.amountInvalid' } };
   }
 
   const image = await resolveImage(formData, 'image', null);
@@ -194,7 +194,7 @@ export async function updateGift(
   const parsed = parseGiftForm(formData);
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
   if (parsed.data.price && parseMoney(parsed.data.price) === null) {
-    return { errors: { price: 'Ce montant semble invalide.' } };
+    return { errors: { price: 'error.amountInvalid' } };
   }
 
   const image = await resolveImage(formData, 'image', gift.imageUrl);

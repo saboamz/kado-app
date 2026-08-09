@@ -8,11 +8,16 @@ import { PersonCard } from '@/components/PersonCard';
 import { getOrCreateInvite } from '@/lib/invite-actions';
 import { getFriendGroups } from '@/lib/people';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
 import styles from './friends.module.css';
 
-export const metadata: Metadata = { title: 'Mes amis' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('friends.title') };
+}
 
 export default async function FriendsPage() {
+  const t = await getT();
   const user = await requireUser();
   const { friends, received, sent } = await getFriendGroups(user.id);
   const invite = await getOrCreateInvite();
@@ -20,8 +25,8 @@ export default async function FriendsPage() {
   return (
     <>
       <PageHeader
-        title="Mes amis"
-        subtitle="Les personnes dont vous voyez les listes, et qui voient les vôtres."
+        title={t('friends.title')}
+        subtitle={t('friends.subtitle')}
         actions={
           <ButtonLink href="/search" variant="secondary">
             Trouver quelqu&rsquo;un
@@ -49,9 +54,9 @@ export default async function FriendsPage() {
         {friends.length === 0 ? (
           <EmptyState
             icon={<UsersIcon size={24} />}
-            title="Pas encore d'amis"
-            body="Ajoutez vos proches pour voir leurs listes et savoir quoi leur offrir."
-            action={<ButtonLink href="/search">Chercher des amis</ButtonLink>}
+            title={t('home.noFriendsTitle')}
+            body={t('friends.emptyBody')}
+            action={<ButtonLink href="/search">{t('friends.find')}</ButtonLink>}
           />
         ) : (
           <Stack>

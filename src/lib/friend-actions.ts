@@ -18,14 +18,14 @@ export async function requestFriendship(
 ): Promise<FriendResult> {
   const user = await requireUser();
   if (addresseeId === user.id) {
-    return { error: 'Vous ne pouvez pas vous ajouter vous-même.' };
+    return { error: 'error.cannotAddYourself' };
   }
 
   const target = await db.user.findUnique({
     where: { id: addresseeId },
     select: { id: true },
   });
-  if (!target) return { error: 'Cette personne est introuvable.' };
+  if (!target) return { error: 'error.personNotFound' };
 
   const existing = await db.friendship.findFirst({
     where: {
@@ -38,10 +38,10 @@ export async function requestFriendship(
 
   if (existing) {
     if (existing.status === 'BLOCKED') {
-      return { error: 'Impossible pour le moment.' };
+      return { error: 'error.tryLater' };
     }
     if (existing.status === 'ACCEPTED') {
-      return { error: 'Vous êtes déjà amis.' };
+      return { error: 'error.alreadyFriends' };
     }
     // They asked first: treat this as the acceptance it plainly is.
     if (existing.addresseeId === user.id) {
@@ -53,7 +53,7 @@ export async function requestFriendship(
       revalidatePath('/friends');
       return {};
     }
-    return { error: 'Demande déjà envoyée.' };
+    return { error: 'error.requestAlreadySent' };
   }
 
   await db.friendship.create({
@@ -83,7 +83,7 @@ export async function acceptFriendship(
     where: { id: friendshipId, addresseeId: user.id, status: 'PENDING' },
     data: { status: 'ACCEPTED' },
   });
-  if (count === 0) return { error: 'Cette demande n’existe plus.' };
+  if (count === 0) return { error: 'error.requestGone' };
 
   const friendship = await db.friendship.findUnique({
     where: { id: friendshipId },
@@ -108,7 +108,7 @@ export async function removeFriendship(
       OR: [{ requesterId: user.id }, { addresseeId: user.id }],
     },
   });
-  if (count === 0) return { error: 'Cette relation n’existe plus.' };
+  if (count === 0) return { error: 'error.relationGone' };
 
   revalidatePath('/friends');
   revalidatePath('/app');

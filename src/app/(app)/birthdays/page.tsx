@@ -14,11 +14,17 @@ import { db } from '@/lib/db';
 import { daysUntilBirthday, formatBirthdayCountdown } from '@/lib/format';
 import { friendIds } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
+import { getT } from '@/lib/i18n/server';
+import type { TFunction } from '@/lib/i18n/t';
 import styles from './birthdays.module.css';
 
-export const metadata: Metadata = { title: 'Anniversaires' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t('birthdays.title') };
+}
 
 export default async function BirthdaysPage() {
+  const t = await getT();
   const user = await requireUser();
   const friends = await friendIds(user.id);
 
@@ -45,26 +51,26 @@ export default async function BirthdaysPage() {
   return (
     <>
       <PageHeader
-        title="Anniversaires"
-        subtitle="Qui fête quoi, et quand — pour ne plus jamais s'y prendre trop tard."
+        title={t('birthdays.title')}
+        subtitle={t('birthdays.subtitle')}
         back={{ href: '/app', label: 'Accueil' }}
       />
 
       {upcoming.length === 0 ? (
         <EmptyState
           icon={<UsersIcon size={24} />}
-          title="Aucun anniversaire connu"
-          body="Vos amis n'ont pas renseigné leur date de naissance, ou vous n'avez pas encore d'amis."
-          action={<ButtonLink href="/search">Trouver des proches</ButtonLink>}
+          title={t('birthdays.emptyTitle')}
+          body={t('birthdays.emptyBody')}
+          action={<ButtonLink href="/search">{t('birthdays.findPeople')}</ButtonLink>}
         />
       ) : (
         <>
           {soon.length > 0 && (
             <section className={styles.section}>
-              <SectionTitle>Dans le mois</SectionTitle>
+              <SectionTitle>{t('birthdays.thisMonth')}</SectionTitle>
               <Stack>
                 {soon.map((person) => (
-                  <PersonRow key={person.id} person={person} highlight />
+                  <PersonRow key={person.id} person={person} highlight t={t} />
                 ))}
               </Stack>
             </section>
@@ -72,10 +78,10 @@ export default async function BirthdaysPage() {
 
           {later.length > 0 && (
             <section className={styles.section}>
-              <SectionTitle>Plus tard</SectionTitle>
+              <SectionTitle>{t('birthdays.later')}</SectionTitle>
               <Stack>
                 {later.map((person) => (
-                  <PersonRow key={person.id} person={person} />
+                  <PersonRow key={person.id} person={person} t={t} />
                 ))}
               </Stack>
             </section>
@@ -89,6 +95,7 @@ export default async function BirthdaysPage() {
 function PersonRow({
   person,
   highlight,
+  t,
 }: {
   person: {
     id: string;
@@ -98,6 +105,9 @@ function PersonRow({
     _count: { lists: number };
   };
   highlight?: boolean;
+  /** Passed down: this runs below the page, which is where the request's
+      translator is resolved. */
+  t: TFunction;
 }) {
   return (
     <CardLink href={`/u/${person.id}`} className={styles.row}>
@@ -109,11 +119,11 @@ function PersonRow({
       <div className={styles.text}>
         <span className={styles.name}>{person.name}</span>
         <span className={styles.lists}>
-          {person._count.lists} liste{person._count.lists > 1 ? 's' : ''}
+          {t('common.lists', { count: person._count.lists })}
         </span>
       </div>
       <Badge tone={highlight ? 'accent' : 'neutral'}>
-        {formatBirthdayCountdown(person.days)}
+        {formatBirthdayCountdown(person.days, t)}
       </Badge>
     </CardLink>
   );

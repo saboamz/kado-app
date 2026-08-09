@@ -22,6 +22,7 @@
  */
 
 import { db } from './db';
+import type { TFunction } from './i18n/t';
 
 export type OnboardingStepId = 'wish' | 'friend' | 'profile' | 'decoration';
 
@@ -55,6 +56,7 @@ export type Onboarding = {
  */
 export async function getOnboarding(
   userId: string,
+  t: TFunction,
 ): Promise<Onboarding | null> {
   const user = await db.user.findUnique({
     where: { id: userId },
@@ -86,36 +88,36 @@ export async function getOnboarding(
   const steps: OnboardingStep[] = [
     {
       id: 'wish',
-      title: 'Ajoutez une première envie',
-      body: 'Un lien, un prix, une idée — c’est ce que vos proches viendront regarder.',
+      title: t('onboarding.wishTitle'),
+      body: t('onboarding.wishBody'),
       href: firstList ? `/lists/${firstList.id}/gifts/new` : '/lists',
-      cta: 'Ajouter une envie',
+      cta: t('onboarding.wishCta'),
       done: giftCount > 0,
     },
     {
       id: 'friend',
-      title: 'Invitez quelqu’un',
-      body: 'Votre lien d’invitation vous connecte directement, sans recherche.',
+      title: t('onboarding.friendTitle'),
+      body: t('onboarding.friendBody'),
       href: '/friends',
-      cta: 'Obtenir mon lien',
+      cta: t('onboarding.friendCta'),
       done: friendCount > 0,
     },
     {
       id: 'profile',
-      title: 'Complétez votre profil',
-      body: 'Date de naissance et centres d’intérêt : de quoi guider ceux qui cherchent une idée.',
+      title: t('onboarding.profileTitle'),
+      body: t('onboarding.profileBody'),
       href: '/profile/edit',
-      cta: 'Compléter',
+      cta: t('onboarding.profileCta'),
       // Deliberately not the avatar: a photo is a preference, while a birthday
       // and a few interests are what someone hunting for a present needs.
       done: Boolean(user.birthday) && interestCount > 0,
     },
     {
       id: 'decoration',
-      title: 'Décorez votre profil',
-      body: 'Un GIF en bas de page, pour que votre profil vous ressemble.',
+      title: t('onboarding.decorationTitle'),
+      body: t('onboarding.decorationBody'),
       href: '/profile/edit',
-      cta: 'Choisir un GIF',
+      cta: t('onboarding.decorationCta'),
       done: decorationCount > 0,
     },
   ];

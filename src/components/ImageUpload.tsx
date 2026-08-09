@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { MAX_UPLOAD_BYTES } from '@/lib/upload-limits';
+import { useT } from '@/lib/i18n/client';
 import { UploadedImage } from './UploadedImage';
 import styles from './imageUpload.module.css';
 
@@ -25,6 +26,7 @@ export function ImageUpload({
   /** A refusal from the action — a wrong format is only detectable there. */
   serverError?: string;
 }) {
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(initialUrl ?? null);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export function ImageUpload({
     // Checked again on the server, where it counts; this is only to spare
     // somebody a slow upload that was always going to be refused.
     if (file.size > MAX_UPLOAD_BYTES) {
-      setError('Cette image dépasse 4 Mo.');
+      setError(t('upload.tooLarge'));
       if (inputRef.current) inputRef.current.value = '';
       return;
     }
@@ -75,7 +77,7 @@ export function ImageUpload({
 
         <div className={styles.controls}>
           <label className={styles.button}>
-            {preview ? 'Changer' : 'Choisir une image'}
+            {preview ? t('image.change') : t('image.choose')}
             <input
               ref={inputRef}
               type="file"

@@ -2,8 +2,11 @@
 
 import { useActionState } from 'react';
 import type { FormState } from '@/lib/gift-actions';
-import { PRIORITY_LABELS } from '@/lib/format';
+import { priorityLabel } from '@/lib/format';
+import type { TFunction } from '@/lib/i18n/t';
+import { categoryName } from '@/lib/i18n/categories';
 import { CATEGORIES } from '@/lib/taxonomy';
+import { useLocale, useT } from '@/lib/i18n/client';
 import { Field, SelectField, TextareaField } from './Field';
 import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
@@ -13,10 +16,12 @@ import styles from './forms.module.css';
 // literally the wording shown back to them on the gift. They used to be two
 // separate lists that had already drifted: level 2 read "J'en ai envie" in
 // this form and "J'en ai vraiment envie" everywhere else.
-const PRIORITIES = [3, 2, 1].map((value) => ({
-  value,
-  label: PRIORITY_LABELS[value],
-}));
+function priorities(t: TFunction) {
+  return [3, 2, 1].map((value) => ({
+    value,
+    label: priorityLabel(value, t),
+  }));
+}
 
 export type GiftInitial = {
   name: string;
@@ -40,6 +45,8 @@ export function GiftForm({
   submitLabel: string;
   pendingLabel: string;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const [state, formAction] = useActionState(action, {});
   // Cents back to a plain decimal for the input; the action re-parses it.
   const price =
@@ -50,9 +57,9 @@ export function GiftForm({
       <Field
         id="name"
         name="name"
-        label="Qu'est-ce qui vous ferait plaisir ?"
+        label={t('form.giftName')}
         defaultValue={initial?.name}
-        placeholder="AirPods Pro, un vase en grès, un week-end…"
+        placeholder={t('form.giftNamePlaceholder')}
         required
         autoFocus={!initial}
         error={state.errors?.name}
@@ -61,12 +68,12 @@ export function GiftForm({
       <Field
         id="url"
         name="url"
-        label="Lien"
+        label={t('form.link')}
         type="url"
         inputMode="url"
         defaultValue={initial?.url ?? ''}
-        placeholder="Facultatif — collez le lien de la boutique"
-        hint="La boutique, la photo et le prix seront repris de la page si nous arrivons à la lire."
+        placeholder={t('form.linkPlaceholder')}
+        hint={t('form.linkHint')}
         error={state.errors?.url}
       />
 
@@ -74,26 +81,31 @@ export function GiftForm({
         <Field
           id="price"
           name="price"
-          label="Prix"
+          label={t('form.price')}
           inputMode="decimal"
           defaultValue={price}
-          placeholder="Facultatif"
+          placeholder={t('form.optional')}
           error={state.errors?.price}
         />
         <SelectField
           id="category"
           name="category"
-          label="Catégorie"
+          label={t('form.category')}
           defaultValue={initial?.category ?? ''}
-          options={CATEGORIES}
-          placeholder="Choisir…"
+          /* Values stay French — they are what the database stores and what
+             the recommender joins on. Only the labels follow the reader. */
+          options={CATEGORIES.map((value) => ({
+            value,
+            label: categoryName(value, locale),
+          }))}
+          placeholder={t('form.choose')}
           error={state.errors?.category}
         />
       </div>
 
       <ImageUpload
         name="image"
-        label="Photo"
+        label={t('form.photo')}
         initialUrl={initial?.imageUrl}
         serverError={state.errors?.image}
       />
@@ -101,16 +113,16 @@ export function GiftForm({
       <TextareaField
         id="description"
         name="description"
-        label="Précisions"
+        label={t('form.details')}
         defaultValue={initial?.description ?? ''}
-        placeholder="Taille, couleur, modèle exact…"
+        placeholder={t('form.detailsPlaceholder')}
         error={state.errors?.description}
       />
 
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>À quel point en avez-vous envie ?</legend>
+        <legend className={styles.legend}>{t('form.howMuch')}</legend>
         <div className={styles.priority}>
-          {PRIORITIES.map((p) => (
+          {priorities(t).map((p) => (
             <label key={p.value} className={styles.priorityOption}>
               <input
                 type="radio"
