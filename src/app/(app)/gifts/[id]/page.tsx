@@ -46,6 +46,10 @@ export default async function GiftPage({
   const owning = await db.gift.findUnique({
     where: { id },
     select: {
+      /* Whether the link ever resolved to a catalogue row. Selected here
+         rather than derived from the view, because a product can be joined
+         and still carry no price — the two are different questions. */
+      productId: true,
       list: {
         select: {
           id: true,
@@ -88,6 +92,17 @@ export default async function GiftPage({
   const estimated =
     gift.priceCents == null && gift.estimatedPriceCents != null;
 
+  /*
+   * A link we could not read, said out loud.
+   *
+   * The resolver fails silently by design — a shop refusing robots must not
+   * cost somebody their wish — but silence left the owner with no way to know
+   * why their wish had no price or picture. Shown only to them: it is about
+   * their own link, and a friend can do nothing with it.
+   */
+  const linkUnread =
+    relation === 'owner' && Boolean(gift.url) && !owning.productId;
+
   return (
     <>
       {/* Absent for an owner — that absence is the signal. */}
@@ -126,6 +141,10 @@ export default async function GiftPage({
 
       {/* Labelled, always. An unmarked guess is worse than no figure at all:
           somebody budgets against it and finds out at the till. */}
+      {linkUnread && (
+        <p className={styles.estimateNote}>{t('gift.linkUnread')}</p>
+      )}
+
       {estimated && (
         <p className={styles.estimateNote}>
           {/* Addressed to whoever is reading: naming the owner on their own

@@ -2,6 +2,7 @@ import { priceBand } from './catalogue';
 import { judge } from './catalogue-quality';
 import { db } from './db';
 import { extractProduct } from './extract';
+import { fetchViaReader, normaliseCurrency } from './reader-fallback';
 import { findOrCreateProduct } from './product-resolve';
 import { fetchHtml } from './fetch-page';
 import { LINK_FETCH_PER_USER, rateLimit, recordAttempt } from './rate-limit';
@@ -41,6 +42,15 @@ export async function linkGiftToProduct(
   url: string | null,
   categoryId: string | null,
   userId: string,
+  /**
+   * Whether to fall back to the reading proxy when the direct read fails.
+   *
+   * On by default, because that is the whole point. Off for the nightly
+   * sweep, which already retries a link every night and would otherwise turn
+   * one failed save into an outbound proxy request per gift per night, for
+   * gifts that have already failed both ways.
+   */
+  useReader = true,
 ): Promise<string | null> {
   if (!url) return null;
 
@@ -71,17 +81,44 @@ export async function linkGiftToProduct(
     extracted = extractProduct(await fetchHtml(verdict.url.href));
   } catch {
     /*
-     * Network failures only, and silent on purpose: a merchant that is slow,
-     * paywalled, JS-rendered or hostile to bots is an ordinary Tuesday, and
-     * the gift is already saved.
+     * The direct read failed — 403, a bot check, a timeout. Ordinary, and
+     * silent: the gift is already saved and must not depend on a shop being
+     * reachable.
      *
-     * The try block is deliberately narrow. Wrapping the database work below
-     * in it as well — which is what this used to do — meant a Prisma error, a
-     * violated constraint or a bug of mine was swallowed with exactly the same
-     * silence, and the catalogue would have stayed empty with nothing to say
-     * why.
+     * Before giving up, one more attempt through the reading proxy, which
+     * gets past the refusals a server-side request collects. It asks for the
+     * page's own HTML, so this goes through the SAME extractor as a direct
+     * read — the merchant's json-ld and Open Graph, not a guess at prose.
+     *
+     * The try block stays deliberately narrow. Wrapping the database work
+     * below in it as well — which this used to do — meant a Prisma error or a
+     * violated constraint was swallowed with the same silence, and the
+     * catalogue stayed empty with nothing to say why.
      */
-    return null;
+    if (!useReader) return null;
+
+    const viaReader = await fetchViaReader(verdict.url.href)
+      .then(extractProduct)
+      .catch(() => null);
+
+    if (!viaReader?.title) return null;
+
+    /*
+     * The currency is checked before the price is kept.
+     *
+     * The proxy does not always reach a shop from where we would: Suuupply
+     * answers it 243.00 USD for a jumper it sells at 165 €. Storing that as
+     * euros would put a number on somebody's wish that is wrong by half, and
+     * nothing downstream would ever question it. An unconfirmable currency
+     * takes its price with it — no price is honest, a wrong one is not.
+     */
+    const currency = normaliseCurrency(viaReader.currency);
+    extracted = {
+      ...viaReader,
+      extractedBy: 'reader' as const,
+      currency,
+      priceCents: currency ? viaReader.priceCents : null,
+    };
   }
 
   // No title means nothing identifiable was found; a row with no name is not
@@ -156,6 +193,10 @@ export async function sweepUnlinkedGifts(
       gift.url,
       gift.category,
       gift.list.ownerId,
+      // Direct read only. A save has already tried the proxy for this link;
+      // asking it again every night for something that failed twice is spend
+      // without a story.
+      false,
     );
     if (productId) linked += 1;
   }
