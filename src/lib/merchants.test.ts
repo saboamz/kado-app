@@ -1,5 +1,5 @@
 import { db } from './db';
-import { merchantDomain, merchantName, merchantSlug } from './merchants';
+import { backfillMerchants, merchantDomain, merchantName, merchantSlug } from './merchants';
 import { findOrCreateProduct } from './product-resolve';
 
 /**
@@ -198,5 +198,44 @@ describe('resolving a product', () => {
     expect(merchant!.domains).toEqual(
       expect.arrayContaining([domain, `shop.${domain}`]),
     );
+  });
+});
+
+describe('rows written before merchants existed', () => {
+  it('get one attached, without being re-fetched', async () => {
+    /*
+     * findOrCreateProduct only resolves a merchant on the CREATE path, so a
+     * row that already existed keeps its null forever — and both the
+     * deduplication key and the diversity cap go on reading nothing for it.
+     * Production had exactly two such rows.
+     */
+    const domain = `ancienne-${Date.now()}.fr`;
+    const orphan = await db.product.create({
+      data: {
+        title: 'Produit historique',
+        sourceUrl: `https://${domain}/x`,
+        urlNorm: `${domain}/x`,
+        status: 'active',
+      },
+      select: { id: true, merchantId: true },
+    });
+    productIds.push(orphan.id);
+    expect(orphan.merchantId).toBeNull();
+
+    const result = await backfillMerchants();
+    expect(result.attached).toBeGreaterThan(0);
+
+    const after = await db.product.findUnique({
+      where: { id: orphan.id },
+      select: { merchantId: true },
+    });
+    expect(after!.merchantId).not.toBeNull();
+    merchantIds.push(after!.merchantId!);
+  });
+
+  it('finds nothing to do on a second run', async () => {
+    // Idempotent, so a nightly job that has caught up costs one query.
+    const again = await backfillMerchants();
+    expect(again.attached).toBe(0);
   });
 });

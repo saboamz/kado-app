@@ -1,3 +1,5 @@
+import { db } from './db';
+
 /**
  * Naming a shop from the address its products come from.
  *
@@ -93,4 +95,64 @@ export function merchantName(domain: string): string {
 /** The unique key a merchant row is created under. */
 export function merchantSlug(domain: string): string {
   return domain.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+/**
+ * Attaches merchants to rows written before merchants existed.
+ *
+ * Every product created up to now carries `merchantId: null`, because nothing
+ * ever created a merchant to attach. findOrCreateProduct only resolves one on
+ * the CREATE path — an existing row is never revisited — so those rows would
+ * keep their null for as long as they live, and the two mechanisms that read
+ * the column would go on doing nothing for them.
+ *
+ * Deliberately its own pass rather than a migration: it needs normalizeUrl
+ * and the domain rules, which are TypeScript. Idempotent, so running it twice
+ * is free, and bounded so it cannot become the longest thing in the night.
+ */
+export async function backfillMerchants(
+  limit = 200,
+): Promise<{ attempted: number; attached: number }> {
+  const rows = await db.product.findMany({
+    where: { merchantId: null, urlNorm: { not: null } },
+    select: { id: true, urlNorm: true },
+    take: limit,
+  });
+
+  let attached = 0;
+  for (const row of rows) {
+    const host = row.urlNorm?.split('/')[0]?.split(':')[0];
+    const domain = host ? merchantDomain(host) : null;
+    if (!domain || !host) continue;
+
+    const existing = await db.merchant.findFirst({
+      where: { domains: { hasSome: [host, domain] } },
+      select: { id: true, domains: true },
+    });
+
+    let merchantId = existing?.id ?? null;
+    if (!merchantId) {
+      const slug = merchantSlug(domain);
+      try {
+        const created = await db.merchant.create({
+          data: {
+            slug,
+            name: merchantName(domain),
+            domains: host === domain ? [domain] : [domain, host],
+          },
+          select: { id: true },
+        });
+        merchantId = created.id;
+      } catch {
+        const raced = await db.merchant.findUnique({ where: { slug }, select: { id: true } });
+        merchantId = raced?.id ?? null;
+      }
+    }
+    if (!merchantId) continue;
+
+    await db.product.update({ where: { id: row.id }, data: { merchantId } });
+    attached += 1;
+  }
+
+  return { attempted: rows.length, attached };
 }
