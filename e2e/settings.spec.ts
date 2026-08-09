@@ -79,18 +79,29 @@ test('choosing the dark theme applies it and it survives a reload', async ({
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
-test('the system theme leaves the choice to the device', async ({ page }) => {
+test('light is what you get back when you leave the dark theme', async ({
+  page,
+}) => {
+  /*
+   * There used to be a third option, "Comme mon appareil", and the app
+   * followed prefers-color-scheme. It no longer does: light is the default
+   * and dark is a decision, so that option produced exactly the same screen
+   * as "Clair" while promising something else.
+   */
   await signIn(page, scenario.ownerEmail);
   await page.goto('/settings');
 
-  await page.getByRole('radio', { name: 'Comme mon appareil' }).check();
+  await page.getByRole('radio', { name: 'Sombre' }).check();
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
+  await expect(page.getByText('Vos préférences ont été enregistrées.')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+  await page.getByRole('radio', { name: 'Clair' }).check();
   await page.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(page.getByText('Vos préférences ont été enregistrées.')).toBeVisible();
 
-  // No attribute at all, so the prefers-color-scheme media query applies.
   await page.goto('/app');
   await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'light');
 });
 
 test('the currency preference is remembered', async ({ page }) => {

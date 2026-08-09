@@ -292,7 +292,6 @@ export const fr = {
   'gif.change': 'Changer',
   'gif.remove': 'Retirer',
 
-  'settings.themeSystem': 'Comme mon appareil',
   'settings.themeLight': 'Clair',
   'settings.themeDark': 'Sombre',
   'settings.currency': 'Devise',

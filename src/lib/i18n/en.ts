@@ -287,7 +287,6 @@ export const en: Dictionary = {
   'gif.change': 'Change',
   'gif.remove': 'Remove',
 
-  'settings.themeSystem': 'Match my device',
   'settings.themeLight': 'Light',
   'settings.themeDark': 'Dark',
   'settings.currency': 'Currency',
