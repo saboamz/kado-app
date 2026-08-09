@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { Badge, Card, Priority } from '@/components/display';
+import { LiveRefresh } from '@/components/LiveRefresh';
 import { PageHeader } from '@/components/PageHeader';
 import { SecretSeal, SecretZone } from '@/components/SecretSeal';
 import { UploadedImage } from '@/components/UploadedImage';
@@ -217,6 +218,17 @@ export default async function GiftPage({
           {gift.pot && <Pot giftId={id} pot={gift.pot} />}
 
           {chat && <SecretChat giftId={id} messages={chat} />}
+
+          {/*
+            Live only where something can arrive from somebody else.
+            
+            A pot gains contributions and a chat gains messages; the rest of
+            this page changes only when its owner edits the wish, and polling
+            for that would be spend with nothing to show. Four seconds when a
+            conversation is on screen, ten when it is only the pot — a reply
+            arriving four seconds late still reads as a reply.
+          */}
+          <LiveRefresh intervalMs={chat ? 4_000 : 10_000} />
         </SecretZone>
       )}
 
