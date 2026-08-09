@@ -308,7 +308,7 @@ export const fr = {
   'settings.saved': 'Vos préférences ont été enregistrées.',
 
   'error.emailTaken': 'Un compte existe déjà avec cette adresse.',
-  'error.badCredentials': 'Adresse e-mail ou mot de passe incorrect.',
+  'error.badCredentials': 'E-mail ou mot de passe incorrect.',
   'error.tooManyAttempts': 'Trop de tentatives. Réessayez dans quelques minutes.',
   'lists.defaultName': 'Mes envies',
 

@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { signup } from '@/lib/auth-actions';
-import { useT } from '@/lib/i18n/client';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import { Field } from '@/components/Field';
 import { SubmitButton } from '@/components/SubmitButton';
 import styles from '../auth.module.css';
 
 export default function SignupPage() {
   const t = useT();
+  const errorText = useErrorText();
   const [state, action] = useActionState(signup, {});
   // Carried from an invitation link. A hidden field rather than a cookie:
   // the value only has to survive this one form post, and a cookie would
@@ -30,7 +31,9 @@ export default function SignupPage() {
         {invite && <input type="hidden" name="invite" value={invite} />}
         {state.errors?.form && (
           <p className={styles.formError} role="alert">
-            {state.errors.form}
+            {/* A key, like every other action error — Field does this for
+                the fields, and a form-level error has no Field to do it. */}
+            {errorText(state.errors.form)}
           </p>
         )}
         <Field
