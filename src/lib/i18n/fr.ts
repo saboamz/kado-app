@@ -343,6 +343,14 @@ export const fr = {
 
   'gift.linkUnread': 'Nous n’avons pas pu lire cette page — certaines boutiques refusent les robots. Ajoutez le prix vous-même si vous le souhaitez.',
 
+  'pot.goalLabel': 'Objectif de la cagnotte',
+  'pot.goalFromShop': 'Relevé sur la boutique. Corrigez si le prix a changé.',
+  'pot.goalFree': 'Facultatif — sans objectif, la cagnotte collecte sans jamais se dire complète.',
+  'reserve.opening': 'Ouverture…',
+  'reserve.takeBack': 'Le reprendre pour moi seul',
+  'reserve.mineNote': 'Vous avez réservé ce cadeau. Si le prix est élevé, ouvrez-le aux autres invités : chacun mettra ce qu’il veut, et le propriétaire n’en saura toujours rien.',
+  'reserve.freeNote': 'Les autres invités verront qu’il est pris, sans savoir par qui. Le propriétaire ne verra rien du tout.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',

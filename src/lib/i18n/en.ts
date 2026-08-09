@@ -337,6 +337,14 @@ export const en: Dictionary = {
 
   'gift.linkUnread': 'We could not read this page — some shops refuse robots. Add the price yourself if you like.',
 
+  'pot.goalLabel': 'Pot goal',
+  'pot.goalFromShop': 'Read from the shop. Correct it if the price has changed.',
+  'pot.goalFree': 'Optional — with no goal the pot collects without ever calling itself complete.',
+  'reserve.opening': 'Opening…',
+  'reserve.takeBack': 'Take it back for myself',
+  'reserve.mineNote': 'You claimed this gift. If it is expensive, open it to the other guests: everyone puts in what they like, and the owner still knows nothing.',
+  'reserve.freeNote': 'The other guests will see it is taken, without knowing by whom. The owner sees nothing at all.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',
