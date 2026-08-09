@@ -61,8 +61,22 @@ describe('the secrecy rule', () => {
   });
 
   it('never fetches reservation rows for an owner in the first place', () => {
-    expect(giftInclude('owner')).toEqual({});
+    /*
+     * Asserted as "touches no secret table", not as "is empty".
+     *
+     * `{}` was the same statement while nothing else needed joining, and it
+     * stopped being one the moment an owner's query legitimately had to read
+     * the product row for its price. Naming the forbidden tables says what
+     * the rule actually is, and keeps failing if a reservation join is ever
+     * added back — which `toEqual({})` would also have done, but so would a
+     * harmless join, and a test that cries wolf gets relaxed.
+     */
+    const forOwner = giftInclude('owner');
+    expect(forOwner).not.toHaveProperty('reservation');
+    expect(forOwner).not.toHaveProperty('contributions');
+
     expect(giftInclude('friend')).toHaveProperty('reservation');
+    expect(giftInclude('friend')).toHaveProperty('contributions');
   });
 
   it('still tells a friend the gift is free', () => {

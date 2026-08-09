@@ -15,6 +15,23 @@
   letter-spacing: -0.01em;
 }
 
+/*
+ * An estimate does not get the full weight of a real price.
+ *
+ * Same size, so the layout does not jump, but muted — the figure is a guide
+ * and the eye should read it as one before the note underneath explains why.
+ */
+.price[data-estimated] {
+  color: var(--ink2);
+}
+
+.estimateNote {
+  margin: -6px 0 14px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink3);
+}
+
 .flags {
   display: flex;
   flex-wrap: wrap;

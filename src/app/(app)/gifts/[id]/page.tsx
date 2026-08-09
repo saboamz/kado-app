@@ -84,6 +84,10 @@ export default async function GiftPage({
   const ownerFirstName =
     owning.list.owner.name.trim().split(/\s+/)[0] ?? owning.list.owner.name;
 
+  /* A figure nobody typed. Shown differently, and never silently. */
+  const estimated =
+    gift.priceCents == null && gift.estimatedPriceCents != null;
+
   return (
     <>
       {/* Absent for an owner — that absence is the signal. */}
@@ -110,11 +114,27 @@ export default async function GiftPage({
       )}
 
       <div className={styles.headline}>
-        <span className={styles.price}>
-          {formatMoney(gift.priceCents, gift.currency)}
+        <span className={styles.price} data-estimated={estimated ? '' : undefined}>
+          {estimated
+            ? t('gift.estimatedPrice', {
+                price: formatMoney(gift.estimatedPriceCents!, gift.currency, locale),
+              })
+            : formatMoney(gift.priceCents, gift.currency, locale)}
         </span>
         <Priority priority={gift.priority} t={t} />
       </div>
+
+      {/* Labelled, always. An unmarked guess is worse than no figure at all:
+          somebody budgets against it and finds out at the till. */}
+      {estimated && (
+        <p className={styles.estimateNote}>
+          {/* Addressed to whoever is reading: naming the owner on their own
+              page talks about them in the third person. */}
+          {relation === 'owner'
+            ? t('gift.estimatedNoteOwn')
+            : t('gift.estimatedNote', { name: ownerFirstName })}
+        </p>
+      )}
 
       <div className={styles.flags}>
         {gift.category && <Badge>{categoryName(gift.category, locale)}</Badge>}
@@ -159,7 +179,7 @@ export default async function GiftPage({
         <SecretZone>
           <SecretSeal title={t('gift.friendsSide')}>
             {gift.pot
-              ? `${ownerFirstName} ne voit ni le total, ni les participants, ni même l’existence de cette cagnotte.`
+              ? t('gift.potHiddenFromOwner', { name: ownerFirstName })
               : gift.reservation?.state === 'free'
                 ? t('gift.hiddenIfYouReserve')
                 : t('gift.ownerSeesNothing')}
