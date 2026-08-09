@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { buildItemSimilarity } from '@/lib/cf';
 import { promoteQuarantined, sweepUnlinkedGifts } from '@/lib/gift-product-link';
+import { backfillMerchants } from '@/lib/merchants';
 import { purgeOldAttempts } from '@/lib/rate-limit';
 import { refreshPopularity } from '@/lib/reco';
 
@@ -78,6 +79,15 @@ export async function GET(request: Request) {
    */
   const promotion = await promoteQuarantined();
 
+  /*
+   * Attach merchants to rows written before merchants existed.
+   *
+   * Purely local work — no outbound request — so it is cheap, and it is
+   * idempotent: once every row has a merchant this finds nothing and costs
+   * one indexed query a night.
+   */
+  const backfill = await backfillMerchants();
+
   return NextResponse.json({
     ok: true,
     popularityRowsUpdated: popularity,
@@ -87,6 +97,7 @@ export async function GET(request: Request) {
     giftsLinked: sweep.linked,
     quarantineRetried: promotion.attempted,
     quarantinePromoted: promotion.promoted,
+    merchantsAttached: backfill.attached,
     ms: Date.now() - startedAt,
   });
 }
