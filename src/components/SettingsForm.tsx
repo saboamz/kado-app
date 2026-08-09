@@ -12,7 +12,17 @@ import styles from './forms.module.css';
    before the locale is known, so it could only hold one language. */
 function themes(t: TFunction) {
   return [
-    { value: 'SYSTEM', label: t('settings.themeSystem') },
+    /*
+     * Two choices, because there are only two outcomes.
+     *
+     * SYSTEM used to mean "follow the device". It no longer does — light is
+     * the default and dark is a decision — so it produced exactly the same
+     * screen as LIGHT while promising something else. An option whose label
+     * describes behaviour the app dropped is worse than no option.
+     *
+     * The value stays in the enum: accounts already set to SYSTEM read as
+     * light, which is what they now see, and nothing has to be migrated.
+     */
     { value: 'LIGHT', label: t('settings.themeLight') },
     { value: 'DARK', label: t('settings.themeDark') },
   ] as const;
@@ -63,7 +73,13 @@ export function SettingsForm({
               type="radio"
               name="theme"
               value={theme.value}
-              defaultChecked={initial.theme === theme.value}
+              defaultChecked={
+              // SYSTEM is no longer offered but still exists on older
+              // accounts, and it renders as light — so it selects Clair.
+              theme.value === 'DARK'
+                ? initial.theme === 'DARK'
+                : initial.theme !== 'DARK'
+            }
             />
             <span>
               <span className={styles.radioLabel}>{theme.label}</span>

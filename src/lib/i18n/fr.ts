@@ -292,7 +292,6 @@ export const fr = {
   'gif.change': 'Changer',
   'gif.remove': 'Retirer',
 
-  'settings.themeSystem': 'Comme mon appareil',
   'settings.themeLight': 'Clair',
   'settings.themeDark': 'Sombre',
   'settings.currency': 'Devise',
@@ -396,7 +395,6 @@ export const fr = {
   'landing.demoNothing': 'Aucune information de réservation sur cette page.',
   'landing.demoTaken': 'Déjà réservé par un proche',
   'landing.demoPot': '45 € réunis sur 60 €',
-  'landing.free': 'Gratuit, sans publicité.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
