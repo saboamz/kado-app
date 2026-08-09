@@ -66,34 +66,13 @@
 }
 
 /*
- * Dark theme.
+ * Dark theme, applied on an EXPLICIT choice only.
  *
- * Declared once and applied by both the media query and the explicit
- * attribute, so "Système" and an explicit choice cannot drift apart.
+ * It used to follow prefers-color-scheme unless overridden, so the app was
+ * dark for anybody whose device is dark — including people who never asked
+ * for it and did not know the setting existed. Light is what the palette was
+ * drawn for; dark is offered in Réglages to those who want it.
  */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --canvas: oklch(0.145 0.008 40);
-    --bg: oklch(0.195 0.008 40);
-    --card: oklch(0.238 0.009 40);
-    --card2: oklch(0.278 0.01 40);
-    --ink: oklch(0.955 0.006 60);
-    --ink2: oklch(0.775 0.008 60);
-    --ink3: oklch(0.635 0.008 60);
-    --line: oklch(0.345 0.01 40);
-    --line2: oklch(0.3 0.01 40);
-    --acc: oklch(0.775 0.105 195);
-    --acc-on: oklch(0.185 0.025 195);
-    --acc-bg: oklch(0.3 0.042 195);
-    --sec: oklch(0.8 0.098 60);
-    --sec-on: oklch(0.19 0.025 55);
-    --sec-bg: oklch(0.3 0.038 55);
-    --danger: oklch(0.735 0.135 25);
-    --danger-bg: oklch(0.3 0.045 25);
-    --shadow: 0 10px 30px -14px oklch(0 0 0 / 0.5);
-  }
-}
-
 :root[data-theme='dark'] {
   --canvas: oklch(0.145 0.008 40);
   --bg: oklch(0.195 0.008 40);
@@ -126,12 +105,6 @@ html {
   /* Renders native controls (scrollbars, date pickers) in the matching theme.
      Without it they stay light on a dark page. */
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme='light']) {
-    color-scheme: dark;
-  }
 }
 
 html[data-theme='dark'] {

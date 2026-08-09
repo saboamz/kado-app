@@ -61,7 +61,6 @@ export default async function LandingPage() {
             {t('auth.signIn')}
           </ButtonLink>
         </div>
-        <p className={styles.free}>{t('landing.free')}</p>
 
         {/*
           The product, in one look.

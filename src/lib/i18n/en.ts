@@ -390,7 +390,6 @@ export const en: Dictionary = {
   'landing.demoNothing': 'No reservation information on this page.',
   'landing.demoTaken': 'Already claimed by a friend',
   'landing.demoPot': '45 € raised of 60 €',
-  'landing.free': 'Free, and no advertising.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',

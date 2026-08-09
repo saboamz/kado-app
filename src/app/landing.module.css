@@ -34,12 +34,6 @@
   color: var(--ink3);
 }
 
-.free {
-  margin: -8px 0 0;
-  font-size: 12.5px;
-  color: var(--ink3);
-}
-
 .brand {
   display: inline-flex;
   align-items: center;
@@ -125,9 +119,16 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  /* Each card is as tall as what it holds. The owner's side having LESS to
-     show is the point being made, and stretching it to match hides that. */
-  align-self: start;
+  /*
+   * Both cards share a height, and their content sits at the top.
+   *
+   * Sizing each to its own content read as two unrelated blocks side by side,
+   * with the shorter one adrift in a taller column. Matching them gives the
+   * pair a single frame; what still differs — the badge, the pot, the bar —
+   * is then obviously the thing being compared, rather than the geometry.
+   */
+  height: 100%;
+  justify-content: flex-start;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -158,10 +159,9 @@
 /*
  * What an owner gets instead of reservation data: a statement of absence.
  *
- * Not pushed to the bottom of the card. Equal-height panes made the owner's
- * side stretch to match the friends' side, and `margin-top: auto` then
- * dropped this line to the floor, leaving a hole in the middle that read as
- * a rendering fault rather than as emptiness.
+ * Left in the flow rather than pushed to the bottom: `margin-top: auto` on an
+ * equal-height card dropped it to the floor and left a hole in the middle
+ * that read as a rendering fault rather than as emptiness.
  */
 .cardQuiet {
   font-size: 12.5px;
