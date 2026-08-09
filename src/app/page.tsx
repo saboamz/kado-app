@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { getCurrentUser } from '@/lib/session';
+import { LegalFooter } from '@/components/LegalFooter';
 import { getT } from '@/lib/i18n/server';
 import styles from './landing.module.css';
 
@@ -115,6 +116,10 @@ export default async function LandingPage() {
           <h2 className={styles.secretTitle}>{t('landing.secretTitle')}</h2>
           <p className={styles.secretBody}>{t('landing.secretBody')}</p>
         </section>
+
+        {/* Mentions légales only count as published if the public can reach
+            them, so the links have to exist somewhere signed out. */}
+        <LegalFooter />
       </div>
     </main>
   );

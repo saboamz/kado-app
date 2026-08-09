@@ -146,6 +146,27 @@ export async function updateSettings(
  */
 export async function deleteAccount(): Promise<void> {
   const user = await requireUser();
+
+  /*
+   * The event log has to be cleared by hand.
+   *
+   * GiftEvent carries actorId and recipientId as plain strings with no
+   * relation to User, so no cascade reaches it — deleting an account left
+   * every row it had produced sitting in the table indefinitely, keyed to a
+   * person who had asked to be forgotten. That is a right to erasure the app
+   * was not honouring, and no amount of privacy policy makes it acceptable.
+   *
+   * Deleted rather than anonymised: the id IS the only identifying part, and
+   * a log of "somebody once added a wish" is worth nothing to the recommender
+   * without knowing who, so there is nothing here to preserve.
+   *
+   * Before the user row, so a failure leaves the account intact and the
+   * person can try again, rather than half-deleted with orphaned events.
+   */
+  await db.giftEvent.deleteMany({
+    where: { OR: [{ actorId: user.id }, { recipientId: user.id }] },
+  });
+
   await db.user.delete({ where: { id: user.id } });
   redirect('/');
 }

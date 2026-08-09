@@ -396,6 +396,74 @@ export const fr = {
   'landing.demoTaken': 'Déjà réservé par un proche',
   'landing.demoPot': '45 € réunis sur 60 €',
 
+  // ── Legal pages ──────────────────────────────────────────────────────────
+  'legal.backHome': 'Retour à l’accueil',
+  'legal.updated': 'Dernière mise à jour : 9 août 2026.',
+  'legal.noticeTitle': 'Mentions légales',
+  'legal.publisher': 'Éditeur',
+  'legal.publisherBody':
+    'Kado est édité par un particulier, à titre non professionnel, sans publicité et sans revenus. Conformément à l’article 6-III-2 de la loi pour la confiance dans l’économie numérique, son identité n’est pas publiée ici : elle est détenue par l’hébergeur, qui la communiquera sur réquisition de l’autorité judiciaire.',
+  'legal.director': 'Directeur de la publication',
+  'legal.directorBody': 'L’éditeur, dans les mêmes conditions d’anonymat que ci-dessus.',
+  'legal.host': 'Hébergeur',
+  'legal.hostDataBody':
+    'Les données sont stockées chez Neon (base de données) et Vercel (fichiers envoyés), sur des serveurs situés dans l’Union européenne.',
+  'legal.contact': 'Contact',
+
+  'legal.privacyTitle': 'Politique de confidentialité',
+  'legal.privacyIntro':
+    'Cette page décrit ce que Kado enregistre à votre sujet, pourquoi, combien de temps, et ce que vous pouvez exiger. Elle décrit le fonctionnement réel de l’application, pas un modèle.',
+  'legal.controller': 'Responsable de traitement',
+  'legal.controllerBody':
+    'L’éditeur de Kado, joignable à sabri9595@gmail.com pour toute question ou demande relative à vos données.',
+  'legal.collected': 'Ce qui est enregistré',
+  'legal.collectedAccount':
+    'Compte : votre adresse e-mail, votre nom, et votre mot de passe sous forme chiffrée — jamais en clair, y compris pour nous.',
+  'legal.collectedOptional':
+    'Facultatif : une courte présentation, votre date de naissance, une photo de profil, vos centres d’intérêt, un GIF de décoration. Rien de tout cela n’est obligatoire, et tout est modifiable ou supprimable à tout moment.',
+  'legal.collectedUse':
+    'Usage : vos listes, vos envies, vos amis, vos réservations, vos participations aux cagnottes et vos messages dans les salons privés.',
+  'legal.collectedTech':
+    'Technique : un journal des ajouts, réservations et participations, utilisé pour les suggestions de cadeaux ; et les tentatives de connexion, conservées 24 heures pour limiter les attaques par force brute.',
+  'legal.why': 'Pourquoi, et sur quelle base',
+  'legal.whyBody':
+    'Pour exécuter le service que vous avez demandé en créant un compte (article 6.1.b du RGPD) : sans ces données, il n’y a ni liste, ni ami, ni cadeau. La limitation des tentatives de connexion repose sur l’intérêt légitime à protéger les comptes (article 6.1.f).',
+  'legal.retention': 'Combien de temps',
+  'legal.retentionBody':
+    'Vos données sont conservées tant que votre compte existe. Une session expire au bout de 30 jours. Les tentatives de connexion sont effacées au bout de 24 heures. À la suppression de votre compte, tout est effacé immédiatement : listes, envies, réservations, participations, messages, photos et journal d’activité. Rien n’est conservé sous forme anonymisée.',
+  'legal.thirdParties': 'Qui d’autre voit quelque chose',
+  'legal.thirdPartiesBody':
+    'Vercel héberge l’application et stocke les photos que vous envoyez. Neon héberge la base de données, dans l’Union européenne. Quand vous cherchez un GIF, la requête part chez GIPHY, et les GIFs affichés sur un profil sont chargés depuis leurs serveurs — GIPHY voit donc les visites sur ce profil. Quand vous collez un lien de boutique que le marchand nous refuse, l’adresse de la page est transmise à un service de lecture externe (r.jina.ai) pour en récupérer le titre et le prix. Aucune donnée n’est vendue, louée, ni transmise à des fins publicitaires.',
+  'legal.cookies': 'Cookies',
+  'legal.cookiesBody':
+    'Un seul cookie est déposé : celui qui vous maintient connecté. Il est strictement nécessaire au fonctionnement du service, ne suit personne et ne sert à aucune mesure d’audience. C’est pourquoi aucun bandeau ne vous est demandé.',
+  'legal.rights': 'Vos droits',
+  'legal.rightsBody':
+    'Vous pouvez accéder à vos données, les corriger, les effacer, en limiter l’usage ou vous opposer à leur traitement. L’essentiel se fait directement dans l’application : votre profil est modifiable, et la suppression de compte dans les Réglages efface tout, sans délai ni confirmation par e-mail. Pour le reste, écrivez à sabri9595@gmail.com. Vous pouvez également saisir la CNIL.',
+  'legal.secretNote': 'Une précision sur le secret',
+  'legal.secretNoteBody':
+    'Kado est conçu pour que le propriétaire d’une liste ne puisse pas savoir qui a réservé quoi. Ce n’est pas une promesse de discrétion : les réservations ne sont jamais chargées lorsque c’est lui qui consulte la page. Vos participations à une cagnotte ne sont visibles nominativement que par la personne qui déclare avoir acheté le cadeau, et uniquement à ce moment-là.',
+
+  'legal.termsTitle': 'Conditions d’utilisation',
+  'legal.termsIntro':
+    'En créant un compte sur Kado, vous acceptez ce qui suit. Le service est gratuit et fourni tel quel.',
+  'legal.termsAccess': 'Accès au service',
+  'legal.termsAccessBody':
+    'Kado est gratuit, sans publicité et sans engagement. Il faut avoir au moins 15 ans pour créer un compte. Vous êtes responsable de la confidentialité de votre mot de passe.',
+  'legal.termsContent': 'Ce que vous publiez',
+  'legal.termsContentBody':
+    'Vous restez propriétaire de ce que vous écrivez et envoyez. Vous vous engagez à ne rien publier d’illégal, haineux ou portant atteinte aux droits d’autrui, y compris dans les salons de discussion privés. Un compte manifestement en infraction peut être suspendu.',
+  'legal.termsAvailability': 'Disponibilité',
+  'legal.termsAvailabilityBody':
+    'Le service est fourni sans garantie de disponibilité. Il peut être interrompu, modifié ou arrêté, notamment pour maintenance. Les prix affichés à partir de liens marchands sont des indications reprises de pages externes : ils peuvent être faux ou périmés, et n’engagent ni Kado ni le marchand.',
+  'legal.termsEnd': 'Fin',
+  'legal.termsEndBody':
+    'Vous pouvez supprimer votre compte à tout moment depuis les Réglages ; l’effacement est immédiat et définitif. Ces conditions sont soumises au droit français.',
+
+  'legal.footerNotice': 'Mentions légales',
+  'legal.footerPrivacy': 'Confidentialité',
+  'legal.footerTerms': 'Conditions',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',

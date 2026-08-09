@@ -70,3 +70,42 @@ describe('deleting an account', () => {
     await db.$disconnect();
   });
 });
+
+describe('the right to be forgotten', () => {
+  it('clears the event log a departing person produced', async () => {
+    /*
+     * GiftEvent carries actorId and recipientId as plain strings with no
+     * relation to User, so no cascade reaches it. Deleting an account left
+     * every row it had produced in the table indefinitely, keyed to somebody
+     * who had asked to be forgotten — a right to erasure the app was simply
+     * not honouring.
+     */
+    const leaver = await makeUser('Partant');
+    const friend = await makeUser('Reste');
+
+    await db.giftEvent.createMany({
+      data: [
+        { actorId: leaver.id, kind: 'add_wish', weight: 1 },
+        { actorId: friend.id, recipientId: leaver.id, kind: 'view_wish', weight: 1 },
+        { actorId: friend.id, kind: 'add_wish', weight: 1 },
+      ],
+    });
+
+    await db.giftEvent.deleteMany({
+      where: { OR: [{ actorId: leaver.id }, { recipientId: leaver.id }] },
+    });
+    await db.user.delete({ where: { id: leaver.id } });
+
+    const left = await db.giftEvent.findMany({
+      where: { OR: [{ actorId: leaver.id }, { recipientId: leaver.id }] },
+    });
+    expect(left).toHaveLength(0);
+
+    // Somebody else's history is untouched: this erases one person, not a log.
+    const theirs = await db.giftEvent.count({ where: { actorId: friend.id } });
+    expect(theirs).toBe(1);
+
+    await db.giftEvent.deleteMany({ where: { actorId: friend.id } });
+    await cleanup([friend.id]);
+  });
+});
