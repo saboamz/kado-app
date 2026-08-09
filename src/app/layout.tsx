@@ -29,8 +29,16 @@ const lora = Lora({
   display: 'swap',
 });
 
+/*
+ * What a pasted link says in a group chat.
+ *
+ * Rewritten with the landing page it advertises: the old wording said the
+ * friends "remplissent" the list, which is backwards — you fill it, they
+ * claim from it — and a card is the one place there is no room to recover
+ * from a sentence read the wrong way.
+ */
 const DESCRIPTION =
-  'Ajoutez ce qui vous ferait plaisir. Vos proches réservent en secret — vous ne voyez jamais qui a pris quoi.';
+  'Kado est une liste de cadeaux en ligne. Vous y notez vos envies, vos proches y réservent en secret — vous ne voyez jamais qui a pris quoi.';
 
 export const metadata: Metadata = {
   /*
@@ -63,13 +71,13 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Kado',
     locale: 'fr_FR',
-    title: 'Kado — des listes de souhaits que vos proches remplissent en secret',
+    title: 'Kado — dites ce qui vous ferait plaisir, vos proches s’organisent',
     description: DESCRIPTION,
     images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Kado' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kado — des listes de souhaits que vos proches remplissent en secret',
+    title: 'Kado — dites ce qui vous ferait plaisir, vos proches s’organisent',
     description: DESCRIPTION,
     images: ['/opengraph-image'],
   },
