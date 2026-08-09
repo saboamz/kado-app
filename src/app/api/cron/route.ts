@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { buildItemSimilarity } from '@/lib/cf';
-import { sweepUnlinkedGifts } from '@/lib/gift-product-link';
+import { promoteQuarantined, sweepUnlinkedGifts } from '@/lib/gift-product-link';
 import { purgeOldAttempts } from '@/lib/rate-limit';
 import { refreshPopularity } from '@/lib/reco';
 
@@ -69,6 +69,15 @@ export async function GET(request: Request) {
    */
   const sweep = await sweepUnlinkedGifts();
 
+  /*
+   * Give the quarantined rows another chance.
+   *
+   * After the sweep, and sharing its shape: outbound requests to third
+   * parties, bounded by a count and a clock. A merchant behind a bot check
+   * when the wish was saved usually serves the real page later.
+   */
+  const promotion = await promoteQuarantined();
+
   return NextResponse.json({
     ok: true,
     popularityRowsUpdated: popularity,
@@ -76,6 +85,8 @@ export async function GET(request: Request) {
     attemptsPurged,
     giftsRetried: sweep.attempted,
     giftsLinked: sweep.linked,
+    quarantineRetried: promotion.attempted,
+    quarantinePromoted: promotion.promoted,
     ms: Date.now() - startedAt,
   });
 }

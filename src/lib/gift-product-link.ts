@@ -1,3 +1,5 @@
+import { priceBand } from './catalogue';
+import { judge } from './catalogue-quality';
 import { db } from './db';
 import { extractProduct } from './extract';
 import { findOrCreateProduct } from './product-resolve';
@@ -159,4 +161,90 @@ export async function sweepUnlinkedGifts(
   }
 
   return { attempted, linked };
+}
+
+/**
+ * Re-reads quarantined rows, and promotes the ones that turn out to be real.
+ *
+ * ── Why quarantine needs its own sweep ─────────────────────────────────────
+ *
+ * sweepUnlinkedGifts looks for gifts with `productId: null`. A quarantined
+ * product IS attached to its gift — it exists, it is simply held back from
+ * recommendation — so that sweep would never look at it again and `stale`
+ * would be a graveyard rather than a waiting room.
+ *
+ * What makes a second read worth doing: the first one often failed for
+ * reasons that pass. A merchant behind a bot check at 3am serves the real
+ * page the next day; a shop that was mid-deploy comes back. The row is
+ * promoted the moment a read finds a price or an image.
+ *
+ * A row that never improves simply stays in `stale` — invisible to every
+ * recommender tier, still attached to the wish that named it, costing one row.
+ *
+ * ── Why no per-person rate limit ───────────────────────────────────────────
+ *
+ * sweepUnlinkedGifts charges each fetch to the gift's owner, because that
+ * sweep is finishing work a person started and must not become a way around
+ * their budget. This one is not: a quarantined row may be shared by several
+ * wishes, or by none once the original was deleted. There is nobody to
+ * charge. `limit` and `budgetMs` are what bound it instead — 25 rows and 30
+ * seconds a night, against a catalogue that grows by a handful a day.
+ */
+export async function promoteQuarantined(
+  limit = 25,
+  budgetMs = 30_000,
+): Promise<{ attempted: number; promoted: number }> {
+  const candidates = await db.product.findMany({
+    where: { status: 'stale', mergedInto: null, sourceUrl: { not: null } },
+    // Oldest first, so nothing waits forever behind a steady arrival of new
+    // quarantined rows.
+    orderBy: { updatedAt: 'asc' },
+    take: limit,
+    select: { id: true, sourceUrl: true },
+  });
+
+  const startedAt = Date.now();
+  let attempted = 0;
+  let promoted = 0;
+
+  for (const product of candidates) {
+    if (Date.now() - startedAt >= budgetMs) break;
+    attempted += 1;
+
+    const verdict = await checkUrl(product.sourceUrl!);
+    if (!verdict.ok) continue;
+
+    let extracted;
+    try {
+      extracted = extractProduct(await fetchHtml(verdict.url.href));
+    } catch {
+      // Still unreachable. It keeps its place in the queue and its turn will
+      // come round again; `updatedAt` is untouched, so it stays at the front.
+      continue;
+    }
+
+    if (judge(extracted).kind !== 'active') continue;
+
+    /*
+     * Promoted, and the new facts written with it.
+     *
+     * Gaps only, exactly as findOrCreateProduct does on a revisit: the title
+     * and category already on the row may have been corrected by a person,
+     * and a fresher read of the merchant page is no reason to overwrite that.
+     */
+    await db.product.update({
+      where: { id: product.id },
+      data: {
+        status: 'active',
+        imageUrl: extracted.imageUrl ?? undefined,
+        priceCents: extracted.priceCents ?? undefined,
+        priceBand: extracted.priceCents != null ? priceBand(extracted.priceCents) : undefined,
+        brand: extracted.brand ?? undefined,
+        gtin: extracted.gtin ?? undefined,
+      },
+    });
+    promoted += 1;
+  }
+
+  return { attempted, promoted };
 }
