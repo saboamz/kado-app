@@ -366,6 +366,15 @@ export const en: Dictionary = {
   'error.nothingContributed': 'You have not put anything into this pot.',
   'error.alreadyBought': 'The gift has already been bought: settle your share directly.',
 
+  'error.notTheBuyer': 'You did not declare this purchase.',
+  'pot.iBought': 'I bought the gift',
+  'pot.buyerHintNew': 'Press this once you have paid for it — not before. The pot then closes and you see who owes you what.',
+  'pot.confirmShort': 'The pot is {amount} short. Confirming closes it and nobody will be able to chip in. Carry on?',
+  'pot.confirmFull': 'The pot will close and nobody will be able to chip in. Carry on?',
+  'pot.undo': 'Actually, I did not buy it',
+  'pot.undoing': 'Undoing…',
+  'pot.reopenNote': 'You can undo this: the pot reopens and the others can chip in again.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',
