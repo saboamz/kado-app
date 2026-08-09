@@ -4,6 +4,7 @@ import { SettingsForm } from '@/components/SettingsForm';
 import { DeleteAccount } from '@/components/DeleteAccount';
 import { db } from '@/lib/db';
 import { requireUser } from '@/lib/session';
+import { LegalFooter } from '@/components/LegalFooter';
 import { getT } from '@/lib/i18n/server';
 import styles from '@/components/forms.module.css';
 
@@ -38,6 +39,7 @@ export default async function SettingsPage() {
         </p>
         <DeleteAccount />
       </section>
+      <LegalFooter />
     </>
   );
 }

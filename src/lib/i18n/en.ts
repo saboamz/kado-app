@@ -390,6 +390,74 @@ export const en: Dictionary = {
   'landing.demoTaken': 'Already claimed by a friend',
   'landing.demoPot': '45 € raised of 60 €',
 
+  // ── Legal pages ──────────────────────────────────────────────────────────
+  'legal.backHome': 'Back to the home page',
+  'legal.updated': 'Last updated: 9 August 2026.',
+  'legal.noticeTitle': 'Legal notice',
+  'legal.publisher': 'Publisher',
+  'legal.publisherBody':
+    'Kado is published by a private individual, in a non-professional capacity, with no advertising and no revenue. Under article 6-III-2 of the French law on confidence in the digital economy, their identity is not published here: it is held by the host, who will disclose it at the request of a judicial authority.',
+  'legal.director': 'Publication director',
+  'legal.directorBody': 'The publisher, under the same terms of anonymity as above.',
+  'legal.host': 'Host',
+  'legal.hostDataBody':
+    'Data is stored with Neon (database) and Vercel (uploaded files), on servers located in the European Union.',
+  'legal.contact': 'Contact',
+
+  'legal.privacyTitle': 'Privacy policy',
+  'legal.privacyIntro':
+    'This page describes what Kado records about you, why, for how long, and what you can demand. It describes how the app actually works, not a template.',
+  'legal.controller': 'Data controller',
+  'legal.controllerBody':
+    'The publisher of Kado, reachable at sabri9595@gmail.com for any question or request about your data.',
+  'legal.collected': 'What is recorded',
+  'legal.collectedAccount':
+    'Account: your email address, your name, and your password in hashed form — never in the clear, including to us.',
+  'legal.collectedOptional':
+    'Optional: a short description, your date of birth, a profile photo, your interests, a decorative GIF. None of it is required, and all of it can be changed or removed at any time.',
+  'legal.collectedUse':
+    'Use: your lists, your wishes, your friends, what you have claimed, what you have chipped in, and your messages in the private chats.',
+  'legal.collectedTech':
+    'Technical: a log of wishes added, gifts claimed and pots joined, used for gift suggestions; and sign-in attempts, kept for 24 hours to limit brute-force attacks.',
+  'legal.why': 'Why, and on what basis',
+  'legal.whyBody':
+    'To perform the service you asked for by creating an account (GDPR article 6.1.b): without this data there is no list, no friend and no gift. Rate-limiting sign-in attempts rests on the legitimate interest in protecting accounts (article 6.1.f).',
+  'legal.retention': 'For how long',
+  'legal.retentionBody':
+    'Your data is kept for as long as your account exists. A session expires after 30 days. Sign-in attempts are erased after 24 hours. When you delete your account, everything goes at once: lists, wishes, claims, contributions, messages, photos and activity log. Nothing is kept in anonymised form.',
+  'legal.thirdParties': 'Who else sees anything',
+  'legal.thirdPartiesBody':
+    'Vercel hosts the app and stores the photos you upload. Neon hosts the database, in the European Union. When you search for a GIF the query goes to GIPHY, and GIFs shown on a profile are loaded from their servers — so GIPHY sees visits to that profile. When you paste a shop link the merchant refuses us, the page address is passed to an external reading service (r.jina.ai) to retrieve its title and price. No data is sold, rented, or passed on for advertising.',
+  'legal.cookies': 'Cookies',
+  'legal.cookiesBody':
+    'One cookie is set: the one that keeps you signed in. It is strictly necessary to the service, tracks nobody and feeds no analytics. That is why you are not asked to accept a banner.',
+  'legal.rights': 'Your rights',
+  'legal.rightsBody':
+    'You may access your data, correct it, erase it, restrict its use or object to its processing. Most of that is in the app itself: your profile is editable, and deleting your account in Settings erases everything, with no delay and no email confirmation. For anything else, write to sabri9595@gmail.com. You may also complain to the CNIL.',
+  'legal.secretNote': 'A note about the secret',
+  'legal.secretNoteBody':
+    'Kado is built so that a list’s owner cannot learn who claimed what. This is not a promise of discretion: reservations are never loaded when it is the owner looking at the page. What you chip in to a pot is shown by name only to the person who declares they bought the gift, and only at that point.',
+
+  'legal.termsTitle': 'Terms of use',
+  'legal.termsIntro':
+    'By creating an account on Kado you accept the following. The service is free and provided as is.',
+  'legal.termsAccess': 'Access to the service',
+  'legal.termsAccessBody':
+    'Kado is free, carries no advertising and commits you to nothing. You must be at least 15 to create an account. You are responsible for keeping your password to yourself.',
+  'legal.termsContent': 'What you publish',
+  'legal.termsContentBody':
+    'You remain the owner of what you write and upload. You undertake not to publish anything unlawful, hateful or infringing on the rights of others, including in the private chats. An account clearly in breach may be suspended.',
+  'legal.termsAvailability': 'Availability',
+  'legal.termsAvailabilityBody':
+    'The service is provided with no guarantee of availability. It may be interrupted, changed or discontinued, in particular for maintenance. Prices shown from shop links are indications taken from external pages: they may be wrong or out of date, and bind neither Kado nor the merchant.',
+  'legal.termsEnd': 'Ending',
+  'legal.termsEndBody':
+    'You may delete your account at any time from Settings; erasure is immediate and final. These terms are governed by French law.',
+
+  'legal.footerNotice': 'Legal notice',
+  'legal.footerPrivacy': 'Privacy',
+  'legal.footerTerms': 'Terms',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',

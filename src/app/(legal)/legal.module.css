@@ -1,0 +1,92 @@
+/*
+ * The legal pages: long text, read once, in a hurry.
+ *
+ * A narrower column than the app's, because these are paragraphs rather than
+ * cards, and a measure of about 70 characters is what keeps them readable.
+ */
+.page {
+  min-height: 100dvh;
+  padding: clamp(24px, 5vw, 56px) var(--gutter) clamp(48px, 9vw, 88px);
+  background: var(--canvas);
+}
+
+.inner {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 13.5px;
+  color: var(--ink2);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.article {
+  color: var(--ink);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 6vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.updated {
+  margin: 0 0 24px;
+  font-size: 12.5px;
+  color: var(--ink3);
+}
+
+.lede {
+  margin: 0 0 28px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
+.heading {
+  margin: 28px 0 8px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
+/* A second paragraph under the same heading needs its own air, or it reads
+   as a continuation of the address above it. */
+.spaced {
+  margin-top: 12px;
+}
+
+.link {
+  color: var(--acc);
+}
