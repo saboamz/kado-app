@@ -193,7 +193,8 @@ function fromOpenGraph(html: string): Extracted | null {
       ),
     );
 
-  const title = og('og:title');
+  const rawTitle = og('og:title');
+  const title = rawTitle ? withoutShopName(rawTitle) : null;
   const price = og('product:price:amount') ?? og('og:price:amount');
   const image = og('og:image') ?? og('og:image:secure_url');
   const description = og('og:description');
@@ -252,13 +253,26 @@ function fromMicrodata(html: string): Extracted | null {
  * same product reads differently at every site and titleKey fragments. Better
  * than nothing only because the user can correct it by hand.
  */
+/**
+ * Drops the shop's own name from the end of a title.
+ *
+ * "Casquette … - Homme | Citadium" is one product at one shop, and two shops
+ * selling the same article must not produce two title keys.
+ *
+ * Applied to Open Graph as well as to <title>, because merchants put it in
+ * both: Citadium's og:title carries "| Citadium" verbatim, so trimming only
+ * the <title> layer left the shop name on every row that page produced.
+ */
+function withoutShopName(raw: string): string {
+  return raw.split(/\s+[|—–·]\s+/)[0]?.trim() || raw;
+}
+
 function fromTitleTag(html: string): Extracted | null {
   const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const raw = match ? clean(match[1]) : null;
   if (!raw) return null;
 
-  // Strip the trailing "| Merchant" the separator conventions all use.
-  const title = raw.split(/\s+[|—–·]\s+/)[0]?.trim() || raw;
+  const title = withoutShopName(raw);
 
   return { ...EMPTY, title, extractedBy: 'title' };
 }

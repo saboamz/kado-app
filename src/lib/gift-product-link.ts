@@ -1,8 +1,8 @@
 import { priceBand } from './catalogue';
 import { judge } from './catalogue-quality';
 import { db } from './db';
-import { EMPTY, extractProduct } from './extract';
-import { fetchViaReader, readerTitle } from './reader-fallback';
+import { extractProduct } from './extract';
+import { fetchViaReader, normaliseCurrency } from './reader-fallback';
 import { findOrCreateProduct } from './product-resolve';
 import { fetchHtml } from './fetch-page';
 import { LINK_FETCH_PER_USER, rateLimit, recordAttempt } from './rate-limit';
@@ -86,9 +86,9 @@ export async function linkGiftToProduct(
      * reachable.
      *
      * Before giving up, one more attempt through the reading proxy, which
-     * gets past the refusals a server-side request collects. It returns a
-     * TITLE only, never a price — see reader-fallback.ts for the measurements
-     * behind that. A named row is worth having; a guessed price is not.
+     * gets past the refusals a server-side request collects. It asks for the
+     * page's own HTML, so this goes through the SAME extractor as a direct
+     * read — the merchant's json-ld and Open Graph, not a guess at prose.
      *
      * The try block stays deliberately narrow. Wrapping the database work
      * below in it as well — which this used to do — meant a Prisma error or a
@@ -97,13 +97,28 @@ export async function linkGiftToProduct(
      */
     if (!useReader) return null;
 
-    const title = await fetchViaReader(verdict.url.href)
-      .then(readerTitle)
+    const viaReader = await fetchViaReader(verdict.url.href)
+      .then(extractProduct)
       .catch(() => null);
 
-    if (!title) return null;
+    if (!viaReader?.title) return null;
 
-    extracted = { ...EMPTY, title, extractedBy: 'reader' as const };
+    /*
+     * The currency is checked before the price is kept.
+     *
+     * The proxy does not always reach a shop from where we would: Suuupply
+     * answers it 243.00 USD for a jumper it sells at 165 €. Storing that as
+     * euros would put a number on somebody's wish that is wrong by half, and
+     * nothing downstream would ever question it. An unconfirmable currency
+     * takes its price with it — no price is honest, a wrong one is not.
+     */
+    const currency = normaliseCurrency(viaReader.currency);
+    extracted = {
+      ...viaReader,
+      extractedBy: 'reader' as const,
+      currency,
+      priceCents: currency ? viaReader.priceCents : null,
+    };
   }
 
   // No title means nothing identifiable was found; a row with no name is not

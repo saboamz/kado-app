@@ -14,37 +14,25 @@
  * returns it as Markdown. All three of those merchants come back 200 through
  * it.
  *
- * ── Why it takes the title and NOT the price ───────────────────────────────
+ * ── Why it asks for HTML, not Markdown ─────────────────────────────────────
  *
- * This is the whole design, and it was settled by measurement rather than by
- * preference.
+ * The proxy's default is Markdown, and that was the first thing tried. It is
+ * the wrong format here, and the reason is worth stating because it looked
+ * fine at first.
  *
- * A direct read gives STRUCTURED data: json-ld says `"price": "165.00"`, and
- * there is no ambiguity about which number that is. Rendering a page to prose
- * throws that structure away and leaves dozens of numbers with no way to tell
- * them apart — instalments, eco-levies, delivery thresholds, subscriptions,
- * cross-sells, sponsored rows.
+ * Guessing a price out of prose does not work. Four rules were tried against
+ * three real pages, and each was right on one and confidently wrong on
+ * another: lowest-after-the-heading gave Citadium 20 € and Cdiscount nothing;
+ * a wider window gave Cdiscount 29 €, which is a yearly subscription; most
+ * frequent gave Citadium 110 €. Rendering to prose throws away the structure
+ * that said which number was the price, leaving instalments, eco-levies,
+ * delivery thresholds and cross-sells all looking alike.
  *
- * Four rules were tried against three real pages. Every one was right on one
- * page and confidently wrong on another:
- *
- *   lowest after the heading   Citadium 20 € ✓   Cdiscount nothing
- *   wider window               Citadium 20 € ✓   Cdiscount 29 €  ✗ (a yearly
- *                                                subscription)
- *   most frequent              Citadium 110 € ✗  Cdiscount 419,99 € ✓
- *   proximity + repetition     Citadium 20,39 € ✗ Cdiscount 419,99 € ✓
- *
- * And one case settles it outright: Suuupply does not print its price in the
- * rendered text at all. The 165 € is simply not there to find.
- *
- * A price guessed at 39 € instead of 20 € is worse than no price. The
- * "estimate" label on screen covers being a few euros out; it does not cover
- * being wrong by a factor of two, and somebody budgets against that figure.
- *
- * A title, by contrast, is unambiguous — the proxy puts the page's own on the
- * first line. That alone turns a link we could not read at all into a proper
- * catalogue row: deduplicated, attached to its merchant, countable by the
- * recommender. It is a smaller claim, and it is one that holds.
+ * `x-return-format: html` returns the page's own markup instead — json-ld,
+ * Open Graph, microdata, exactly what extractProduct() already parses. No
+ * guessing: the merchant states the price, and we read the statement. On the
+ * three pages measured it yields 20 € for Citadium and 419,99 € with a GTIN
+ * for Cdiscount, where prose gave a wrong answer or none.
  *
  * ── What it costs ──────────────────────────────────────────────────────────
  *
@@ -79,7 +67,14 @@ export async function fetchViaReader(url: string): Promise<string> {
   try {
     const response = await fetch(`${READER}${url}`, {
       signal: controller.signal,
-      headers: { accept: 'text/plain', 'x-return-format': 'markdown' },
+      headers: {
+        // The page's own markup, so the structured data survives. See above.
+        'x-return-format': 'html',
+        // Asked for, though the proxy does not always honour it: a shop that
+        // geolocates its prices may still answer in another currency, which
+        // is why what comes back is checked before it is trusted.
+        'accept-language': 'fr-FR,fr;q=0.9',
+      },
     });
 
     if (!response.ok) throw new Error(`reader status ${response.status}`);
@@ -92,22 +87,31 @@ export async function fetchViaReader(url: string): Promise<string> {
 }
 
 /**
- * The product's name, from the proxy's first line.
+ * Currencies whose amounts we are willing to store.
  *
- * "Casquette Carhartt wip Harlem cap Beige - Homme | Citadium" — the shop's
- * name is appended after a pipe or a dash, as in most <title> tags, and it is
- * trimmed so two shops selling the same article produce the same title key.
+ * A shop that geolocates prices can answer the proxy in dollars — Suuupply
+ * returns 243.00 USD for a jumper it sells at 165 €, because the proxy comes
+ * from somewhere else. Storing that figure as euros would put a number on a
+ * wish that is wrong by half, and nothing downstream would ever question it.
  *
- * Only the trailing segment is dropped, and only when it is short enough to
- * be a shop name rather than part of what the thing is called.
+ * "Euro" spelled out is Citadium's Open Graph tag; the ISO code is what
+ * everything else uses.
  */
-export function readerTitle(markdown: string): string | null {
-  const line = markdown.split('\n').find((l) => l.startsWith('Title:'));
-  if (!line) return null;
+const CURRENCY_ALIASES: Record<string, string> = {
+  EUR: 'EUR',
+  EURO: 'EUR',
+  EUROS: 'EUR',
+  '€': 'EUR',
+};
 
-  const raw = line.slice('Title:'.length).trim();
+/**
+ * The currency, normalised — or null when it is one we will not store.
+ *
+ * Null is not "unknown, assume euros". A price whose currency we could not
+ * confirm is dropped along with it: no price at all is honest, and a price in
+ * the wrong currency is a confident lie.
+ */
+export function normaliseCurrency(raw: string | null | undefined): string | null {
   if (!raw) return null;
-
-  const trimmed = raw.replace(/\s*[|·—–]\s*[^|·—–]{1,30}$/, '').trim();
-  return trimmed || raw;
+  return CURRENCY_ALIASES[raw.trim().toUpperCase()] ?? null;
 }
