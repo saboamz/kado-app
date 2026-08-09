@@ -134,9 +134,13 @@ test('notifications arrive and can be cleared', async ({ page }) => {
   // The request shows as an unread notification, badged in the navigation.
   // Target the badge by its accessible text: the nav also carries the signed-in
   // user's name, which can itself contain the digit.
+  //
+  // Singular OR plural: the badge used to say "notifications non lues"
+  // whatever the count, and now agrees with it — one request reads
+  // "1 notification non lue".
   const nav = page.getByRole('navigation', { name: 'Navigation principale' });
   await expect(
-    nav.getByRole('link', { name: /notifications non lues/ }),
+    nav.getByRole('link', { name: /notifications? non lues?/ }),
   ).toBeVisible();
 
   await page.goto('/notifications');

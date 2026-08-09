@@ -159,7 +159,7 @@ export const fr = {
   'settings.deleteAccount': 'Supprimer mon compte',
 
   // ── Forms ────────────────────────────────────────────────────────────────
-  'form.giftName': 'Qu’est-ce qui vous ferait plaisir ?',
+  'form.giftName': "Qu'est-ce qui vous ferait plaisir ?",
   'form.giftNamePlaceholder': 'AirPods Pro, un vase en grès, un week-end…',
   'form.link': 'Lien',
   'form.linkPlaceholder': 'Facultatif — collez le lien de la boutique',
@@ -180,7 +180,7 @@ export const fr = {
   'form.aboutPlaceholder': 'Ce que vous aimez, en une phrase.',
   'form.birthday': 'Date de naissance',
   'form.birthdayHint': 'Vos amis verront le jour, jamais l’année.',
-  'form.interests': 'Centres d’intérêt',
+  'form.interests': "Centres d'intérêt",
   'form.interestsPlaceholder': 'Café, céramique, randonnée',
   'form.interestsHint': 'Séparés par des virgules — de quoi inspirer vos proches.',
   'form.appearance': 'Apparence',
