@@ -12,7 +12,7 @@ import { ImageResponse } from 'next/og';
  * the palette literally instead of pretending to share the stylesheet.
  */
 export const runtime = 'edge';
-export const alt = 'Kado — des listes de souhaits que vos proches remplissent en secret';
+export const alt = 'Kado — dites ce qui vous ferait plaisir, vos proches s’organisent';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -70,10 +70,10 @@ export default function OpengraphImage() {
               maxWidth: 950,
             }}
           >
-            Des listes de souhaits que vos proches remplissent en secret.
+            Dites ce qui vous ferait plaisir. Vos proches s’organisent.
           </div>
           <div style={{ fontSize: 30, color: INK2, maxWidth: 900, lineHeight: 1.4 }}>
-            Vos amis réservent, se regroupent pour les gros cadeaux — et vous ne
+            Une liste de cadeaux où vos proches réservent en secret — vous ne
             voyez jamais qui a pris quoi.
           </div>
         </div>

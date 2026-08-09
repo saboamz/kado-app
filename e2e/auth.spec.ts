@@ -6,9 +6,20 @@ test('the landing page pitches the product and offers both entry points', async 
   page,
 }) => {
   await page.goto('/');
-  await expect(
-    page.getByRole('heading', { name: /remplissent en secret/i }),
-  ).toBeVisible();
+  /*
+   * Asserted on what a stranger needs, not on one sentence.
+   *
+   * The old check pinned the headline verbatim, so rewriting the copy broke
+   * it — and the copy is the part most likely to change again. What must not
+   * disappear is a visitor being told WHAT this is and being shown the app,
+   * which is exactly what the page was missing before.
+   */
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByText(/liste de cadeaux en ligne/i)).toBeVisible();
+  // The two views of one gift: the demo that says what prose could not.
+  await expect(page.getByText(/Aucune information de réservation/i)).toBeVisible();
+  await expect(page.getByText(/Déjà réservé par un proche/i)).toBeVisible();
+
   await expect(page.getByRole('link', { name: 'Créer mon compte' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Se connecter' })).toBeVisible();
 });
