@@ -452,7 +452,13 @@ export const fr = {
     'Kado est gratuit, sans publicité et sans engagement. Il faut avoir au moins 15 ans pour créer un compte. Vous êtes responsable de la confidentialité de votre mot de passe.',
   'legal.termsContent': 'Ce que vous publiez',
   'legal.termsContentBody':
-    'Vous restez propriétaire de ce que vous écrivez et envoyez. Vous vous engagez à ne rien publier d’illégal, haineux ou portant atteinte aux droits d’autrui, y compris dans les salons de discussion privés. Un compte manifestement en infraction peut être suspendu.',
+    'Vous restez propriétaire de ce que vous écrivez et envoyez. Vous vous engagez à ne rien publier d’illégal, haineux ou portant atteinte aux droits d’autrui, y compris dans les salons de discussion privés.',
+  'legal.termsImages': 'Photos',
+  'legal.termsImagesBody':
+    'Les photos que vous envoyez — photo de profil, images d’envies — doivent convenir à tout public. Sont notamment interdits les contenus à caractère sexuel, violents ou choquants. Ces images ne sont pas analysées automatiquement : c’est votre responsabilité, et celle des personnes qui les voient de nous les signaler.',
+  'legal.termsReport': 'Signalement',
+  'legal.termsReportBody':
+    'Un lien « Signaler » figure sous chaque profil et chaque envie que vous consultez. Le signalement est confidentiel : la personne concernée n’en est pas informée et ne peut pas savoir qui l’a signalée. Un contenu manifestement en infraction est retiré et le compte concerné peut être suspendu.',
   'legal.termsAvailability': 'Disponibilité',
   'legal.termsAvailabilityBody':
     'Le service est fourni sans garantie de disponibilité. Il peut être interrompu, modifié ou arrêté, notamment pour maintenance. Les prix affichés à partir de liens marchands sont des indications reprises de pages externes : ils peuvent être faux ou périmés, et n’engagent ni Kado ni le marchand.',
@@ -463,6 +469,16 @@ export const fr = {
   'legal.footerNotice': 'Mentions légales',
   'legal.footerPrivacy': 'Confidentialité',
   'legal.footerTerms': 'Conditions',
+
+  'report.link': 'Signaler',
+  'report.title': 'Signaler ce contenu',
+  'report.intro': 'Dites-nous ce qui ne va pas. La personne concernée n’en saura rien.',
+  'report.placeholder': 'Photo inappropriée, propos déplacés…',
+  'report.send': 'Envoyer le signalement',
+  'report.sending': 'Envoi…',
+  'report.thanks': 'Merci. Nous allons regarder.',
+  'report.cancel': 'Annuler',
+  'error.cannotReportYourself': 'Vous ne pouvez pas vous signaler vous-même.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',

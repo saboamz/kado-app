@@ -10,6 +10,7 @@ import { ViewpointBanner } from '@/components/Viewpoint';
 import { Pot } from '@/components/Pot';
 import { SecretChat } from '@/components/SecretChat';
 import { ReserveButton } from '@/components/ReserveButton';
+import { ReportButton } from '@/components/ReportButton';
 import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/format';
 import { canViewList, relationTo } from '@/lib/relations';
@@ -244,6 +245,11 @@ export default async function GiftPage({
           <SecretSeal tone="guarantee">
             {"Vue propriétaire : aucune information de réservation n'existe sur cette page."}
           </SecretSeal>
+        </div>
+      )}
+      {relation !== 'owner' && (
+        <div className={styles.report}>
+          <ReportButton giftId={id} />
         </div>
       )}
     </>

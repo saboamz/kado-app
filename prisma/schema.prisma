@@ -54,6 +54,8 @@ model User {
   interests        Interest[]
   reservations     Reservation[]
   purchases        Reservation[]     @relation("PotBuyer")
+  reportsMade      Report[]          @relation("Reporter")
+  reportsAbout     Report[]          @relation("Reported")
   contributions    PotContribution[]
   sentRequests     Friendship[]      @relation("Requester")
   receivedRequests Friendship[]      @relation("Addressee")
@@ -114,6 +116,46 @@ enum Visibility {
 }
 
 /// A merchant, identified by the domains its product links come from.
+/// Somebody telling us a profile or a wish is not acceptable.
+///
+/// ── Why reporting rather than automatic detection ─────────────────────────
+///
+/// Photos are uploaded to two places — avatars and wishes — and nothing looks
+/// at what is in them. Automatic moderation is either paid (Vision, Rekognition)
+/// or a local model that adds seconds to every upload and mistakes a beach
+/// holiday for something else. On an app this size that cost buys very little.
+///
+/// A report is free, exact, and the person looking at the image is a far
+/// better judge than a classifier. It stops being enough at a scale this app
+/// is nowhere near.
+///
+/// ── Why the reporter is recorded ──────────────────────────────────────────
+///
+/// Not to expose them — nothing shows who reported what, ever. It is the only
+/// way to refuse a second report of the same thing by the same person, which
+/// is what stops the table filling up with one angry evening.
+model Report {
+  id         String   @id @default(cuid())
+  reporterId String
+  reporter   User     @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  /// The profile complained about, when it is a profile.
+  subjectId  String?
+  subject    User?    @relation("Reported", fields: [subjectId], references: [id], onDelete: Cascade)
+  /// The wish complained about, when it is a wish.
+  giftId     String?
+  gift       Gift?    @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  reason     String
+  /// Cleared once somebody has looked. Kept rather than deleted, so a second
+  /// report about the same person is visibly a pattern.
+  handledAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  /// One report per person per thing: a second is noise, not a signal.
+  @@unique([reporterId, subjectId])
+  @@unique([reporterId, giftId])
+  @@index([handledAt])
+}
+
 model Merchant {
   id      String   @id @default(cuid())
   slug    String   @unique
@@ -207,6 +249,7 @@ model Gift {
   reservation   Reservation?
   contributions PotContribution[]
   messages      ChatMessage[]
+  reports       Report[]
 
   @@index([listId])
   @@index([productId])

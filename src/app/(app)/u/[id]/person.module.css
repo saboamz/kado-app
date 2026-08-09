@@ -41,3 +41,10 @@
   font-size: 12px;
   color: var(--ink3);
 }
+
+/* The report link, set apart from the content it concerns. */
+.report {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line2);
+}
