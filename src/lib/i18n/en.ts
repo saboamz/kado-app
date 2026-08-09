@@ -345,6 +345,27 @@ export const en: Dictionary = {
   'reserve.mineNote': 'You claimed this gift. If it is expensive, open it to the other guests: everyone puts in what they like, and the owner still knows nothing.',
   'reserve.freeNote': 'The other guests will see it is taken, without knowing by whom. The owner sees nothing at all.',
 
+  'error.notOpenToOthers': 'This gift is not open to several people.',
+  'error.noAccessToList': 'You do not have access to this list.',
+  'error.alreadyPurchased': 'Somebody has already taken care of it.',
+  'error.contributeFirst': 'Chip in first to be able to buy it.',
+  'pot.iBoughtIt': 'I’m the one buying it',
+  'pot.declaring': 'Saving…',
+  'pot.boughtByMe': 'You bought it. Here is what the others owe you.',
+  'pot.boughtBy': '{name} bought it.',
+  'pot.youOwe': 'You owe them {amount}.',
+  'pot.nobodyOwes': 'Nobody owes you anything yet.',
+  'pot.owedTotal': 'Total to collect: {amount}',
+  'pot.buyerHint': 'If you paid for it, say so: you will then see who owes you what.',
+
+  'pot.complete': 'The pot is full. The gift can be bought.',
+
+  'pot.settledNote': 'The pot is closed: {name} bought the gift. Settle up with them directly.',
+  'pot.settledNoteMine': 'The pot is closed. All that is left is getting paid back.',
+
+  'error.nothingContributed': 'You have not put anything into this pot.',
+  'error.alreadyBought': 'The gift has already been bought: settle your share directly.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',

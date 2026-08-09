@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from './db';
+import { mayDeclarePurchase } from './pot-rules';
 import { logEvent } from './events';
 import { parseMoney } from './format';
 import { relationTo } from './relations';
@@ -32,7 +33,7 @@ async function requirePotGift(giftId: string) {
   if (!gift) return { error: 'error.giftNotFound' } as const;
   if (!gift.reservation?.openedToOthers) {
     return {
-      error: "Ce cadeau n'est pas ouvert à plusieurs.",
+      error: 'error.notOpenToOthers',
     } as const;
   }
 
@@ -43,7 +44,7 @@ async function requirePotGift(giftId: string) {
     } as const;
   }
   if (relation === 'stranger') {
-    return { error: "Vous n'avez pas accès à cette liste." } as const;
+    return { error: 'error.noAccessToList' } as const;
   }
 
   return { user, gift } as const;
@@ -115,14 +116,69 @@ export async function withdrawContribution(
   if ('error' in found) return { error: found.error };
   const { user, gift } = found;
 
+  /*
+   * Refused once somebody has paid for the gift.
+   *
+   * Withdrawing then is not leaving a pot, it is taking back what you owe a
+   * friend who has already put the money down for you. Enforced here and not
+   * only in the UI: hiding a button is a suggestion, this is the rule.
+   */
+  const reservation = await db.reservation.findUnique({
+    where: { giftId },
+    select: { purchasedById: true },
+  });
+  if (reservation?.purchasedById) return { error: 'error.alreadyBought' };
+
   const { count } = await db.potContribution.deleteMany({
     where: { giftId, contributorId: user.id },
   });
   if (count === 0) {
-    return { error: "Vous n'avez rien versé dans cette cagnotte." };
+    return { error: 'error.nothingContributed' };
   }
 
   revalidatePath(`/gifts/${giftId}`);
   revalidatePath(`/lists/${gift.listId}`);
+  return {};
+}
+
+/**
+ * Says that you went and bought the thing.
+ *
+ * ── Why this exists, and why it opens the names ────────────────────────────
+ *
+ * No money moves through this app. A contribution is a PROMISE, so at the end
+ * one person pays the shop the whole amount and is owed by everyone else —
+ * and until now they were the single person unable to see who owed them what.
+ * They could watch "100 € réunis" and have nobody to ask.
+ *
+ * Declaring the purchase is what reveals the breakdown, and only to them. The
+ * others go on seeing a count and a total, plus the one line that concerns
+ * them: what they owe, and to whom.
+ *
+ * The timing is the point. Before a purchase, a name beside an amount is only
+ * something to be judged on — somebody puts in what looks acceptable rather
+ * than what they can afford. After it, the same information is what lets a
+ * person be paid back. The risk is what opens the door.
+ */
+export async function declarePurchase(giftId: string): Promise<PotResult> {
+  const found = await requirePotGift(giftId);
+  if ('error' in found) return { error: found.error };
+  const { user } = found;
+
+  const mine = await db.potContribution.findFirst({
+    where: { giftId, contributorId: user.id },
+    select: { id: true },
+  });
+  if (!mayDeclarePurchase(Boolean(mine))) return { error: 'error.contributeFirst' };
+
+  // Scoped to a pot nobody has claimed, so two people pressing at once cannot
+  // overwrite each other — the first to arrive is the one who paid.
+  const { count } = await db.reservation.updateMany({
+    where: { giftId, openedToOthers: true, purchasedById: null },
+    data: { purchasedById: user.id, purchasedAt: new Date() },
+  });
+  if (count === 0) return { error: 'error.alreadyPurchased' };
+
+  revalidatePath(`/gifts/${giftId}`);
   return {};
 }

@@ -183,3 +183,85 @@
   font-size: 12.5px;
   color: var(--danger);
 }
+
+/*
+ * Who bought it, and who owes what.
+ *
+ * Separated from the contribution controls by a rule: the pot above is about
+ * gathering money, this is about settling up afterwards. Two different
+ * moments, and mixing them made the card read as one long form.
+ */
+.purchase {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line2);
+}
+
+.purchaseTitle {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.purchaseNote {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink2);
+}
+
+/* One row per person: the name reads first, the figure sits at the right
+   edge so a column of amounts can be scanned without reading the names. */
+.owed {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.owed > li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line2);
+  font-size: 13.5px;
+}
+
+.owed > li:last-child {
+  border-bottom: 0;
+}
+
+.owedTotal {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink2);
+  text-align: right;
+}
+
+.declare {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.declare:hover:not(:disabled) {
+  background: var(--card2);
+}
+
+/* The pot after it has been paid for: a statement, not a control. */
+.settled {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink2);
+}

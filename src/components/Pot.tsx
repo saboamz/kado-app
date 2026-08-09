@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { formatMoney } from '@/lib/format';
-import { contribute, withdrawContribution } from '@/lib/pot-actions';
+import { contribute, declarePurchase, withdrawContribution } from '@/lib/pot-actions';
 import type { PotView } from '@/lib/secrecy';
 import { useErrorText, useLocale, useT } from '@/lib/i18n/client';
 import { Button } from './Button';
@@ -113,10 +113,104 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
         </p>
       )}
 
-      {complete ? (
+      {/*
+        Who paid, and what that means for whoever is reading.
+        
+        The buyer gets the breakdown because they are out of pocket for the
+        whole amount and have to be able to chase it. Everybody else gets the
+        one line that concerns them.
+      */}
+      {pot.buyer && (
+        <div className={styles.purchase}>
+          {pot.buyer.isMe ? (
+            <>
+              <p className={styles.purchaseTitle}>{t('pot.boughtByMe')}</p>
+              {pot.owed && pot.owed.length > 0 ? (
+                <>
+                  <ul className={styles.owed}>
+                    {pot.owed.map((person) => (
+                      <li key={person.name + person.amountCents}>
+                        <span>{person.name}</span>
+                        <strong>
+                          {formatMoney(person.amountCents, undefined, locale)}
+                        </strong>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className={styles.owedTotal}>
+                    {t('pot.owedTotal', {
+                      amount: formatMoney(
+                        pot.owed.reduce((sum, p) => sum + p.amountCents, 0),
+                        undefined,
+                        locale,
+                      ),
+                    })}
+                  </p>
+                </>
+              ) : (
+                <p className={styles.purchaseNote}>{t('pot.nobodyOwes')}</p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className={styles.purchaseTitle}>
+                {t('pot.boughtBy', { name: pot.buyer.name })}
+              </p>
+              {pot.myContributionCents > 0 && (
+                <p className={styles.purchaseNote}>
+                  {t('pot.youOwe', {
+                    amount: formatMoney(pot.myContributionCents, undefined, locale),
+                  })}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/*
+        Offered only to somebody already in the pot, and only while nobody
+        has claimed it. Without a contribution, the breakdown would be one
+        click away for anyone who can see the gift — no risk taken, every
+        name and amount on screen.
+      */}
+      {!pot.buyer && pot.myContributionCents > 0 && (
+        <div className={styles.purchase}>
+          <button
+            type="button"
+            className={styles.declare}
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await declarePurchase(giftId);
+                if (result.error) setError(result.error);
+              })
+            }
+          >
+            {pending ? t('pot.declaring') : t('pot.iBoughtIt')}
+          </button>
+          <p className={styles.purchaseNote}>{t('pot.buyerHint')}</p>
+        </div>
+      )}
+
+      {/*
+        Once somebody has paid, the pot stops taking promises.
+        
+        The money is out of their pocket and the amount is fixed; a new
+        contribution now would change a total nobody is collecting against
+        any more, and the "withdraw" link would let somebody take back what
+        they owe a friend who has already paid for them.
+      */}
+      {pot.buyer ? (
+        <p className={styles.settled}>
+          {pot.buyer.isMe
+            ? t('pot.settledNoteMine')
+            : t('pot.settledNote', { name: pot.buyer.name })}
+        </p>
+      ) : complete ? (
         <p className={styles.complete}>
           <span aria-hidden>✓</span>
-          La cagnotte est complète. Le cadeau peut être acheté.
+          {t('pot.complete')}
         </p>
       ) : (
         <>
@@ -156,7 +250,11 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
         </>
       )}
 
-      {pot.myContributionCents > 0 && (
+      {/* Hidden once the gift is paid for, because the action refuses it
+          then — withdrawing would be taking back what you owe a friend who
+          already put the money down. A button that always errors is worse
+          than no button. */}
+      {pot.myContributionCents > 0 && !pot.buyer && (
         <button
           type="button"
           className={styles.withdraw}
