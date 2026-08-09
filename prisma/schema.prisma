@@ -53,6 +53,7 @@ model User {
   lists            GiftList[]
   interests        Interest[]
   reservations     Reservation[]
+  purchases        Reservation[]     @relation("PotBuyer")
   contributions    PotContribution[]
   sentRequests     Friendship[]      @relation("Requester")
   receivedRequests Friendship[]      @relation("Addressee")
@@ -249,6 +250,19 @@ model Reservation {
   /// no bar and no "complete". That is what happens when no price could be
   /// read and the opener left the field empty.
   targetCents    Int?
+  /// Whoever went and bought the thing, paying for it themselves.
+  ///
+  /// No money moves through this app: a contribution is a PROMISE, and at the
+  /// end one person is out of pocket for the whole amount. They are the only
+  /// one with something at stake, and until now they were the one person who
+  /// could not see who owed them what.
+  ///
+  /// Declaring the purchase is what opens that up — and only to them. Before
+  /// it, the pot stays a count and a total for everybody, so nobody is
+  /// choosing an amount that will be read next to their name.
+  purchasedById  String?
+  purchasedBy    User?     @relation("PotBuyer", fields: [purchasedById], references: [id], onDelete: SetNull)
+  purchasedAt    DateTime?
   note       String?
   createdAt  DateTime @default(now())
 

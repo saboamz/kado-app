@@ -35,8 +35,16 @@ export type GiftRow = {
     openedToOthers: boolean;
     /** The goal its opener set. Null on pots opened before goals existed. */
     targetCents?: number | null;
+    /** Who advanced the money, once somebody says they did. */
+    purchasedById?: string | null;
+    purchasedBy?: { name: string } | null;
   } | null;
-  contributions?: { contributorId: string; amountCents: number }[];
+  contributions?: {
+    contributorId: string;
+    amountCents: number;
+    /** Only selected once somebody has declared the purchase. See potInclude. */
+    contributor?: { name: string } | null;
+  }[];
 };
 
 /**
@@ -62,6 +70,26 @@ export type PotView = {
   contributorCount: number;
   /** What this viewer personally put in. Never anybody else's figure. */
   myContributionCents: number;
+  /**
+   * Who went and bought it, once they have said so. Null while nobody has.
+   *
+   * Their name is shown to the others because it answers the only question
+   * that matters at that point: who do I owe, and where do I send it.
+   */
+  buyer?: { name: string; isMe: boolean } | null;
+  /**
+   * Who promised what — visible ONLY to the person who paid.
+   *
+   * No money moves through this app. A contribution is a promise, and the
+   * buyer is out of pocket for the whole amount, so they are the one person
+   * who has to be able to chase it. Everybody else keeps seeing a count and
+   * a total: an amount read next to a name stops being a number somebody
+   * could afford and becomes one they will be judged on.
+   *
+   * Absent until a purchase is declared, for everyone including the eventual
+   * buyer — the information appears with the risk, not before it.
+   */
+  owed?: { name: string; amountCents: number }[];
 };
 
 export type GiftView = {
@@ -169,6 +197,40 @@ export function viewGift(
         .filter((c) => c.contributorId === viewerId)
         .reduce((sum, c) => sum + c.amountCents, 0),
     };
+
+    const buyerId = gift.reservation.purchasedById ?? null;
+    if (buyerId) {
+      base.pot.buyer = {
+        name: gift.reservation.purchasedBy?.name ?? '',
+        isMe: buyerId === viewerId,
+      };
+
+      /*
+       * The breakdown, and only for the person who paid.
+       *
+       * Guarded on the VIEWER, not on the data: the query selects names once
+       * a purchase exists, and this is what decides whether they leave this
+       * function. Anyone else — including another contributor — gets the same
+       * count and total they got before.
+       */
+      if (buyerId === viewerId) {
+        const byPerson = new Map<string, { name: string; amountCents: number }>();
+        for (const c of contributions) {
+          // The buyer's own promise is not a debt to themselves.
+          if (c.contributorId === viewerId) continue;
+          const found = byPerson.get(c.contributorId);
+          if (found) found.amountCents += c.amountCents;
+          else
+            byPerson.set(c.contributorId, {
+              name: c.contributor?.name ?? '',
+              amountCents: c.amountCents,
+            });
+        }
+        base.pot.owed = [...byPerson.values()].sort(
+          (a, b) => b.amountCents - a.amountCents,
+        );
+      }
+    }
   }
 
   return base;
@@ -227,8 +289,26 @@ export function giftInclude(relation: ViewerRelation) {
         createdAt: true,
         openedToOthers: true,
         targetCents: true,
+        purchasedById: true,
+        purchasedBy: { select: { name: true } },
       },
     },
-    contributions: { select: { contributorId: true, amountCents: true } },
+    /*
+     * Names are fetched for every friend, and viewGift decides who keeps them.
+     *
+     * Scoping the QUERY to the buyer would mean this selector depending on
+     * who is asking, and the one rule this file exists to keep is that the
+     * shape is decided by RELATION alone. A contributor's name is not the
+     * secret here — the list owner never reaches this branch at all, and that
+     * is what the containment tests hold. Who owes what stays with the buyer
+     * because viewGift drops it, in one place, checked by a test.
+     */
+    contributions: {
+      select: {
+        contributorId: true,
+        amountCents: true,
+        contributor: { select: { name: true } },
+      },
+    },
   } as const;
 }

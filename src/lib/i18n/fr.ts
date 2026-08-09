@@ -351,6 +351,27 @@ export const fr = {
   'reserve.mineNote': 'Vous avez réservé ce cadeau. Si le prix est élevé, ouvrez-le aux autres invités : chacun mettra ce qu’il veut, et le propriétaire n’en saura toujours rien.',
   'reserve.freeNote': 'Les autres invités verront qu’il est pris, sans savoir par qui. Le propriétaire ne verra rien du tout.',
 
+  'error.notOpenToOthers': 'Ce cadeau n’est pas ouvert à plusieurs.',
+  'error.noAccessToList': 'Vous n’avez pas accès à cette liste.',
+  'error.alreadyPurchased': 'Quelqu’un s’en est déjà occupé.',
+  'error.contributeFirst': 'Participez d’abord à la cagnotte pour pouvoir l’acheter.',
+  'pot.iBoughtIt': 'C’est moi qui l’achète',
+  'pot.declaring': 'Enregistrement…',
+  'pot.boughtByMe': 'Vous l’avez acheté. Voici ce que les autres vous doivent.',
+  'pot.boughtBy': '{name} l’a acheté.',
+  'pot.youOwe': 'Vous lui devez {amount}.',
+  'pot.nobodyOwes': 'Personne ne vous doit rien pour l’instant.',
+  'pot.owedTotal': 'Total à récupérer : {amount}',
+  'pot.buyerHint': 'Si vous avez avancé l’argent, dites-le : vous verrez alors qui vous doit quoi.',
+
+  'pot.complete': 'La cagnotte est complète. Le cadeau peut être acheté.',
+
+  'pot.settledNote': 'La cagnotte est close : {name} a acheté le cadeau. Réglez-lui votre part directement.',
+  'pot.settledNoteMine': 'La cagnotte est close. Il ne reste qu’à vous faire rembourser.',
+
+  'error.nothingContributed': 'Vous n’avez rien versé dans cette cagnotte.',
+  'error.alreadyBought': 'Le cadeau a déjà été acheté : réglez votre part directement.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',
