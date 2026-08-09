@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from './db';
+import { parseMoney } from './format';
 import { logEvent } from './events';
 import { relationTo } from './relations';
 import { requireUser } from './session';
@@ -142,16 +143,37 @@ export async function releaseGift(giftId: string): Promise<ReservationResult> {
  * The list's owner is not among them, and nothing here changes that: the pot
  * is derived from the reservation, and an owner's queries never load one.
  */
-export async function openToOthers(giftId: string): Promise<ReservationResult> {
+export async function openToOthers(
+  giftId: string,
+  /**
+   * What the pot should aim at, as typed by the person opening it.
+   *
+   * Offered pre-filled with the price read off the shop, which they confirm
+   * or correct — they have the link in front of them, which nobody else does.
+   * Empty is a real answer: a pot with no goal still collects, it simply has
+   * no bar and never announces itself complete.
+   */
+  target?: string | null,
+): Promise<ReservationResult> {
   const found = await requireReservableGift(giftId);
   if ('error' in found) return { error: found.error };
   const { user, gift } = found;
+
+  let targetCents: number | null = null;
+  if (target != null && target.trim() !== '') {
+    targetCents = parseMoney(target);
+    // Refused rather than silently dropped: somebody typed a figure, and
+    // opening a pot that quietly ignored it would be worse than saying so.
+    if (targetCents === null) return { error: 'error.amountInvalid' };
+    if (targetCents < 100) return { error: 'error.amountMinimum' };
+    if (targetCents > 500_000) return { error: 'error.amountTooHigh' };
+  }
 
   // Scoped to this reserver, and to a reservation that is not open already,
   // so a second click cannot move openedAt and rewrite when it happened.
   const { count } = await db.reservation.updateMany({
     where: { giftId, reserverId: user.id, openedToOthers: false },
-    data: { openedToOthers: true, openedAt: new Date() },
+    data: { openedToOthers: true, openedAt: new Date(), targetCents },
   });
 
   if (count === 0) {

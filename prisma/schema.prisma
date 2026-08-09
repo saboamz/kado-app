@@ -237,6 +237,18 @@ model Reservation {
   /// Set when the holder invites the other friends to chip in.
   openedToOthers Boolean @default(false)
   openedAt       DateTime?
+  /// What the pot is aiming at, in cents, as the person who opened it said.
+  ///
+  /// NOT the wish's price, and never an estimate on its own. A target decides
+  /// when contributors are told to stop, so it has to be a figure somebody
+  /// took responsibility for. The opener is offered the price we read off the
+  /// shop and confirms or corrects it — they have the link in front of them,
+  /// which nobody else does.
+  ///
+  /// Null is a pot with no goal: contributions still add up, there is simply
+  /// no bar and no "complete". That is what happens when no price could be
+  /// read and the opener left the field empty.
+  targetCents    Int?
   note       String?
   createdAt  DateTime @default(now())
 

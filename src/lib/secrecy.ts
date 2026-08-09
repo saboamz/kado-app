@@ -33,6 +33,8 @@ export type GiftRow = {
     reserverId: string;
     createdAt: Date;
     openedToOthers: boolean;
+    /** The goal its opener set. Null on pots opened before goals existed. */
+    targetCents?: number | null;
   } | null;
   contributions?: { contributorId: string; amountCents: number }[];
 };
@@ -152,7 +154,15 @@ export function viewGift(
   if (gift.reservation?.openedToOthers) {
     const contributions = gift.contributions ?? [];
     base.pot = {
-      targetCents: gift.priceCents,
+      /*
+       * The opener's goal, and only then the wish's own price.
+       *
+       * The price is the fallback for pots opened before a goal could be set;
+       * new ones carry their own. An ESTIMATE never reaches here — it is a
+       * separate field precisely so it cannot, because a pot completing
+       * against a guess tells contributors they are done when they are not.
+       */
+      targetCents: gift.reservation.targetCents ?? gift.priceCents,
       raisedCents: contributions.reduce((sum, c) => sum + c.amountCents, 0),
       contributorCount: new Set(contributions.map((c) => c.contributorId)).size,
       myContributionCents: contributions
@@ -212,7 +222,12 @@ export function giftInclude(relation: ViewerRelation) {
   return {
     product: { select: { priceCents: true, currency: true } },
     reservation: {
-      select: { reserverId: true, createdAt: true, openedToOthers: true },
+      select: {
+        reserverId: true,
+        createdAt: true,
+        openedToOthers: true,
+        targetCents: true,
+      },
     },
     contributions: { select: { contributorId: true, amountCents: true } },
   } as const;

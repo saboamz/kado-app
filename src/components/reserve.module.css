@@ -43,3 +43,56 @@
 .secondaryAction:hover {
   color: var(--ink);
 }
+
+/*
+ * The pot's goal, asked once at the moment of opening.
+ *
+ * Sized like a real amount rather than a settings field: this is the figure
+ * that will decide when contributors are told to stop, and it should look
+ * like a number somebody is agreeing to, not a form to fill in.
+ */
+.goalLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+.goalRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.goalCurrency {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+.goalInput {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.goalInput:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 1px;
+}
+
+.goalHint {
+  margin: 6px 0 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink3);
+}

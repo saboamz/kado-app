@@ -205,7 +205,13 @@ export default async function GiftPage({
           </SecretSeal>
 
           {gift.reservation && (
-            <ReserveButton giftId={id} reservation={gift.reservation} />
+            <ReserveButton
+              giftId={id}
+              reservation={gift.reservation}
+              /* The price if its author gave one, else what the shop said.
+                 Only a suggestion until the opener confirms it. */
+              suggestedGoal={gift.priceCents ?? gift.estimatedPriceCents}
+            />
           )}
 
           {gift.pot && <Pot giftId={id} pot={gift.pot} />}
