@@ -27,6 +27,8 @@ export type GiftRow = {
   priority: number;
   listId: string;
   createdAt: Date;
+  /** The catalogue row this wish resolved to, when it has one. */
+  product?: { priceCents: number | null; currency: string } | null;
   reservation?: {
     reserverId: string;
     createdAt: Date;
@@ -73,6 +75,18 @@ export type GiftView = {
   priority: number;
   listId: string;
   createdAt: string;
+  /**
+   * A price nobody typed, taken from the catalogue row the link resolved to.
+   *
+   * Kept SEPARATE from priceCents rather than filled into it, for two
+   * reasons. It is a guess and has to be labelled as one on screen — merged
+   * in, it would be indistinguishable from a figure the wisher actually
+   * wrote. And priceCents is the pot's target: a pot that completes against
+   * an estimate would tell contributors they are done when they are not.
+   *
+   * Absent when the wish carries its own price, or when nothing was found.
+   */
+  estimatedPriceCents?: number | null;
   /** Absent for owners. Its absence is the feature. */
   reservation?: ReservationView;
   /**
@@ -111,6 +125,20 @@ export function viewGift(
     listId: gift.listId,
     createdAt: gift.createdAt.toISOString(),
   };
+
+  /*
+   * Only when the wisher gave no price of their own. Theirs always wins:
+   * they know what they want, and the catalogue only knows what a page said.
+   *
+   * Deliberately ABOVE the owner's early return, so an owner sees it too.
+   * The figure comes from the merchant's page, not from anything anybody did
+   * with the wish — it says nothing about who looked, reserved or
+   * contributed, so it is not secret. Showing it to the owner is also useful:
+   * it is how they notice the link resolved to the wrong article.
+   */
+  if (gift.priceCents == null && gift.product?.priceCents != null) {
+    base.estimatedPriceCents = gift.product.priceCents;
+  }
 
   if (relation === 'owner') return base;
 
@@ -170,8 +198,19 @@ export function viewReservation(
  * refactor away from failing; not loading the data cannot fail that way.
  */
 export function giftInclude(relation: ViewerRelation) {
-  if (relation === 'owner') return {} as const;
+  /*
+   * The product is joined for EVERYONE, owners included.
+   *
+   * It carries a price read off a merchant page and nothing about what
+   * anybody did with the wish, so it is not part of what this file hides.
+   * Kept in both branches rather than hoisted, so the owner branch stays a
+   * complete, readable statement of what an owner's query may touch.
+   */
+  if (relation === 'owner') {
+    return { product: { select: { priceCents: true, currency: true } } } as const;
+  }
   return {
+    product: { select: { priceCents: true, currency: true } },
     reservation: {
       select: { reserverId: true, createdAt: true, openedToOthers: true },
     },

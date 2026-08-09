@@ -328,6 +328,13 @@ export const en: Dictionary = {
 
   'pot.contribute': 'Chip in',
 
+  'gift.estimatedPrice': '~{price}',
+  'gift.estimatedNote': 'Price read from the shop, as a guide — {name} did not give one.',
+
+  'gift.potHiddenFromOwner': '{name} sees neither the total, nor who chipped in, nor that this pot exists at all.',
+
+  'gift.estimatedNoteOwn': 'Price read from the shop, as a guide — you did not give one.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',

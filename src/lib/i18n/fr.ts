@@ -334,6 +334,13 @@ export const fr = {
 
   'pot.contribute': 'Participer',
 
+  'gift.estimatedPrice': '~{price}',
+  'gift.estimatedNote': 'Prix relevé sur la boutique, à titre indicatif — {name} ne l’a pas renseigné.',
+
+  'gift.potHiddenFromOwner': '{name} ne voit ni le total, ni les participants, ni même l’existence de cette cagnotte.',
+
+  'gift.estimatedNoteOwn': 'Prix relevé sur la boutique, à titre indicatif — vous ne l’avez pas renseigné.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',
