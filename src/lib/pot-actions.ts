@@ -182,3 +182,34 @@ export async function declarePurchase(giftId: string): Promise<PotResult> {
   revalidatePath(`/gifts/${giftId}`);
   return {};
 }
+
+/**
+ * Takes back a declared purchase, reopening the pot.
+ *
+ * ── Why this has to exist ──────────────────────────────────────────────────
+ *
+ * Declaring a purchase does three irreversible things at once: it closes the
+ * pot, it locks withdrawals, and it shows the buyer everyone's name and
+ * amount. Somebody who presses it by mistake — or who thought they were
+ * volunteering rather than reporting a payment — had no way back, and a pot
+ * short of its goal could never be topped up again.
+ *
+ * So it is undoable, by the person who claimed it, and only by them. What
+ * they have already seen cannot be unseen; what CAN be given back is the
+ * pot's ability to carry on.
+ */
+export async function undoPurchase(giftId: string): Promise<PotResult> {
+  const found = await requirePotGift(giftId);
+  if ('error' in found) return { error: found.error };
+  const { user } = found;
+
+  // Scoped to this claimant, so nobody can cancel somebody else's purchase.
+  const { count } = await db.reservation.updateMany({
+    where: { giftId, openedToOthers: true, purchasedById: user.id },
+    data: { purchasedById: null, purchasedAt: null },
+  });
+  if (count === 0) return { error: 'error.notTheBuyer' };
+
+  revalidatePath(`/gifts/${giftId}`);
+  return {};
+}

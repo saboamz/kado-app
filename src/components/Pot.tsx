@@ -2,7 +2,12 @@
 
 import { useState, useTransition } from 'react';
 import { formatMoney } from '@/lib/format';
-import { contribute, declarePurchase, withdrawContribution } from '@/lib/pot-actions';
+import {
+  contribute,
+  declarePurchase,
+  undoPurchase,
+  withdrawContribution,
+} from '@/lib/pot-actions';
 import type { PotView } from '@/lib/secrecy';
 import { useErrorText, useLocale, useT } from '@/lib/i18n/client';
 import { Button } from './Button';
@@ -68,7 +73,9 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
         )}
       </p>
 
-      {target && (
+      {/* The bar measures progress towards a goal. Once somebody has paid,
+          there is no progress left to make — what remains is settling up. */}
+      {target && !pot.buyer && (
         <div
           className={styles.bar}
           role="progressbar"
@@ -100,7 +107,10 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
           {pot.contributorCount === 0
             ? t('pot.nobodyYet')
             : t('pot.participants', { count: pot.contributorCount })}
-          {remaining !== null && remaining > 0 && (
+          {/* Dropped once the gift is paid for: "il reste 15 €" describes a
+              pot that is still collecting, and this one has closed. What is
+              missing is now the buyer's to carry, which the breakdown says. */}
+          {!pot.buyer && remaining !== null && remaining > 0 && (
             <> · {t('pot.remaining', { amount: formatMoney(remaining, undefined, locale) })}</>
           )}
         </span>
@@ -150,6 +160,24 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
               ) : (
                 <p className={styles.purchaseNote}>{t('pot.nobodyOwes')}</p>
               )}
+
+              {/* The way back. Pressing "I bought it" by mistake used to be
+                  final: the pot closed, nobody could top it up, and a pot
+                  short of its goal stayed short. */}
+              <button
+                type="button"
+                className={styles.undo}
+                disabled={pending}
+                onClick={() =>
+                  startTransition(async () => {
+                    const result = await undoPurchase(giftId);
+                    if (result.error) setError(result.error);
+                  })
+                }
+              >
+                {pending ? t('pot.undoing') : t('pot.undo')}
+              </button>
+              <p className={styles.purchaseNote}>{t('pot.reopenNote')}</p>
             </>
           ) : (
             <>
@@ -180,16 +208,37 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
             type="button"
             className={styles.declare}
             disabled={pending}
-            onClick={() =>
+            onClick={() => {
+              /*
+               * Asked before, not explained after.
+               *
+               * This closes the pot, locks withdrawals and reveals every name
+               * and amount to whoever pressed it. The shortfall is spelled
+               * out because that is the expensive mistake: closing a pot
+               * 15 € short means paying that 15 € yourself, and nothing on
+               * screen said so.
+               */
+              const short =
+                pot.targetCents != null
+                  ? Math.max(0, pot.targetCents - pot.raisedCents)
+                  : 0;
+              const message =
+                short > 0
+                  ? t('pot.confirmShort', {
+                      amount: formatMoney(short, undefined, locale),
+                    })
+                  : t('pot.confirmFull');
+              if (!confirm(message)) return;
+
               startTransition(async () => {
                 const result = await declarePurchase(giftId);
                 if (result.error) setError(result.error);
-              })
-            }
+              });
+            }}
           >
-            {pending ? t('pot.declaring') : t('pot.iBoughtIt')}
+            {pending ? t('pot.declaring') : t('pot.iBought')}
           </button>
-          <p className={styles.purchaseNote}>{t('pot.buyerHint')}</p>
+          <p className={styles.purchaseNote}>{t('pot.buyerHintNew')}</p>
         </div>
       )}
 

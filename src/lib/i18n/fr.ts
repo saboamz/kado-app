@@ -372,6 +372,15 @@ export const fr = {
   'error.nothingContributed': 'Vous n’avez rien versé dans cette cagnotte.',
   'error.alreadyBought': 'Le cadeau a déjà été acheté : réglez votre part directement.',
 
+  'error.notTheBuyer': 'Vous n’avez pas déclaré cet achat.',
+  'pot.iBought': 'J’ai acheté le cadeau',
+  'pot.buyerHintNew': 'À cliquer une fois le cadeau payé — pas avant. La cagnotte se ferme alors et vous voyez qui vous doit quoi.',
+  'pot.confirmShort': 'Il manque {amount} à la cagnotte. En validant, elle se ferme et personne ne pourra plus participer. Continuer ?',
+  'pot.confirmFull': 'La cagnotte se ferme et personne ne pourra plus participer. Continuer ?',
+  'pot.undo': 'Finalement, je ne l’ai pas acheté',
+  'pot.undoing': 'Annulation…',
+  'pot.reopenNote': 'Vous pouvez revenir en arrière : la cagnotte se rouvrira et les autres pourront à nouveau participer.',
+
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',

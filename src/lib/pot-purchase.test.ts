@@ -173,3 +173,43 @@ describe('who may claim the purchase', () => {
     expect(mayDeclarePurchase(false)).toBe(false);
   });
 });
+
+describe('taking a purchase back', () => {
+  it('returns the pot to the state it was in', () => {
+    /*
+     * The reason undo exists.
+     *
+     * Declaring closes the pot, locks withdrawals and reveals every name and
+     * amount at once. Somebody who pressed it by mistake — or who read "c'est
+     * moi qui l'achète" as volunteering rather than reporting — had no way
+     * back, and a pot 15 € short could never be topped up again.
+     */
+    const reopened = viewGift(
+      gift({
+        reservation: {
+          reserverId: BOB,
+          createdAt: new Date('2026-02-01'),
+          openedToOthers: true,
+          purchasedById: null,
+          purchasedBy: null,
+        },
+      }),
+      'friend',
+      ALICE,
+    );
+
+    expect(reopened.pot?.buyer).toBeUndefined();
+    expect(reopened.pot?.owed).toBeUndefined();
+    // The promises themselves are untouched: undoing the claim is not
+    // undoing the pot.
+    expect(reopened.pot?.raisedCents).toBe(6000);
+    expect(reopened.pot?.contributorCount).toBe(3);
+  });
+
+  it('leaves what the buyer already saw seen', () => {
+    // Stated rather than enforced: names cannot be un-read. What undo gives
+    // back is the pot's ability to carry on, not the secret.
+    const view = viewGift(bought(), 'friend', ALICE);
+    expect(view.pot?.owed).toHaveLength(2);
+  });
+});
