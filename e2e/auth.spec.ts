@@ -15,7 +15,17 @@ test('the landing page pitches the product and offers both entry points', async 
    * which is exactly what the page was missing before.
    */
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.getByText(/liste de cadeaux en ligne/i)).toBeVisible();
+  /*
+   * Scoped to the paragraph, not to the page.
+   *
+   * The <title> now carries the same phrase — that is the point of it, since
+   * it is what somebody types — so an unscoped match finds two elements and
+   * Playwright refuses the ambiguity. What this line is about is the visitor
+   * being TOLD what Kado is, which is the paragraph.
+   */
+  await expect(
+    page.locator('p').filter({ hasText: /liste de cadeaux en ligne/i }),
+  ).toBeVisible();
   // The two views of one gift: the demo that says what prose could not.
   await expect(page.getByText(/Aucune information de réservation/i)).toBeVisible();
   await expect(page.getByText(/Déjà réservé par un proche/i)).toBeVisible();
