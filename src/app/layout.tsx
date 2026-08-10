@@ -4,6 +4,8 @@ import { I18nProvider } from '@/lib/i18n/client';
 import { en } from '@/lib/i18n/en';
 import { fr } from '@/lib/i18n/fr';
 import { getLocale } from '@/lib/i18n/server';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { getCurrentUser } from '@/lib/session';
 import { siteUrl } from '@/lib/site';
 import './globals.css';
@@ -140,6 +142,22 @@ export default async function RootLayout({
         <I18nProvider locale={locale} dict={locale === 'en' ? en : fr}>
           {children}
         </I18nProvider>
+        {/*
+          Two measurements, and they are not the same kind of thing.
+
+          SpeedInsights reports how long pages took to render on real devices
+          — durations only, no identifier, nothing that follows somebody from
+          one page to the next. It is the only way to know whether this app is
+          slow for the people using it rather than on this machine.
+
+          Analytics counts page views. Vercel sets no cookie and stores no raw
+          IP, but it does derive a visitor hash from IP, user-agent and the
+          day, which is tracking under the GDPR however short-lived. That is
+          why the privacy policy now says so plainly instead of claiming there
+          is no audience measurement at all.
+        */}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

@@ -48,6 +48,12 @@ export default async function PrivacyPage() {
       <h2 className={styles.heading}>{t('legal.cookies')}</h2>
       <p className={styles.body}>{t('legal.cookiesBody')}</p>
 
+      {/* Its own section rather than a line in the cookie one: this is a
+          different thing being done for a different reason, and burying it
+          under "cookies" would be technically true and practically hidden. */}
+      <h2 className={styles.heading}>{t('legal.measurement')}</h2>
+      <p className={styles.body}>{t('legal.measurementBody')}</p>
+
       <h2 className={styles.heading}>{t('legal.rights')}</h2>
       <p className={styles.body}>{t('legal.rightsBody')}</p>
 

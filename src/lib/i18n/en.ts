@@ -427,10 +427,13 @@ export const en: Dictionary = {
     'Your data is kept for as long as your account exists. A session expires after 30 days. Sign-in attempts are erased after 24 hours. When you delete your account, everything goes at once: lists, wishes, claims, contributions, messages, photos and activity log. Nothing is kept in anonymised form.',
   'legal.thirdParties': 'Who else sees anything',
   'legal.thirdPartiesBody':
-    'Vercel hosts the app and stores the photos you upload. Neon hosts the database, in the European Union. When you search for a GIF the query goes to GIPHY, and GIFs shown on a profile are loaded from their servers — so GIPHY sees visits to that profile. When you paste a shop link the merchant refuses us, the page address is passed to an external reading service (r.jina.ai) to retrieve its title and price. No data is sold, rented, or passed on for advertising.',
+    'Vercel hosts the app, stores the photos you upload and measures its audience and speed — see the next section. Neon hosts the database, in the European Union. When you search for a GIF the query goes to GIPHY, and GIFs shown on a profile are loaded from their servers — so GIPHY sees visits to that profile. When you paste a shop link the merchant refuses us, the page address is passed to an external reading service (r.jina.ai) to retrieve its title and price. No data is sold, rented, or passed on for advertising.',
   'legal.cookies': 'Cookies',
   'legal.cookiesBody':
-    'One cookie is set: the one that keeps you signed in. It is strictly necessary to the service, tracks nobody and feeds no analytics. That is why you are not asked to accept a banner.',
+    'One cookie is set: the one that keeps you signed in. It is strictly necessary to the service. No advertising cookie, no social-network cookie, no third-party tracker. That is why you are not asked to accept a banner.',
+  'legal.measurement': 'Audience and performance measurement',
+  'legal.measurementBody':
+    'Two tools from Vercel, the host, are active. Speed Insights measures how quickly pages render: durations only, with no identifier and no following you from page to page. Web Analytics counts page views, countries and device types: it sets no cookie and keeps no IP address, but it derives a temporary identifier from one, renewed daily, to tell visits apart. These measurements exist to know whether the app is slow or used, never to profile you, and nothing is sold or shared for advertising. Any content blocker stops them without breaking the app.',
   'legal.rights': 'Your rights',
   'legal.rightsBody':
     'You may access your data, correct it, erase it, restrict its use or object to its processing. Most of that is in the app itself: your profile is editable, and deleting your account in Settings erases everything, with no delay and no email confirmation. For anything else, write to sabri9595@gmail.com. You may also complain to the CNIL.',
