@@ -5,6 +5,7 @@ import { en } from '@/lib/i18n/en';
 import { fr } from '@/lib/i18n/fr';
 import { getLocale } from '@/lib/i18n/server';
 import { getCurrentUser } from '@/lib/session';
+import { siteUrl } from '@/lib/site';
 import './globals.css';
 
 // Self-hosted by next/font: no request to Google at runtime, no layout shift.
@@ -50,13 +51,34 @@ export const metadata: Metadata = {
    * VERCEL_URL which changes on every deployment — a preview card pointing at
    * a superseded deployment breaks as soon as the next one ships.
    */
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ??
-      (process.env.VERCEL_PROJECT_PRODUCTION_URL
-        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-        : 'http://localhost:3000'),
-  ),
-  title: { default: 'Kado', template: '%s · Kado' },
+  metadataBase: new URL(siteUrl()),
+  /*
+   * The title is what a search result reads.
+   *
+   * "Kado" alone said nothing: somebody who has been told about this app and
+   * types "kado liste cadeaux" saw a one-word result that could be anything.
+   * The words after the name are the ones people actually type, and they are
+   * a description of the product rather than a keyword list — a title that
+   * reads as stuffing is worth less than a plain one.
+   *
+   * The template keeps inner pages short: "Réglages · Kado".
+   */
+  title: {
+    default: 'Kado — liste de cadeaux en ligne, entre proches',
+    template: '%s · Kado',
+  },
+  /*
+   * Which language this page is in, and where the other one lives.
+   *
+   * Both point at the same URL: the language follows the account preference
+   * and Accept-Language, not the path, so there is no /fr or /en to name.
+   * Saying so explicitly stops a crawler treating the two renderings of one
+   * address as duplicate content.
+   */
+  alternates: {
+    canonical: '/',
+    languages: { fr: '/', en: '/', 'x-default': '/' },
+  },
   description: DESCRIPTION,
   applicationName: 'Kado',
   /*

@@ -3,6 +3,7 @@ import { ButtonLink } from '@/components/Button';
 import { getCurrentUser } from '@/lib/session';
 import { LegalFooter } from '@/components/LegalFooter';
 import { getT } from '@/lib/i18n/server';
+import { siteUrl } from '@/lib/site';
 import styles from './landing.module.css';
 
 /**
@@ -39,8 +40,36 @@ export default async function LandingPage() {
     { title: t('landing.step3Title'), body: t('landing.step3Body') },
   ];
 
+  /*
+   * What this thing is, in the form a search engine parses.
+   *
+   * Every field is something the app actually does: it is a web application,
+   * it costs nothing, it is in French and English. Nothing here claims a
+   * rating, a review count or an author — the fields that tempt people to
+   * invent, and that Google drops the whole block for when it catches one.
+   *
+   * The description is the same sentence a visitor reads, not a second one
+   * written for robots.
+   */
+  const structured = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Kado',
+    applicationCategory: 'LifestyleApplication',
+    url: siteUrl(),
+    inLanguage: ['fr', 'en'],
+    description: t('landing.intro'),
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+  };
+
   return (
     <main className={styles.page}>
+      <script
+        type="application/ld+json"
+        // The content is built above from our own strings; there is no user
+        // input anywhere in it.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }}
+      />
       <div className={styles.inner}>
         <header className={styles.head}>
           <span className={styles.brand}>

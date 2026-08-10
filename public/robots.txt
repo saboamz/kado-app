@@ -1,4 +1,0 @@
-# Wishlists are private by default and sit behind a session, but profiles can
-# be made public in settings. Nothing here should end up in a search index.
-User-agent: *
-Disallow: /
