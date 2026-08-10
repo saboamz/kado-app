@@ -446,7 +446,13 @@ export const en: Dictionary = {
     'Kado is free, carries no advertising and commits you to nothing. You must be at least 15 to create an account. You are responsible for keeping your password to yourself.',
   'legal.termsContent': 'What you publish',
   'legal.termsContentBody':
-    'You remain the owner of what you write and upload. You undertake not to publish anything unlawful, hateful or infringing on the rights of others, including in the private chats. An account clearly in breach may be suspended.',
+    'You remain the owner of what you write and upload. You undertake not to publish anything unlawful, hateful or infringing on the rights of others, including in the private chats.',
+  'legal.termsImages': 'Photos',
+  'legal.termsImagesBody':
+    'The photos you upload — profile picture, wish images — must be suitable for all audiences. Sexual, violent or shocking content is not allowed. These images are not scanned automatically: it is your responsibility, and that of the people who see them to report them to us.',
+  'legal.termsReport': 'Reporting',
+  'legal.termsReportBody':
+    'A "Report" link sits under every profile and every wish you look at. Reporting is confidential: the person concerned is not told and cannot find out who reported them. Content clearly in breach is removed and the account may be suspended.',
   'legal.termsAvailability': 'Availability',
   'legal.termsAvailabilityBody':
     'The service is provided with no guarantee of availability. It may be interrupted, changed or discontinued, in particular for maintenance. Prices shown from shop links are indications taken from external pages: they may be wrong or out of date, and bind neither Kado nor the merchant.',
@@ -457,6 +463,16 @@ export const en: Dictionary = {
   'legal.footerNotice': 'Legal notice',
   'legal.footerPrivacy': 'Privacy',
   'legal.footerTerms': 'Terms',
+
+  'report.link': 'Report',
+  'report.title': 'Report this content',
+  'report.intro': 'Tell us what is wrong. The person concerned will not know.',
+  'report.placeholder': 'Inappropriate photo, offensive wording…',
+  'report.send': 'Send the report',
+  'report.sending': 'Sending…',
+  'report.thanks': 'Thank you. We will take a look.',
+  'report.cancel': 'Cancel',
+  'error.cannotReportYourself': 'You cannot report yourself.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',

@@ -12,6 +12,7 @@ import { GiftIcon } from '@/components/icons';
 import { Decoration } from '@/components/Decoration';
 import { PageHeader } from '@/components/PageHeader';
 import { ViewpointBanner } from '@/components/Viewpoint';
+import { ReportButton } from '@/components/ReportButton';
 import { db } from '@/lib/db';
 import {
   daysUntilBirthday,
@@ -133,6 +134,13 @@ export default async function PersonPage({
 
       {decor.footer && (
         <Decoration decoration={decor.footer} slot="footer" />
+      )}
+      {/* Under the profile, and only for somebody else's: reporting your own
+          avatar is not a thing. */}
+      {relation !== 'owner' && (
+        <div className={styles.report}>
+          <ReportButton subjectId={person.id} />
+        </div>
       )}
     </>
   );

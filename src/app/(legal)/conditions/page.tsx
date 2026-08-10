@@ -22,6 +22,14 @@ export default async function TermsPage() {
       <h2 className={styles.heading}>{t('legal.termsContent')}</h2>
       <p className={styles.body}>{t('legal.termsContentBody')}</p>
 
+      {/* Spelled out because nothing scans an upload: the rule is the only
+          control there is, and the report link is how it is enforced. */}
+      <h2 className={styles.heading}>{t('legal.termsImages')}</h2>
+      <p className={styles.body}>{t('legal.termsImagesBody')}</p>
+
+      <h2 className={styles.heading}>{t('legal.termsReport')}</h2>
+      <p className={styles.body}>{t('legal.termsReportBody')}</p>
+
       <h2 className={styles.heading}>{t('legal.termsAvailability')}</h2>
       <p className={styles.body}>{t('legal.termsAvailabilityBody')}</p>
 
