@@ -424,7 +424,10 @@ export const fr = {
   'legal.collectedUse':
     'Usage : vos listes, vos envies, vos amis, vos réservations, vos participations aux cagnottes et vos messages dans les salons privés.',
   'legal.collectedTech':
-    'Technique : un journal des ajouts, réservations et participations, utilisé pour les suggestions de cadeaux ; et les tentatives de connexion, conservées 24 heures pour limiter les attaques par force brute.',
+    'Technique : un journal des ajouts, réservations, participations et clics vers les boutiques, utilisé pour les suggestions de cadeaux ; et les tentatives de connexion, conservées 24 heures pour limiter les attaques par force brute.',
+  'legal.outbound': 'Les liens vers les boutiques',
+  'legal.outboundBody':
+    'Quand vous ouvrez le lien d’une boutique depuis une envie, nous enregistrons que ce clic a eu lieu : la date, la boutique concernée et votre compte. Cela sert à deux choses — améliorer les suggestions de cadeaux, et savoir combien de visites nous envoyons à chaque boutique. Ce journal n’est jamais montré au propriétaire de la liste : s’il pouvait voir qu’on a cliqué sur le lien d’une de ses envies, il apprendrait qu’elle intéresse quelqu’un. Vos propres clics sur vos propres envies ne sont pas enregistrés. Aucun identifiant n’est ajouté au lien : la boutique reçoit exactement l’adresse que vous avez collée, et n’apprend rien de nous.',
   'legal.why': 'Pourquoi, et sur quelle base',
   'legal.whyBody':
     'Pour exécuter le service que vous avez demandé en créant un compte (article 6.1.b du RGPD) : sans ces données, il n’y a ni liste, ni ami, ni cadeau. La limitation des tentatives de connexion repose sur l’intérêt légitime à protéger les comptes (article 6.1.f).',

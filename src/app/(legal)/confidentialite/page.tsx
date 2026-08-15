@@ -54,6 +54,13 @@ export default async function PrivacyPage() {
       <h2 className={styles.heading}>{t('legal.measurement')}</h2>
       <p className={styles.body}>{t('legal.measurementBody')}</p>
 
+      {/* Recording a click is a different activity from measuring audience:
+          it is tied to an account rather than anonymous, and it feeds the
+          suggestions. Folding it into the section above would describe it
+          as something it is not. */}
+      <h2 className={styles.heading}>{t('legal.outbound')}</h2>
+      <p className={styles.body}>{t('legal.outboundBody')}</p>
+
       <h2 className={styles.heading}>{t('legal.rights')}</h2>
       <p className={styles.body}>{t('legal.rightsBody')}</p>
 

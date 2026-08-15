@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { Badge, Card, Priority } from '@/components/display';
 import { LiveRefresh } from '@/components/LiveRefresh';
+import { OutboundLink } from '@/components/OutboundLink';
 import { PageHeader } from '@/components/PageHeader';
 import { SecretSeal, SecretZone } from '@/components/SecretSeal';
 import { UploadedImage } from '@/components/UploadedImage';
@@ -176,12 +177,19 @@ export default async function GiftPage({
 
       {gift.url && (
         <Card plain className={styles.link}>
-          <a href={gift.url} target="_blank" rel="noopener noreferrer nofollow">
+          {/* Counted on the way out, except for the owner — see
+              OutboundLink. The link itself behaves identically either way. */}
+          <OutboundLink
+            href={gift.url}
+            giftId={id}
+            productId={owning.productId}
+            isOwner={isOwner}
+          >
             <span className={styles.linkMerchant}>
               {gift.merchant ?? 'Voir le produit'}
             </span>
             <span className={styles.linkUrl}>{gift.url}</span>
-          </a>
+          </OutboundLink>
         </Card>
       )}
 

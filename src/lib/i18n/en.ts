@@ -418,7 +418,10 @@ export const en: Dictionary = {
   'legal.collectedUse':
     'Use: your lists, your wishes, your friends, what you have claimed, what you have chipped in, and your messages in the private chats.',
   'legal.collectedTech':
-    'Technical: a log of wishes added, gifts claimed and pots joined, used for gift suggestions; and sign-in attempts, kept for 24 hours to limit brute-force attacks.',
+    'Technical: a log of wishes added, gifts claimed, pots joined and shop links opened, used for gift suggestions; and sign-in attempts, kept for 24 hours to limit brute-force attacks.',
+  'legal.outbound': 'Links out to shops',
+  'legal.outboundBody':
+    'When you open a shop link from a wish, we record that the click happened: the date, which shop, and your account. It serves two purposes — improving gift suggestions, and knowing how many visits we send each shop. This log is never shown to the list’s owner: if they could see that someone clicked the link on one of their wishes, they would learn that it interests somebody. Your own clicks on your own wishes are not recorded. No identifier is added to the link: the shop receives exactly the address you pasted, and learns nothing from us.',
   'legal.why': 'Why, and on what basis',
   'legal.whyBody':
     'To perform the service you asked for by creating an account (GDPR article 6.1.b): without this data there is no list, no friend and no gift. Rate-limiting sign-in attempts rests on the legitimate interest in protecting accounts (article 6.1.f).',
