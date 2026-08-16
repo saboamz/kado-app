@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { rotateInvite } from '@/lib/invite-actions';
-import { useT } from '@/lib/i18n/client';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import styles from './inviteLink.module.css';
 
 /**
@@ -14,7 +14,9 @@ import styles from './inviteLink.module.css';
  */
 export function InviteLink({ code, uses }: { code: string; uses: number }) {
   const t = useT();
+  const errorText = useErrorText();
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   /*
@@ -77,11 +79,27 @@ export function InviteLink({ code, uses }: { code: string; uses: number }) {
           type="button"
           className={styles.rotate}
           disabled={pending}
-          onClick={() => startTransition(() => void rotateInvite())}
+          aria-busy={pending}
+          onClick={() =>
+            startTransition(async () => {
+              setError(null);
+              const result = await rotateInvite();
+              if (result.error) setError(errorText(result.error) ?? null);
+            })
+          }
         >
-          {pending ? 'Un instant…' : t('invite.rotate')}
+          {pending ? t('invite.rotating') : t('invite.rotate')}
         </button>
       </div>
+
+      {/* Rotating invalidates every link already shared, so a rotation that
+          quietly failed is the worst outcome: you believe the old link is
+          dead when it is still live. */}
+      {error && (
+        <p role="alert" className={styles.error}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
