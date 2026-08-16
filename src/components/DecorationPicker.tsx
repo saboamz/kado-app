@@ -9,7 +9,7 @@ import {
   setDecoration,
 } from '@/lib/decoration-actions';
 import { SLOTS, SLOT_LABELS, type GifChoice, type Slot } from '@/lib/decorations';
-import { useT } from '@/lib/i18n/client';
+import { useErrorText, useT } from '@/lib/i18n/client';
 import type { DecorationView } from './Decoration';
 import styles from './decorationPicker.module.css';
 
@@ -106,21 +106,41 @@ export function DecorationPicker({
 
 function RemoveButton({ slot, onDone }: { slot: Slot; onDone: () => void }) {
   const t = useT();
+  const errorText = useErrorText();
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  /*
+   * onDone() only on success.
+   *
+   * It used to run unconditionally, so a refused removal still took the GIF
+   * off the screen and the row came back on the next load — the UI said one
+   * thing and the database said another.
+   */
   return (
-    <button
-      type="button"
-      className={styles.remove}
-      disabled={pending}
-      onClick={() =>
-        startTransition(async () => {
-          await clearDecoration(slot);
-          onDone();
-        })
-      }
-    >
-      {pending ? '…' : t('gif.remove')}
-    </button>
+    <>
+      <button
+        type="button"
+        className={styles.remove}
+        disabled={pending}
+        aria-busy={pending}
+        onClick={() =>
+          startTransition(async () => {
+            setError(null);
+            const result = await clearDecoration(slot);
+            if (result.error) setError(errorText(result.error) ?? null);
+            else onDone();
+          })
+        }
+      >
+        {pending ? '…' : t('gif.remove')}
+      </button>
+      {error && (
+        <p role="alert" className={styles.error}>
+          {error}
+        </p>
+      )}
+    </>
   );
 }
 
@@ -132,7 +152,9 @@ function Search({
   onPick: (gif: GifChoice) => void;
 }) {
   const t = useT();
+  const errorText = useErrorText();
   const [query, setQuery] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [gifs, setGifs] = useState<GifChoice[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'unconfigured' | 'failed'>(
     'loading',
@@ -170,17 +192,29 @@ function Search({
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {status === 'unconfigured' && (
-        <p className={styles.notice}>
-          La recherche de GIFs n’est pas encore configurée sur ce serveur.
+      {/*
+        The search is debounced and asynchronous, so without a live region a
+        screen reader user typed a query and heard nothing at all — not
+        "searching", not "failed", not how many results arrived.
+      */}
+      <div role="status" aria-live="polite" aria-atomic="true">
+        {status === 'unconfigured' && (
+          <p className={styles.notice}>{t('gif.unconfigured')}</p>
+        )}
+        {status === 'failed' && <p className={styles.notice}>{t('gif.failed')}</p>}
+        {status === 'loading' && (
+          <p className={styles.notice}>{t('action.searching')}</p>
+        )}
+        {status === 'idle' && gifs.length > 0 && (
+          <p className="srOnly">{t('gif.resultCount', { count: gifs.length })}</p>
+        )}
+      </div>
+
+      {error && (
+        <p role="alert" className={styles.error}>
+          {error}
         </p>
       )}
-      {status === 'failed' && (
-        <p className={styles.notice}>
-          La recherche n’a pas répondu. Réessayez dans un instant.
-        </p>
-      )}
-      {status === 'loading' && <p className={styles.notice}>{t('action.searching')}</p>}
 
       {gifs.length > 0 && (
         <ul className={styles.grid}>
@@ -190,10 +224,24 @@ function Search({
                 type="button"
                 className={styles.gifButton}
                 disabled={pending}
+                /*
+                  The button's only content is the image, and Giphy titles are
+                  often null — which left alt="" and a button with no
+                  accessible name at all, announced as bare "button" across a
+                  whole grid. The name lives here now and the image is
+                  decorative.
+                */
+                aria-label={
+                  gif.title
+                    ? t('gif.chooseNamed', { title: gif.title })
+                    : t('gif.choose')
+                }
                 onClick={() =>
                   startTransition(async () => {
+                    setError(null);
                     const result = await setDecoration(slot, gif);
-                    if (!result.error) onPick(gif);
+                    if (result.error) setError(errorText(result.error) ?? null);
+                    else onPick(gif);
                   })
                 }
               >
@@ -205,7 +253,7 @@ function Search({
                   blind. This rendition is a few tens of kilobytes, so the
                   whole grid costs about what one full-size GIF would.
                 */}
-                <img src={gif.previewUrl} alt={gif.title ?? ''} loading="lazy" />
+                <img src={gif.previewUrl} alt="" loading="lazy" />
               </button>
             </li>
           ))}
