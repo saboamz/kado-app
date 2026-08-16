@@ -145,8 +145,11 @@ test('notifications arrive and can be cleared', async ({ page }) => {
 
   await page.goto('/notifications');
   await expect(page.getByText(/souhaite devenir votre ami/)).toBeVisible();
-  await expect(page.getByLabel('Non lue')).toHaveCount(1);
+  // "Non lue" is visually-hidden text beside the dot, not an aria-label on
+  // it: a label on a bare span with no role is not reliably announced, so the
+  // unread state used to rest on colour alone.
+  await expect(page.getByText('Non lue', { exact: true })).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Tout marquer comme lu' }).click();
-  await expect(page.getByLabel('Non lue')).toHaveCount(0);
+  await expect(page.getByText('Non lue', { exact: true })).toHaveCount(0);
 });
