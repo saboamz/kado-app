@@ -18,13 +18,25 @@
   color: inherit;
   transition:
     border-color 0.16s ease,
-    background 0.16s ease;
+    background 0.16s ease,
+    transform 0.12s ease;
 }
 
 a.card:hover,
 button.card:hover {
   border-color: var(--ink3);
   text-decoration: none;
+}
+
+/*
+ * A card is the primary way to navigate — a list, a gift, a person. It is a
+ * large surface, so it takes the smallest scale of the three: enough to
+ * register as pressed, not enough to shift the text under the finger.
+ */
+a.card:active,
+button.card:active {
+  transform: scale(0.985);
+  background: var(--card2);
 }
 
 .cardPlain {

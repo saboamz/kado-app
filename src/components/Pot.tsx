@@ -29,6 +29,18 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
+  /*
+   * Which action is running, not merely that one is.
+   *
+   * useTransition reports a single flag for every transition started from it,
+   * so contributing used to grey out "J'ai acheté" and "Retirer" as well, and
+   * relabel a button that had nothing to do with the click. Every control
+   * still disables while anything is in flight — one at a time is the rule —
+   * but only the one that was pressed says so.
+   */
+  const [running, setRunning] = useState<
+    null | 'contribute' | 'withdraw' | 'declare' | 'undo'
+  >(null);
 
   const target = pot.targetCents;
   const remaining = target ? Math.max(0, target - pot.raisedCents) : null;
@@ -37,12 +49,17 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
     : 0;
   const complete = remaining !== null && remaining === 0;
 
-  function run(action: () => Promise<{ error?: string }>) {
+  function run(
+    which: 'contribute' | 'withdraw' | 'declare' | 'undo',
+    action: () => Promise<{ error?: string }>,
+  ) {
     setError(null);
+    setRunning(which);
     startTransition(async () => {
       const result = await action();
       if (result.error) setError(result.error);
       else setAmount('');
+      setRunning(null);
     });
   }
 
@@ -168,14 +185,10 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
                 type="button"
                 className={styles.undo}
                 disabled={pending}
-                onClick={() =>
-                  startTransition(async () => {
-                    const result = await undoPurchase(giftId);
-                    if (result.error) setError(result.error);
-                  })
-                }
+                aria-busy={running === 'undo'}
+                onClick={() => run('undo', () => undoPurchase(giftId))}
               >
-                {pending ? t('pot.undoing') : t('pot.undo')}
+                {running === 'undo' ? t('pot.undoing') : t('pot.undo')}
               </button>
               <p className={styles.purchaseNote}>{t('pot.reopenNote')}</p>
             </>
@@ -208,6 +221,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
             type="button"
             className={styles.declare}
             disabled={pending}
+            aria-busy={running === 'declare'}
             onClick={() => {
               /*
                * Asked before, not explained after.
@@ -230,13 +244,10 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
                   : t('pot.confirmFull');
               if (!confirm(message)) return;
 
-              startTransition(async () => {
-                const result = await declarePurchase(giftId);
-                if (result.error) setError(result.error);
-              });
+              run('declare', () => declarePurchase(giftId));
             }}
           >
-            {pending ? t('pot.declaring') : t('pot.iBought')}
+            {running === 'declare' ? t('pot.declaring') : t('pot.iBought')}
           </button>
           <p className={styles.purchaseNote}>{t('pot.buyerHintNew')}</p>
         </div>
@@ -269,6 +280,7 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
                 key={value}
                 type="button"
                 className={styles.quickButton}
+                aria-pressed={amount === String(value)}
                 onClick={() => setAmount(String(value))}
               >
                 {value} €
@@ -290,10 +302,12 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
             />
             <Button
               disabled={pending || !amount}
-              aria-busy={pending}
-              onClick={() => run(() => contribute(giftId, amount))}
+              aria-busy={running === 'contribute'}
+              onClick={() => run('contribute', () => contribute(giftId, amount))}
             >
-              {pending ? t('chat.sending') : t('pot.contribute')}
+              {running === 'contribute'
+                ? t('pot.contributing')
+                : t('pot.contribute')}
             </Button>
           </div>
         </>
@@ -308,9 +322,10 @@ export function Pot({ giftId, pot }: { giftId: string; pot: PotView }) {
           type="button"
           className={styles.withdraw}
           disabled={pending}
-          onClick={() => run(() => withdrawContribution(giftId))}
+          aria-busy={running === 'withdraw'}
+          onClick={() => run('withdraw', () => withdrawContribution(giftId))}
         >
-          Retirer ma participation
+          {running === 'withdraw' ? t('pot.withdrawing') : t('pot.withdraw')}
         </button>
       )}
 

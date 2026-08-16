@@ -109,9 +109,16 @@
   background: var(--acc-bg);
 }
 
+/*
+ * A small, destructive control packed next to message text — the worst place
+ * for a 32px target. The box grows to 44px and the type stays at 11.5px, so
+ * it is no louder than before and much harder to hit by accident.
+ */
 .delete {
   align-self: flex-start;
-  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 11.5px;
   color: var(--ink3);
   text-decoration: underline;

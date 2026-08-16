@@ -23,11 +23,24 @@
   transition:
     background 0.16s ease,
     border-color 0.16s ease,
-    opacity 0.16s ease;
+    opacity 0.16s ease,
+    transform 0.1s ease;
 }
 
 .button:hover {
   text-decoration: none;
+}
+
+/*
+ * The press, acknowledged on touch-down rather than on the server's reply.
+ *
+ * On a phone there is no hover, so between the finger landing and the page
+ * changing there was previously no feedback at all — the gap that makes an
+ * app feel like a web page. The scale is small on purpose: it should read as
+ * the control yielding, not as an animation.
+ */
+.button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .button:disabled {
@@ -86,6 +99,17 @@
   width: 100%;
   min-height: 52px;
   font-size: 15px;
+}
+
+/*
+ * Less scale, not more.
+ *
+ * What the eye reads is the distance an edge travels, not the ratio. At full
+ * width 0.97 moves the sides by several pixels and looks like a glitch, so a
+ * wider button takes a smaller factor to yield by the same amount.
+ */
+.block:active:not(:disabled) {
+  transform: scale(0.985);
 }
 
 .field {
