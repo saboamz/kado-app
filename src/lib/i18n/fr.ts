@@ -14,6 +14,7 @@ import type { Plural } from './t';
 export const fr = {
   // ── Navigation and chrome ────────────────────────────────────────────────
   'nav.main': 'Navigation principale',
+  'nav.skip': 'Aller au contenu',
   'nav.home': 'Accueil',
   'nav.lists': 'Mes listes',
   'nav.search': 'Rechercher',
@@ -122,6 +123,9 @@ export const fr = {
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
+  'notifications.markAll': 'Tout marquer comme lu',
+  'notifications.markingAll': 'Marquage…',
+  'notifications.markAllFailed': 'Le marquage n’a pas abouti. Réessayez.',
   'notifications.emptyTitle': 'Rien de neuf',
   'notifications.emptyBody':
     'Les anniversaires, nouvelles listes et demandes d’amis apparaîtront ici.',
@@ -194,6 +198,7 @@ export const fr = {
   'action.signingIn': 'Connexion…',
   'action.copied': 'Copié',
   'action.searching': 'Recherche…',
+  'action.loading': 'Chargement…',
   'action.nothingYet': 'Rien pour l’instant',
 
   // ── Reserving and pots ───────────────────────────────────────────────────
@@ -325,6 +330,9 @@ export const fr = {
   'auth.signupLede': 'Vos listes, vos amis, et des surprises qui le restent vraiment.',
 
   'pot.contribute': 'Participer',
+  'pot.contributing': 'Envoi…',
+  'pot.withdraw': 'Retirer ma participation',
+  'pot.withdrawing': 'Retrait…',
 
   'gift.estimatedPrice': '~{price}',
   'gift.estimatedNote': 'Prix relevé sur la boutique, à titre indicatif — {name} ne l’a pas renseigné.',
@@ -486,9 +494,19 @@ export const fr = {
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',
+  'invite.rotating': 'Un instant…',
   'upload.tooLarge': 'Cette image dépasse 4 Mo.',
   'search.placeholder': 'Nom ou adresse e-mail',
   'gif.placeholder': 'Chercher : chat, merci, anniversaire…',
+  'gif.choose': 'Choisir ce GIF',
+  'gif.chooseNamed': 'Choisir le GIF : {title}',
+  'gif.unconfigured':
+    'La recherche de GIFs n’est pas encore configurée sur ce serveur.',
+  'gif.failed': 'La recherche n’a pas répondu. Réessayez dans un instant.',
+  'gif.resultCount': {
+    one: '{count} GIF trouvé',
+    other: '{count} GIFs trouvés',
+  },
   'account.confirmDelete':
     'Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.',
 

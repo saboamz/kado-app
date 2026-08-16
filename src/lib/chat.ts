@@ -56,11 +56,28 @@ export async function getChatForViewer(
   }));
 }
 
-/** How many messages a friend would see. Zero for anybody else. */
+/**
+ * How many messages a friend would see. Zero for anybody else.
+ *
+ * The permission check is repeated rather than delegated to
+ * getChatForViewer, which used to load 200 message rows and their author
+ * joins only to read `.length`. The gate is the same three lines and the same
+ * order — resolve the owner, refuse anybody who is not a friend, and only
+ * then touch the table — so the secret is kept by the same rule, without
+ * fetching the bodies nobody asked for.
+ */
 export async function countChatForViewer(
   giftId: string,
   viewerId: string,
 ): Promise<number> {
-  const messages = await getChatForViewer(giftId, viewerId);
-  return messages?.length ?? 0;
+  const gift = await db.gift.findUnique({
+    where: { id: giftId },
+    select: { list: { select: { ownerId: true, visibility: true } } },
+  });
+  if (!gift) return 0;
+
+  const relation = await relationTo(viewerId, gift.list.ownerId);
+  if (relation !== 'friend') return 0;
+
+  return db.chatMessage.count({ where: { giftId } });
 }

@@ -16,6 +16,7 @@ import type { Dictionary } from './t';
 export const en: Dictionary = {
   // ── Navigation and chrome ────────────────────────────────────────────────
   'nav.main': 'Main navigation',
+  'nav.skip': 'Skip to content',
   'nav.home': 'Home',
   'nav.lists': 'My lists',
   'nav.search': 'Search',
@@ -121,6 +122,9 @@ export const en: Dictionary = {
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
+  'notifications.markAll': 'Mark all as read',
+  'notifications.markingAll': 'Marking…',
+  'notifications.markAllFailed': 'Could not mark them read. Try again.',
   'notifications.emptyTitle': 'Nothing new',
   'notifications.emptyBody': 'Birthdays, new lists and friend requests will show up here.',
   'notifications.unread': 'Unread',
@@ -192,6 +196,7 @@ export const en: Dictionary = {
   'action.signingIn': 'Signing in…',
   'action.copied': 'Copied',
   'action.searching': 'Searching…',
+  'action.loading': 'Loading…',
   'action.nothingYet': 'Nothing yet',
 
   // ── Reserving and pots ───────────────────────────────────────────────────
@@ -319,6 +324,9 @@ export const en: Dictionary = {
   'auth.signupLede': 'Your lists, your friends, and surprises that stay surprises.',
 
   'pot.contribute': 'Chip in',
+  'pot.contributing': 'Sending…',
+  'pot.withdraw': 'Withdraw my contribution',
+  'pot.withdrawing': 'Withdrawing…',
 
   'gift.estimatedPrice': '~{price}',
   'gift.estimatedNote': 'Price read from the shop, as a guide — {name} did not give one.',
@@ -480,9 +488,18 @@ export const en: Dictionary = {
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',
+  'invite.rotating': 'One moment…',
   'upload.tooLarge': 'This image is larger than 4 MB.',
   'search.placeholder': 'Name or email address',
   'gif.placeholder': 'Search: cat, thanks, birthday…',
+  'gif.choose': 'Choose this GIF',
+  'gif.chooseNamed': 'Choose the GIF: {title}',
+  'gif.unconfigured': 'GIF search is not configured on this server yet.',
+  'gif.failed': 'The search did not respond. Try again in a moment.',
+  'gif.resultCount': {
+    one: '{count} GIF found',
+    other: '{count} GIFs found',
+  },
   'account.confirmDelete':
     'Permanently delete your account and all your data? This cannot be undone.',
 
