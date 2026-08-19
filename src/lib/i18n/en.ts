@@ -89,7 +89,7 @@ export const en: Dictionary = {
   'lists.title': 'My lists',
   'lists.subtitle': 'What you would like to receive, sorted by occasion.',
   'lists.emptyBody':
-    'Create a list — a birthday, Christmas, or simply what you feel like right now.',
+    'Create a list — a birthday, or simply what you feel like right now.',
   'lists.newList': 'New list',
   'lists.emptyListTitle': 'This list is empty',
   'lists.emptyListBody': 'Add what would make you happy.',
@@ -179,7 +179,7 @@ export const en: Dictionary = {
   'form.details': 'Details',
   'form.detailsPlaceholder': 'Size, colour, exact model…',
   'form.listName': 'List name',
-  'form.listNamePlaceholder': 'Birthday, Christmas, Wedding…',
+  'form.listNamePlaceholder': 'Birthday, Wedding…',
   'form.occasion': 'Occasion',
   'form.avatar': 'Profile photo',
   'form.about': 'About',
@@ -225,7 +225,7 @@ export const en: Dictionary = {
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Add a wish: a link, a price, or simply an idea.',
   'lists.newTitle': 'New list',
-  'lists.newSubtitle': 'One list per occasion: a birthday, Christmas, or what you fancy now.',
+  'lists.newSubtitle': 'One list per occasion: a birthday, or what you fancy now.',
   'lists.create': 'Create the list',
   'lists.editTitle': 'Edit the list',
   'lists.deleteList': 'Delete this list',

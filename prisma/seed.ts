@@ -49,7 +49,7 @@ async function main() {
       passwordHash,
       name: 'Thomas Bel',
       bio: 'Vélo, cuisine et vieux synthés.',
-      interests: { create: [{ label: 'Vélo' }, { label: 'Musique' }] },
+      interests: { create: [{ label: 'Vélo' }, { label: 'Cuisine' }] },
     },
   });
 
@@ -170,7 +170,7 @@ async function main() {
 
   // An empty list, so the empty state is reachable without faking it.
   await db.giftList.create({
-    data: { name: 'Noël', occasion: 'Noël', ownerId: sophie.id },
+    data: { name: 'Crémaillère', occasion: 'Crémaillère', ownerId: sophie.id },
   });
 
   await db.giftList.create({

@@ -127,7 +127,7 @@ const PRODUCTS: Record<string, { title: string; brand: string; cents: number }[]
 };
 
 const INTERESTS = [
-  'Café', 'Céramique', 'Randonnée', 'Design', 'Vélo', 'Musique', 'Jardinage',
+  'Café', 'Céramique', 'Randonnée', 'Design', 'Vélo', 'Jardinage',
   'Lecture', 'Cuisine', 'Voyage', 'Photographie', 'Yoga', 'Escalade', 'Thé',
   'Mode', 'Méditation', 'Bijoux', 'Cinéma',
 ];
@@ -143,7 +143,7 @@ const COLORS = ['#FF6A55', '#6C5CE7', '#00B894', '#FDCB6E', '#0984E3', '#E17055'
 
 const EVENT_LABELS = ['Anniversaire', 'Mariage', 'Crémaillère', 'Remise de diplôme'];
 
-const OCCASIONS = ['Anniversaire', 'Noël', 'Crémaillère', 'Liste de naissance', null];
+const OCCASIONS = ['Anniversaire', 'Crémaillère', 'Liste de naissance', null];
 
 /** Free-text wishes with no product behind them. Invisible to the CF. */
 const FREE_WISHES = [
@@ -279,7 +279,7 @@ async function main() {
       const list = await db.giftList.create({
         data: {
           ownerId: user.id,
-          name: l === 0 ? 'Mes envies' : pick(['Anniversaire', 'Noël', 'Cadeaux utiles']),
+          name: l === 0 ? 'Mes envies' : pick(['Anniversaire', 'Cadeaux utiles']),
           occasion: pick(OCCASIONS),
           visibility: rnd() < 0.85 ? 'FRIENDS' : 'PUBLIC',
           isDefault: l === 0,

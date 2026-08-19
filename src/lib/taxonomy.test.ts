@@ -56,7 +56,6 @@ describe('categoriesForInterest', () => {
     ['Randonnée', 'Sport'],
     ['Lecture', 'Culture'],
     ['Vélo', 'Sport'],
-    ['Musique', 'Musique'],
     // Jardinage used to fall into Maison for want of anywhere better; the
     // enriched list gives it its own bucket.
     ['Jardinage', 'Jardin'],
@@ -89,7 +88,7 @@ describe('categoriesForInterest', () => {
     // A typo in the table would produce a categoryId no product carries, and
     // the tier would go quietly empty again — the exact failure this replaced.
     const declared = new Set<string>(CATEGORIES);
-    for (const interest of ['Café', 'Vélo', 'Musique', 'Parfum', 'Camping', 'Bijoux']) {
+    for (const interest of ['Café', 'Vélo', 'Parfum', 'Camping', 'Bijoux']) {
       for (const category of categoriesForInterest(interest)) {
         expect(declared.has(category)).toBe(true);
       }

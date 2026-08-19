@@ -135,12 +135,12 @@ describe('distinctOccasion', () => {
     // The duplication this exists to stop: "Anniversaire" printed twice, one
     // line under the other, on both the list index and the list detail.
     expect(distinctOccasion('Anniversaire', 'Anniversaire')).toBeNull();
-    expect(distinctOccasion('Noël', 'noël')).toBeNull();
-    expect(distinctOccasion('Noël ', ' Noël')).toBeNull();
+    expect(distinctOccasion('Crémaillère', 'crémaillère')).toBeNull();
+    expect(distinctOccasion('Crémaillère ', ' Crémaillère')).toBeNull();
   });
 
   it('keeps an occasion that adds something', () => {
-    expect(distinctOccasion('Mes envies', 'Noël')).toBe('Noël');
+    expect(distinctOccasion('Mes envies', 'Mariage')).toBe('Mariage');
     expect(distinctOccasion('Nouvel appartement', 'Crémaillère')).toBe(
       'Crémaillère',
     );

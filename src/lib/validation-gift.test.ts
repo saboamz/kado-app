@@ -86,7 +86,7 @@ describe('gift validation', () => {
 describe('list validation', () => {
   it('accepts a null occasion, as an unfilled form sends', () => {
     const parsed = listSchema.safeParse({
-      name: 'Noël',
+      name: 'Crémaillère',
       occasion: null,
       visibility: 'FRIENDS',
     });
@@ -95,11 +95,11 @@ describe('list validation', () => {
 
   it('accepts a named list', () => {
     const parsed = listSchema.safeParse({
-      name: '  Noël  ',
+      name: '  Crémaillère  ',
       visibility: 'FRIENDS',
     });
     expect(parsed.success).toBe(true);
-    expect(parsed.success && parsed.data.name).toBe('Noël');
+    expect(parsed.success && parsed.data.name).toBe('Crémaillère');
   });
 
   it('rejects a blank name', () => {

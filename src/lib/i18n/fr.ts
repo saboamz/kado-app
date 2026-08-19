@@ -89,7 +89,7 @@ export const fr = {
   // ── Lists ────────────────────────────────────────────────────────────────
   'lists.title': 'Mes listes',
   'lists.subtitle': 'Ce que vous aimeriez recevoir, rangé par occasion.',
-  'lists.emptyBody': 'Créez une liste — anniversaire, Noël, ou simplement vos envies du moment.',
+  'lists.emptyBody': 'Créez une liste — anniversaire, ou simplement vos envies du moment.',
   'lists.newList': 'Nouvelle liste',
   'lists.emptyListTitle': 'Cette liste est vide',
   'lists.emptyListBody': 'Ajoutez ce qui vous ferait plaisir.',
@@ -181,7 +181,7 @@ export const fr = {
   'form.details': 'Précisions',
   'form.detailsPlaceholder': 'Taille, couleur, modèle exact…',
   'form.listName': 'Nom de la liste',
-  'form.listNamePlaceholder': 'Anniversaire, Noël, Mariage…',
+  'form.listNamePlaceholder': 'Anniversaire, Mariage…',
   'form.occasion': 'Occasion',
   'form.avatar': 'Photo de profil',
   'form.about': 'À propos',
@@ -227,7 +227,7 @@ export const fr = {
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Ajoutez une envie : un lien, un prix, ou simplement une idée.',
   'lists.newTitle': 'Nouvelle liste',
-  'lists.newSubtitle': 'Une liste par occasion : anniversaire, Noël, ou vos envies du moment.',
+  'lists.newSubtitle': 'Une liste par occasion : anniversaire, ou vos envies du moment.',
   'lists.create': 'Créer la liste',
   'lists.editTitle': 'Modifier la liste',
   'lists.deleteList': 'Supprimer cette liste',
