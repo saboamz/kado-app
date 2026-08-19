@@ -149,7 +149,7 @@ export function priorityLabel(priority: number, t: TFunction): string {
 /**
  * The occasion, unless it is just the list's name again.
  *
- * Most lists are named after their occasion — "Anniversaire", "Noël" — and
+ * Most lists are named after their occasion — "Anniversaire", "Mariage" — and
  * printing both rendered the same word twice, one line under the other. It
  * earns its line only when it says something the name does not.
  *

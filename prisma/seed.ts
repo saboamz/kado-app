@@ -169,7 +169,7 @@ async function main() {
 
   // An empty list, so the empty state is reachable without faking it.
   await db.giftList.create({
-    data: { name: 'Noël', occasion: 'Noël', ownerId: sophie.id },
+    data: { name: 'Crémaillère', occasion: 'Crémaillère', ownerId: sophie.id },
   });
 
   await db.giftList.create({
