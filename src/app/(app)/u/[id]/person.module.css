@@ -13,8 +13,18 @@
   text-wrap: pretty;
 }
 
-.birthday {
+/* A person can publish several dates, so this is a list now. */
+.events {
   margin: 5px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.birthday {
+  margin: 0;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--acc);

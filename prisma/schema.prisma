@@ -25,7 +25,6 @@ model User {
   passwordHash  String
   name          String
   bio           String?
-  birthday      DateTime?
   /// An uploaded photo. Absent, the avatar falls back to the person's
   /// initials on a tint derived from their name — see avatarTint() in
   /// format.ts. There is no stored colour: it was removed once nothing
@@ -63,6 +62,7 @@ model User {
   messages         ChatMessage[]
   invites          Invite[]
   decorations      ProfileDecoration[]
+  events           LifeEvent[]
 
   // No @@index([email]): `email @unique` above already creates a B-tree, so a
   // second index on the same column only cost writes and storage.
@@ -115,6 +115,39 @@ enum Visibility {
   FRIENDS
   PUBLIC
 }
+
+/// A date somebody chooses to publish about themselves.
+///
+/// This replaced a single `birthday` column on User. That column decided for
+/// everybody which date mattered and what it was called, and it was the only
+/// one on offer: a person with a wedding, a graduation or nothing at all had
+/// no way to say so. Here the label is theirs to write, so the app carries
+/// the dates people actually want their friends to know, and no others.
+///
+/// `day` and `month` are stored apart from any year on purpose. The year is
+/// the identifying half of a date of birth and nothing in the product needs
+/// it — friends need to know a day is coming, not how old somebody is.
+/// Keeping it out means it cannot leak, and ordering by the next occurrence
+/// stays simple.
+model LifeEvent {
+  id         String     @id @default(cuid())
+  /// What the person calls it. Free text: "Anniversaire", "Mariage",
+  /// "Remise de diplôme" — the app supplies no list and imposes no meaning.
+  label      String
+  /// 1-31. Validated in the action, not by the database, so a bad value
+  /// gives a message in the person's language rather than a 500.
+  day        Int
+  /// 1-12.
+  month      Int
+  visibility Visibility @default(FRIENDS)
+  ownerId    String
+  owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([ownerId])
+}
+
 
 /// A merchant, identified by the domains its product links come from.
 /// Somebody telling us a profile or a wish is not acceptable.
@@ -464,7 +497,7 @@ enum NotificationType {
   FRIEND_ACCEPTED
   NEW_LIST
   NEW_GIFTS
-  BIRTHDAY_SOON
+  EVENT_SOON
   POT_PROGRESS
   CHAT_MESSAGE
 }

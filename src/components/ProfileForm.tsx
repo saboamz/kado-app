@@ -14,7 +14,6 @@ export function ProfileForm({
   initial: {
     name: string;
     bio: string | null;
-    birthday: string;
     avatarUrl: string | null;
     interests: string;
   };
@@ -48,16 +47,6 @@ export function ProfileForm({
         defaultValue={initial.bio ?? ''}
         placeholder={t('form.aboutPlaceholder')}
         error={state.errors?.bio}
-      />
-
-      <Field
-        id="birthday"
-        name="birthday"
-        type="date"
-        label={t('form.birthday')}
-        defaultValue={initial.birthday}
-        hint={t('form.birthdayHint')}
-        error={state.errors?.birthday}
       />
 
       <Field

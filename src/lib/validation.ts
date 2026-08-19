@@ -38,6 +38,32 @@ export function fieldErrors(error: z.ZodError): Record<string, string> {
   return out;
 }
 
+/**
+ * A date somebody publishes about themselves.
+ *
+ * The day is checked against the month so 31 February is refused at the door
+ * rather than silently rolling into March. February takes 29 whatever the
+ * year: an event carries no year, so there is nothing to test a leap against,
+ * and refusing the 29th would lock out everybody born on it.
+ */
+const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+export const eventSchema = z
+  .object({
+    label: z
+      .string()
+      .trim()
+      .min(1, 'error.eventLabelRequired')
+      .max(60, 'error.nameLong'),
+    day: z.coerce.number().int().min(1, 'error.eventDateInvalid').max(31, 'error.eventDateInvalid'),
+    month: z.coerce.number().int().min(1, 'error.eventDateInvalid').max(12, 'error.eventDateInvalid'),
+    visibility: z.enum(['PRIVATE', 'FRIENDS', 'PUBLIC']),
+  })
+  .refine((v) => v.day <= (DAYS_IN_MONTH[v.month - 1] ?? 0), {
+    message: 'error.eventDateInvalid',
+    path: ['day'],
+  });
+
 export const listSchema = z.object({
   name: z
     .string()
@@ -107,3 +133,4 @@ export const giftSchema = z.object({
 
 export type GiftInput = z.infer<typeof giftSchema>;
 export type ListInput = z.infer<typeof listSchema>;
+export type EventInput = z.infer<typeof eventSchema>;

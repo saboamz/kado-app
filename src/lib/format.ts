@@ -71,21 +71,40 @@ export function formatRelative(
 }
 
 /**
- * Days until the next occurrence of a birthday, ignoring the year.
+ * Days until the next occurrence of a day-and-month, ignoring the year.
  * Returns 0 on the day itself.
+ *
+ * Takes the two numbers rather than a Date because that is how an event is
+ * stored: there is no year to carry, and inventing one only to throw it away
+ * is how a 29 February quietly becomes 1 March.
  */
-export function daysUntilBirthday(
-  birthday: Date | string,
+export function daysUntilDate(
+  day: number,
+  month: number,
   from = new Date(),
 ): number {
-  const b = typeof birthday === 'string' ? new Date(birthday) : birthday;
   const today = new Date(from.getFullYear(), from.getMonth(), from.getDate());
-  let next = new Date(today.getFullYear(), b.getMonth(), b.getDate());
-  if (next < today) next = new Date(today.getFullYear() + 1, b.getMonth(), b.getDate());
-  return Math.round((next.getTime() - today.getTime()) / DAY);
+
+  /*
+   * A 29 February in a common year is not a date: new Date(2026, 1, 29)
+   * silently becomes 1 March, which would have this return 0 on 1 March every
+   * year rather than counting to the next real 29th. Rejecting the roll-over
+   * and trying the following year is what finds it.
+   */
+  for (let year = today.getFullYear(); year <= today.getFullYear() + 8; year++) {
+    // month is 1-12 in the database and 0-11 in a Date.
+    const candidate = new Date(year, month - 1, day);
+    if (candidate.getMonth() !== month - 1) continue;
+    if (candidate < today) continue;
+    return Math.round((candidate.getTime() - today.getTime()) / DAY);
+  }
+
+  // Unreachable for any day/month the schema accepts: a leap day is at most
+  // eight years out, and every other date occurs annually.
+  return 0;
 }
 
-export function formatBirthdayCountdown(days: number, t: TFunction): string {
+export function formatDateCountdown(days: number, t: TFunction): string {
   if (days === 0) return t('time.today');
   if (days === 1) return t('time.tomorrow');
   if (days < 31) return t('time.inDays', { count: days });
