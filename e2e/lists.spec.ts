@@ -47,8 +47,12 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   await expect(page.getByRole('heading', { name: listName })).toBeVisible();
   await expect(page.getByText('Cette liste est vide')).toBeVisible();
 
-  // Add a wish.
+  // Add a wish. Wait for the form's own route rather than assuming the click
+  // landed: on mobile the empty state and the header both offer "Ajouter",
+  // and filling a field on a page that has not arrived yet times out on a
+  // locator that is about to exist.
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
+  await page.waitForURL('**/gifts/new');
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(wish);
   await page.getByLabel('Lien').fill('boutique.fr/theiere');
   await page.getByLabel('Prix').fill('42,50');
@@ -58,8 +62,16 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   await expect(page.getByText('42,50 €')).toBeVisible();
 
   // The bare domain became a real link and the shop was derived from it.
+  //
+  // Wait for the gift page before asserting on the merchant link. The card on
+  // the list page carries the shop name in its own accessible name, so
+  // /boutique\.fr/ matches the card too — and while the navigation is still in
+  // flight it matches it first, then fails on the card's own /gifts/… href.
   await page.getByText(wish).click();
-  await expect(page.getByText('boutique.fr', { exact: false })).toBeVisible();
+  await page.waitForURL(/\/gifts\/[a-z0-9]+$/);
+  // Exact match: the card shows the shop name and the full URL, and both
+  // contain "boutique.fr", so a substring match resolves to two elements.
+  await expect(page.getByText('boutique.fr', { exact: true })).toBeVisible();
   await expect(
     page.getByRole('link', { name: /boutique\.fr/ }),
   ).toHaveAttribute('href', 'https://boutique.fr/theiere');

@@ -58,7 +58,14 @@ test('a friend request can be sent, accepted, and unlocks the lists', async ({
   await signIn(page, scenario.ownerEmail);
   await page.goto('/friends');
   await expect(page.getByText(/Demandes reçues/)).toBeVisible();
+  // The Accepter button going away is the signal that the action landed and
+  // the page revalidated. Asserting the new count straight after the click
+  // raced that round trip and read the stale "Amis (2)".
+  //
+  // Not "Demandes reçues" disappearing: the seed leaves other pending
+  // requests on this account, so that heading can legitimately stay.
   await page.getByRole('button', { name: 'Accepter' }).click();
+  await expect(page.getByRole('button', { name: 'Accepter' })).toHaveCount(0);
   // The fixture owner already has two friends, so this makes three.
   await expect(page.getByText(/^Amis \(3\)$/)).toBeVisible();
 
