@@ -46,7 +46,7 @@ async function main() {
       name: 'Thomas Bel',
       bio: 'Vélo, cuisine et vieux synthés.',
       birthday: daysFromNow(24),
-      interests: { create: [{ label: 'Vélo' }, { label: 'Musique' }] },
+      interests: { create: [{ label: 'Vélo' }, { label: 'Cuisine' }] },
     },
   });
 

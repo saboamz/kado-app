@@ -127,7 +127,7 @@ const PRODUCTS: Record<string, { title: string; brand: string; cents: number }[]
 };
 
 const INTERESTS = [
-  'Café', 'Céramique', 'Randonnée', 'Design', 'Vélo', 'Musique', 'Jardinage',
+  'Café', 'Céramique', 'Randonnée', 'Design', 'Vélo', 'Jardinage',
   'Lecture', 'Cuisine', 'Voyage', 'Photographie', 'Yoga', 'Escalade', 'Thé',
   'Mode', 'Méditation', 'Bijoux', 'Cinéma',
 ];
