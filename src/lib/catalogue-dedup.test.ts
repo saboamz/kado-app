@@ -21,7 +21,7 @@ const BASE = 'https://www.merchant.fr/p/theiere-fonte-1l';
 const PAIRS: Pair[] = [
   // ---- must merge -------------------------------------------------------
   { why: 'utm_source', same: true, a: BASE, b: `${BASE}?utm_source=newsletter` },
-  { why: 'utm family, several', same: true, a: BASE, b: `${BASE}?utm_medium=cpc&utm_campaign=noel&utm_content=a1` },
+  { why: 'utm family, several', same: true, a: BASE, b: `${BASE}?utm_medium=cpc&utm_campaign=promo&utm_content=a1` },
   { why: 'gclid', same: true, a: BASE, b: `${BASE}?gclid=Cj0KCQiA` },
   { why: 'fbclid', same: true, a: BASE, b: `${BASE}?fbclid=IwAR0abc` },
   { why: 'mc_cid (Mailchimp)', same: true, a: BASE, b: `${BASE}?mc_cid=12ab&mc_eid=34cd` },

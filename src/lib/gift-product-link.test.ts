@@ -131,7 +131,7 @@ describe('the category comes from the person who made the wish', () => {
       currency: 'EUR',
       extractedBy: 'json-ld',
       sourceUrl: 'https://merchant-cat-test.fr/p/casque',
-      categoryId: 'Musique',
+      categoryId: 'Culture',
     });
 
     expect(second?.id).toBe(first?.id);
