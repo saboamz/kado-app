@@ -34,6 +34,7 @@ export default async function AppLayout({
       user={{ name: user.name, avatarUrl: profile?.avatarUrl ?? null }}
       labels={{
         main: t('nav.main'),
+        skip: t('nav.skip'),
         home: t('nav.home'),
         lists: t('nav.lists'),
         search: t('nav.search'),

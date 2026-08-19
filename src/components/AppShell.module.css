@@ -17,6 +17,35 @@
   background: var(--canvas);
 }
 
+/*
+ * Off-screen until focused, then a real, visible control at the top-left.
+ * Not display:none — a hidden element cannot receive focus, which would make
+ * the link useless to exactly the people it exists for.
+ */
+.skip {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+}
+
+.skip:focus {
+  left: 8px;
+  top: 8px;
+  padding: 11px 15px;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* The target takes focus programmatically; it should not draw a ring for it. */
+.main:focus {
+  outline: none;
+}
+
 .body {
   display: flex;
   flex-direction: column;
@@ -54,7 +83,18 @@
   text-decoration: none;
   transition:
     color 0.16s ease,
-    background 0.16s ease;
+    background 0.16s ease,
+    transform 0.12s ease;
+}
+
+/*
+ * The most-pressed element in the product, and the one that most needs to
+ * answer instantly: a route change takes as long as it takes, but the tab
+ * has to acknowledge the finger before then.
+ */
+.navItem:active {
+  transform: scale(0.92);
+  background: var(--line2);
 }
 
 /*

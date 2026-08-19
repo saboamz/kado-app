@@ -64,7 +64,8 @@ model User {
   invites          Invite[]
   decorations      ProfileDecoration[]
 
-  @@index([email])
+  // No @@index([email]): `email @unique` above already creates a B-tree, so a
+  // second index on the same column only cost writes and storage.
 }
 
 enum Theme {
@@ -310,6 +311,10 @@ model Reservation {
   createdAt  DateTime @default(now())
 
   @@index([reserverId])
+  /// Declared in the add_pot_purchase migration but never in this schema, so
+  /// every subsequent `migrate dev` proposed dropping it. Written down here
+  /// so the schema matches the database rather than silently undoing it.
+  @@index([purchasedById])
 }
 
 /// Money a friend put toward a collaborative gift. Same secrecy rule.
@@ -449,6 +454,9 @@ model Notification {
   createdAt DateTime         @default(now())
 
   @@index([userId, read])
+  /// The notifications page filters on userId and sorts by createdAt; the
+  /// index above cannot serve that sort, so Postgres was sorting in memory.
+  @@index([userId, createdAt])
 }
 
 enum NotificationType {
