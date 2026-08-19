@@ -40,11 +40,13 @@ test('a date can be published and then removed', async ({ page }) => {
   await expect(page.getByText(label)).toBeVisible();
 
   // Scoped to the row that carries the new label, so it cannot remove another.
-  await page
-    .locator('li')
-    .filter({ hasText: label })
-    .getByRole('button', { name: 'Retirer' })
-    .click();
+  const row = page.locator('li').filter({ hasText: label });
+  await row.getByRole('button', { name: 'Retirer' }).click();
+
+  // Wait for the row itself to go, not for the text: the assertion used to
+  // race the revalidation and read the label still on screen. Waiting on the
+  // element that the action removes is the signal that it landed.
+  await expect(row).toHaveCount(0);
   await expect(page.getByText(label)).toHaveCount(0);
 });
 
