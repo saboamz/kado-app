@@ -68,7 +68,6 @@ const INTEREST_TO_CATEGORIES: Record<string, Category[]> = {
   thé: ['Gourmandise', 'Maison'],
   cuisine: ['Maison', 'Gourmandise'],
   pâtisserie: ['Gourmandise', 'Maison'],
-  vin: ['Gourmandise'],
   céramique: ['Maison'],
   poterie: ['Maison'],
   design: ['Maison', 'Mode'],
