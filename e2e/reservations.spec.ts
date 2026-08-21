@@ -141,7 +141,7 @@ test('a stranger cannot reserve from a list they cannot see', async ({
   try {
     await signIn(page, outsider.ownerEmail);
     await page.goto(`/gifts/${scenario.freeGiftId}`);
-    await expect(page.getByText('404')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible();
   } finally {
     await destroyScenario(outsider);
   }
