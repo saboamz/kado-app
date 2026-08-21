@@ -7,6 +7,20 @@ import {
   type Scenario,
 } from './fixtures';
 
+/*
+ * KNOWN: "a full list lifecycle" still fails roughly one run in three.
+ *
+ * The waits below are correct and were worth adding — a click followed
+ * straight by a fill times out on the field, which reads as a slow form when
+ * the truth is a navigation that never started. With them the failure at
+ * least names the right step.
+ *
+ * It is not fixed. waitForURL itself times out, so the click genuinely does
+ * not navigate sometimes. `waitUntil: 'networkidle'` before the click was
+ * tried and changed nothing, so a pre-hydration click is not the whole story
+ * either. The next step is a full Playwright trace of a failing run.
+ */
+
 /** Specs that add or remove wishes work on their own list, never the seed's. */
 let scenario: Scenario;
 
@@ -40,6 +54,10 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   // Create.
   await page.goto('/lists');
   await page.getByRole('link', { name: /Nouvelle liste/ }).click();
+  // Wait for the route, not for the field. Filling a form on a page still in
+  // flight times out on a locator that is about to exist, which reads as a
+  // slow form rather than as the navigation it actually is.
+  await page.waitForURL('**/lists/new');
   await page.getByLabel('Nom de la liste').fill(listName);
   await page.getByLabel('Occasion').fill('Pour tester');
   await page.getByRole('button', { name: 'Créer la liste' }).click();
@@ -78,6 +96,7 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
 
   // Edit the wish.
   await page.getByRole('link', { name: 'Modifier' }).click();
+  await page.waitForURL(/\/gifts\/[a-z0-9]+\/edit$/);
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(`${wish} en fonte`);
   await page.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(
@@ -102,6 +121,7 @@ test('a wish needs only a name', async ({ page }) => {
   await signIn(page, scenario.ownerEmail);
   await page.goto(`/lists/${scenario.listId}`);
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
+  await page.waitForURL('**/gifts/new');
 
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Une idée libre');
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
@@ -129,6 +149,7 @@ test('an unreadable price is reported rather than silently dropped', async ({
   await signIn(page, scenario.ownerEmail);
   await page.goto(`/lists/${scenario.listId}`);
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
+  await page.waitForURL('**/gifts/new');
 
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Prix douteux');
   await page.getByLabel('Prix').fill('beaucoup');
