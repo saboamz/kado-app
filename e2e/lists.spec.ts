@@ -150,7 +150,7 @@ test('a friend can read a list but not shape it', async ({ page }) => {
 
   // …and the route itself refuses, so hiding the button is not the defence.
   await page.goto(`${listUrl}/edit`);
-  await expect(page.getByText('404')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '404' })).toBeVisible();
 });
 
 test('a stranger cannot see a friends-only list at all', async ({ page }) => {
