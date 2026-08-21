@@ -24,10 +24,6 @@ const profileSchema = z.object({
     .min(1, 'error.nameRequired')
     .max(80, 'error.nameLong'),
   bio: optionalText(280),
-  birthday: optionalText(10).refine(
-    (v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v),
-    'Date invalide.',
-  ),
   interests: optionalText(200),
 });
 
@@ -40,12 +36,11 @@ export async function updateProfile(
   const parsed = profileSchema.safeParse({
     name: formData.get('name'),
     bio: formData.get('bio'),
-    birthday: formData.get('birthday'),
     interests: formData.get('interests'),
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
 
-  const { name, bio, birthday, interests } = parsed.data;
+  const { name, bio, interests } = parsed.data;
 
   const current = await db.user.findUniqueOrThrow({
     where: { id: user.id },
@@ -83,7 +78,6 @@ export async function updateProfile(
       data: {
         name,
         bio: bio || null,
-        birthday: birthday ? new Date(`${birthday}T00:00:00Z`) : null,
         ...(avatarUrl !== undefined ? { avatarUrl } : {}),
       },
     }),

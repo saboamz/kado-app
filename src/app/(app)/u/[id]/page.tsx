@@ -15,10 +15,10 @@ import { ViewpointBanner } from '@/components/Viewpoint';
 import { ReportButton } from '@/components/ReportButton';
 import { db } from '@/lib/db';
 import {
-  daysUntilBirthday,
-  formatBirthdayCountdown,
+  formatDateCountdown,
 } from '@/lib/format';
 import { getListsForViewer } from '@/lib/gifts';
+import { eventsForViewer } from '@/lib/life-events';
 import { relationTo } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
 import { getT } from '@/lib/i18n/server';
@@ -66,7 +66,8 @@ export default async function PersonPage({
     notFound();
   }
 
-  const days = person.birthday ? daysUntilBirthday(person.birthday) : null;
+  // Only what this viewer is allowed to read — see eventsForViewer.
+  const events = await eventsForViewer(person.id, relation);
   // Keyed by slot, so each place on the page asks for its own.
   const decor = Object.fromEntries(person.decorations.map((d) => [d.slot, d]));
 
@@ -89,10 +90,14 @@ export default async function PersonPage({
         />
         <div>
           {person.bio && <p className={styles.bio}>{person.bio}</p>}
-          {days !== null && (
-            <p className={styles.birthday}>
-              Anniversaire {formatBirthdayCountdown(days, t)}
-            </p>
+          {events.length > 0 && (
+            <ul className={styles.events}>
+              {events.map((e) => (
+                <li key={e.id} className={styles.birthday}>
+                  {e.label} {formatDateCountdown(e.days, t)}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>

@@ -148,14 +148,10 @@ describe('the getting-started checklist', () => {
     expect((await stepsFor(user.id))[1]!.done).toBe(false);
   });
 
-  it('wants a birthday AND an interest before the profile counts as done', async () => {
-    // Both, because both are what somebody hunting for a present reads. A
-    // birthday alone tells them when, not what.
+  it('wants an interest before the profile counts as done', async () => {
+    // Interests are what somebody hunting for a present reads. A published
+    // date is a choice, so the step cannot wait on one.
     const user = await newcomer();
-    await db.user.update({
-      where: { id: user.id },
-      data: { birthday: new Date('1990-05-04') },
-    });
 
     expect((await stepsFor(user.id))[2]!.done).toBe(false);
 
@@ -171,10 +167,6 @@ describe('the getting-started checklist', () => {
 
     await makeGift(list.id);
     await makeFriends(user.id, friend.id);
-    await db.user.update({
-      where: { id: user.id },
-      data: { birthday: new Date('1988-01-01') },
-    });
     await db.interest.create({ data: { userId: user.id, label: 'Cuisine' } });
     await db.profileDecoration.create({
       data: {

@@ -2,9 +2,9 @@ import { en } from './i18n/en';
 import { fr } from './i18n/fr';
 import { translator } from './i18n/t';
 import {
-  daysUntilBirthday,
+  daysUntilDate,
   distinctOccasion,
-  formatBirthdayCountdown,
+  formatDateCountdown,
   formatMoney,
   initials,
   parseMoney,
@@ -53,24 +53,30 @@ describe('parseMoney', () => {
   );
 });
 
-describe('daysUntilBirthday', () => {
+describe('daysUntilDate', () => {
   const from = new Date(2026, 2, 1); // 1 March 2026
 
   it('counts forward within the same year', () => {
-    expect(daysUntilBirthday(new Date(1990, 2, 14), from)).toBe(13);
+    expect(daysUntilDate(14, 3, from)).toBe(13);
   });
 
   it('returns zero on the day itself', () => {
-    expect(daysUntilBirthday(new Date(1990, 2, 1), from)).toBe(0);
+    expect(daysUntilDate(1, 3, from)).toBe(0);
   });
 
   it('rolls over to next year for a date already past', () => {
     // 1 February is behind us, so the next one is eleven months away.
-    expect(daysUntilBirthday(new Date(1990, 1, 1), from)).toBe(337);
+    expect(daysUntilDate(1, 2, from)).toBe(337);
+  });
+
+  it('carries 29 February to the next leap year', () => {
+    // The event has no year to be a leap of, so the next real 29 February is
+    // what it means: 2028 from here.
+    expect(daysUntilDate(29, 2, from)).toBe(730);
   });
 });
 
-describe('formatBirthdayCountdown', () => {
+describe('formatDateCountdown', () => {
   it.each([
     [0, 'c’est aujourd’hui'],
     [1, 'demain'],
@@ -78,7 +84,7 @@ describe('formatBirthdayCountdown', () => {
     [30, 'dans 30 jours'],
     [60, 'dans 2 mois'],
   ])('renders %i days as %s', (days, expected) => {
-    expect(formatBirthdayCountdown(days, inFrench)).toBe(expected);
+    expect(formatDateCountdown(days, inFrench)).toBe(expected);
   });
 
   it.each([
@@ -87,7 +93,7 @@ describe('formatBirthdayCountdown', () => {
     [12, 'in 12 days'],
     [60, 'in 2 months'],
   ])('renders %i days as %s in English', (days, expected) => {
-    expect(formatBirthdayCountdown(days, inEnglish)).toBe(expected);
+    expect(formatDateCountdown(days, inEnglish)).toBe(expected);
   });
 });
 

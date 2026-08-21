@@ -52,7 +52,7 @@ export const fr = {
   // ── Home ─────────────────────────────────────────────────────────────────
   'home.greeting': 'Bonjour {name}',
   'home.subtitle': 'Vos listes, et ce que préparent vos proches.',
-  'home.birthdays': 'Anniversaires',
+  'home.events': 'À venir',
   'home.myLists': 'Mes listes',
   'home.aroundYou': 'Chez vos proches',
   'home.noListsTitle': 'Aucune liste pour l’instant',
@@ -79,7 +79,7 @@ export const fr = {
   'onboarding.friendCta': 'Obtenir mon lien',
   'onboarding.profileTitle': 'Complétez votre profil',
   'onboarding.profileBody':
-    'Date de naissance et centres d’intérêt : de quoi guider ceux qui cherchent une idée.',
+    'Vos centres d’intérêt : de quoi guider ceux qui cherchent une idée.',
   'onboarding.profileCta': 'Compléter',
   'onboarding.decorationTitle': 'Décorez votre profil',
   'onboarding.decorationBody':
@@ -128,18 +128,29 @@ export const fr = {
   'notifications.markAllFailed': 'Le marquage n’a pas abouti. Réessayez.',
   'notifications.emptyTitle': 'Rien de neuf',
   'notifications.emptyBody':
-    'Les anniversaires, nouvelles listes et demandes d’amis apparaîtront ici.',
+    'Les dates à venir, nouvelles listes et demandes d’amis apparaîtront ici.',
   'notifications.unread': 'Non lue',
 
-  // ── Birthdays ────────────────────────────────────────────────────────────
-  'birthdays.title': 'Anniversaires',
-  'birthdays.subtitle': 'Qui fête quoi, et quand — pour ne plus jamais s’y prendre trop tard.',
-  'birthdays.emptyTitle': 'Aucun anniversaire connu',
-  'birthdays.emptyBody':
-    'Vos amis n’ont pas renseigné leur date de naissance, ou vous n’avez pas encore d’amis.',
-  'birthdays.findPeople': 'Trouver des proches',
-  'birthdays.thisMonth': 'Dans le mois',
-  'birthdays.later': 'Plus tard',
+  // ── Events ───────────────────────────────────────────────────────────────
+  'events.title': 'À venir',
+  'events.subtitle': 'Les dates que vos proches ont choisi de publier.',
+  'events.emptyTitle': 'Aucune date à venir',
+  'events.emptyBody':
+    'Vos proches n’ont publié aucune date, ou vous n’avez pas encore d’amis.',
+  'events.findPeople': 'Trouver des proches',
+  'events.thisMonth': 'Dans le mois',
+  'events.later': 'Plus tard',
+  'events.mine': 'Mes dates',
+  'events.add': 'Ajouter une date',
+  'events.label': 'Intitulé',
+  'events.labelPlaceholder': 'Anniversaire, mariage, remise de diplôme…',
+  'events.labelHint': 'C’est vous qui choisissez ce que vous publiez, et son nom.',
+  'events.day': 'Jour',
+  'events.month': 'Mois',
+  'events.visibility': 'Qui peut la voir',
+  'events.none': 'Vous n’avez publié aucune date.',
+  'events.delete': 'Retirer',
+  'events.adding': 'Ajout…',
 
   // ── Profile and settings ─────────────────────────────────────────────────
   'profile.title': 'Profil',
@@ -175,8 +186,6 @@ export const fr = {
   'form.avatar': 'Photo de profil',
   'form.about': 'À propos',
   'form.aboutPlaceholder': 'Ce que vous aimez, en une phrase.',
-  'form.birthday': 'Date de naissance',
-  'form.birthdayHint': 'Vos amis verront le jour, jamais l’année.',
   'form.interests': "Centres d'intérêt",
   'form.interestsPlaceholder': 'Café, céramique, randonnée',
   'form.interestsHint': 'Séparés par des virgules — de quoi inspirer vos proches.',
@@ -253,6 +262,10 @@ export const fr = {
   'error.textLong': 'Ce texte est trop long.',
   'error.giftNameRequired': 'Donnez un nom à cette envie.',
   'error.listNameRequired': 'Donnez un nom à votre liste.',
+  'error.eventLabelRequired': 'Donnez un nom à cette date.',
+  'error.eventDateInvalid': 'Cette date n’existe pas.',
+  'error.eventTooMany': 'Vous avez atteint le nombre maximum de dates.',
+  'error.eventNotFound': 'Date introuvable.',
   'error.categoryRequired': 'Choisissez une catégorie.',
   'error.giftNotFound': 'Cadeau introuvable',
   'error.messageNotFound': 'Message introuvable.',
