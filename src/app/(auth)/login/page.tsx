@@ -58,12 +58,6 @@ export default function LoginPage() {
       <p className={styles.footer}>
         Pas encore de compte ? <Link href="/signup">{t('auth.createAccount')}</Link>
       </p>
-
-      <p className={styles.demo}>
-        Compte de démonstration : <code>sophie@kadlio.app</code> — mot de passe{' '}
-        <code>kadlio1234</code>. Essayez aussi <code>thomas@kadlio.app</code>, qui a
-        réservé un cadeau de Sophie.
-      </p>
     </>
   );
 }
