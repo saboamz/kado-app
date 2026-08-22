@@ -266,3 +266,34 @@
   text-wrap: pretty;
 }
 
+
+/* The way into the intent pages — one per occasion somebody searches for.
+   Quiet links rather than cards: a visitor who wants the pitch has just read
+   it, and these exist mostly for the person arriving with a narrower
+   question (and for the crawler that follows links, not sitemaps). */
+.occasions {
+  margin-top: 8px;
+}
+
+.occasionsTitle {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.occasionsList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.occasionLink {
+  font-size: 13.5px;
+  color: var(--acc);
+}

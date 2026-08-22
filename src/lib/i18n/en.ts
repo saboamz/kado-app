@@ -441,6 +441,127 @@ export const en: Dictionary = {
   'landing.demoNothing': 'No reservation information on this page.',
   'landing.demoTaken': 'Already claimed by a friend',
   'landing.demoPot': '45 € raised of 60 €',
+  'landing.occasionsTitle': 'Kadlio for every occasion',
+
+  // ── Intent pages, one per thing somebody searches for ────────────────────
+  'seo.faqTitle': 'Frequently asked questions',
+  'seo.othersTitle': 'Kadlio for other occasions',
+  'seo.ctaTitle': 'Create your list in minutes',
+  'seo.ctaBody': 'Free, no ads, no commission. Friends and family join through a simple link.',
+
+  'seo.wishlist.title': 'Online wish list, free and tied to no shop',
+  'seo.wishlist.metaDescription':
+    'Create your online wish list: a shop link, a price, or just an idea. Friends and family claim gifts in secret, with no duplicates. Free, with no ads.',
+  'seo.wishlist.navLabel': 'Wish list',
+  'seo.wishlist.h1': 'An online wish list, free in every sense',
+  'seo.wishlist.lede':
+    'Write down your wishes wherever they come from: a link to any shop, a price, a photo — or just a sentence. Friends and family secretly claim what they plan to give, and you never see who took what.',
+  'seo.wishlist.s1Title': 'No shop imposed',
+  'seo.wishlist.s1Body':
+    'A wish can come from anywhere: an online shop, a flea market, or no shop at all — “a weekend in Iceland” is a perfectly valid wish. Kadlio is tied to no retailer and takes no commission.',
+  'seo.wishlist.s2Title': 'You choose who sees what',
+  'seo.wishlist.s2Body':
+    'Each list has its own visibility: private, for your friends, or open to anyone with the link. You can keep one list for yourself and share another.',
+  'seo.wishlist.s3Title': 'Priorities, not instructions',
+  'seo.wishlist.s3Body':
+    'Mark what would truly delight you and what would simply be welcome. Your friends choose knowingly, without you having arranged anything for them.',
+  'seo.wishlist.faq1q': 'Is it really free?',
+  'seo.wishlist.faq1a': 'Yes. Kadlio has no ads, no subscription, and no commission on anything.',
+  'seo.wishlist.faq2q': 'Do my friends need an account?',
+  'seo.wishlist.faq2a':
+    'Yes, a free one: it is what lets someone see a wish is already claimed without ever showing you. They join through an invitation link, in moments.',
+  'seo.wishlist.faq3q': 'Can I add a wish without a shop link?',
+  'seo.wishlist.faq3a':
+    'Yes. The name is enough — price, photo and description are optional. Many wishes have no product behind them.',
+  'seo.wishlist.faq4q': 'Who can see my list?',
+  'seo.wishlist.faq4a':
+    'Whoever you decide: only you, your friends, or anyone with the link. What you never see, though, are the reservations on your own list.',
+
+  'seo.birth.title': 'Online baby list, no store imposed',
+  'seo.birth.metaDescription':
+    'A baby list with no store attached: the pram from one shop, the night light from another, or second-hand. A pot for the expensive gear, with no commission.',
+  'seo.birth.navLabel': 'Baby list',
+  'seo.birth.h1': 'A baby list with no store imposed',
+  'seo.birth.lede':
+    'Classic baby registries lock you into one retailer’s catalogue. On Kadlio, every wish comes from wherever you want: an online shop, a craftsman, second-hand — or simply “size 1 nappies”.',
+  'seo.birth.s1Title': 'Everything in one place, from anywhere',
+  'seo.birth.s1Body':
+    'The pram from one site, the car seat from another, the sleeping bag a friend is sewing: one list holds it all, with a link and a price where there is one, and a plain sentence where there is not.',
+  'seo.birth.s2Title': 'The expensive gear is funded together',
+  'seo.birth.s2Body':
+    'On a 400 € pram, one relative claims it and opens a pot: everyone pledges what they wish, the target is visible, one person buys. Money never passes through Kadlio — no commission, no hidden fees.',
+  'seo.birth.s3Title': 'The whole family, however far',
+  'seo.birth.s3Body':
+    'An invitation link is all it takes for grandparents, uncles and friends to join the list. Everyone sees what is already taken; nobody gives the same night light twice.',
+  'seo.birth.faq1q': 'Is the baby list free?',
+  'seo.birth.faq1a': 'Yes, entirely: no subscription, no ads, and no commission on the pots.',
+  'seo.birth.faq2q': 'Do we have to pick a partner store?',
+  'seo.birth.faq2a':
+    'No. Kadlio has no retail partnerships: you add a link to any shop you like, or no link at all.',
+  'seo.birth.faq3q': 'How does the pot work for a big purchase?',
+  'seo.birth.faq3a':
+    'Relatives each pledge an amount toward the target. One person buys the item and only then sees who pledged what, to be paid back directly. No payment goes through the site.',
+  'seo.birth.faq4q': 'Do we see what people have chosen to give?',
+  'seo.birth.faq4a':
+    'No: reservations stay invisible to the parents, as on every Kadlio list. You keep control of the list itself — wishes, priorities, visibility — and discover the gifts when they are given.',
+
+  'seo.wedding.title': 'Online wedding list, commission-free',
+  'seo.wedding.metaDescription':
+    'Your wedding list with no retailer and no commission: wishes from anywhere, a pot for the honeymoon, and guests who organise without duplicates.',
+  'seo.wedding.navLabel': 'Wedding list',
+  'seo.wedding.h1': 'A wedding list with no store and no commission',
+  'seo.wedding.lede':
+    'Traditional wedding lists take their cut or limit you to a catalogue. Kadlio sells nothing and deducts nothing: you describe what would make you happy, your guests organise among themselves.',
+  'seo.wedding.s1Title': 'Wishes, not a catalogue',
+  'seo.wedding.s1Body':
+    'Add what you actually want: tableware spotted somewhere, a contribution to the honeymoon, a piece from a craftsman. A link and a price if you have them, a plain sentence if not.',
+  'seo.wedding.s2Title': 'Guests team up on the big wishes',
+  'seo.wedding.s2Body':
+    'A guest claims “Honeymoon” and opens the pot to the others, with the target you set. Pledges add up out of your sight; the money moves between them, never through Kadlio.',
+  'seo.wedding.s3Title': 'One link to share',
+  'seo.wedding.s3Body':
+    'Your list opens through an invitation link you spread as you wish: the witnesses first, every guest later. Each sees what is already taken and what remains.',
+  'seo.wedding.faq1q': 'What does a wedding list cost on Kadlio?',
+  'seo.wedding.faq1a':
+    'Nothing. No setup fee, no subscription, and above all no commission on the pots — what is pledged goes to the gift in full.',
+  'seo.wedding.faq2q': 'Do guests pay online?',
+  'seo.wedding.faq2a':
+    'No. A contribution is a pledge: one person buys or gives the amount, the others pay them back directly — bank transfer, cash, as they like. Kadlio keeps the tally, not the till.',
+  'seo.wedding.faq3q': 'Can the honeymoon go on the list?',
+  'seo.wedding.faq3a':
+    'Yes: add it as a wish, with the amount as its price. Your guests will claim it and open the pot on it.',
+  'seo.wedding.faq4q': 'Do guests need an account?',
+  'seo.wedding.faq4a':
+    'Yes, free and quick — it is what lets everyone track who claimed what without ever showing you.',
+
+  'seo.group.title': 'Group gift: a simple pot, no commission',
+  'seo.group.metaDescription':
+    'Organise a group gift without a spreadsheet or chasing people: a claim, a pot with a target, everyone’s pledges, one buyer paid back directly. No commission.',
+  'seo.group.navLabel': 'Group gift',
+  'seo.group.h1': 'The group gift, without the spreadsheet',
+  'seo.group.lede':
+    'A gift bought together usually means a message thread, a spreadsheet, and someone fronting the money without daring to ask for it back. Kadlio structures exactly that — and nothing more.',
+  'seo.group.s1Title': 'A claim, then an open pot',
+  'seo.group.s1Body':
+    'Whoever decides first claims the wish, then opens it to the others with a target — the price, confirmed by the person with the shop link in front of them. Each then pledges what they choose.',
+  'seo.group.s2Title': 'Nobody announces their amount to the group',
+  'seo.group.s2Body':
+    'Until the gift is bought, the pot shows only a total and a number of participants. You choose what you give without doing it under the group’s gaze.',
+  'seo.group.s3Title': 'Only the buyer sees the accounts',
+  'seo.group.s3Body':
+    'One person buys the gift and declares it. They alone then see who pledged what — they are the one out of pocket — and everyone pays them back directly. No payment passes through Kadlio.',
+  'seo.group.faq1q': 'Does the money go through Kadlio?',
+  'seo.group.faq1a':
+    'Never. Contributions are pledges; settling up happens between you, by transfer or otherwise. So there is no commission and no fee.',
+  'seo.group.faq2q': 'Can the person receiving the gift see the pot?',
+  'seo.group.faq2a':
+    'No. On their own list, reservations and pots are never loaded — they discover the gift on the day.',
+  'seo.group.faq3q': 'What if the target is not reached?',
+  'seo.group.faq3a':
+    'Nothing automatic: the pot stays open and the group decides — top it up, adjust the target, or talk it over in the conversation attached to the gift.',
+  'seo.group.faq4q': 'How does the group coordinate?',
+  'seo.group.faq4a':
+    'Every gift has its own conversation, invisible to the person concerned. That is where you sort out who buys, who wraps, who brings it.',
 
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Back to the home page',
