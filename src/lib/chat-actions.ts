@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from './db';
 import { relationTo } from './relations';
+import { CHAT_PER_USER, rateLimit, recordAttempt } from './rate-limit';
 import { requireUser } from './session';
 
 export type ChatResult = { error?: string };
@@ -19,6 +20,12 @@ export async function postChatMessage(
   body: string,
 ): Promise<ChatResult> {
   const user = await requireUser();
+
+  // A friend can write 2000 characters as often as they like otherwise, and
+  // the page polls every few seconds — this is a row nobody asked for.
+  const budget = await rateLimit('chat:post', user.id, CHAT_PER_USER);
+  if (!budget.allowed) return { error: 'error.tooManyMessages' };
+  await recordAttempt('chat:post', user.id);
 
   const parsed = messageSchema.safeParse(body);
   if (!parsed.success) {

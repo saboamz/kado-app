@@ -81,7 +81,7 @@ deployment from exhausting the connection limit.
    ephemeral and unshared, so a locally-written file is gone on the next
    request and was never visible to another instance.
 
-3. **Secrets.** Set `AUTH_SECRET` and `CRON_SECRET`, each 32 random bytes:
+3. **Secrets.** Set `CRON_SECRET`, 32 random bytes:
    ```
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```

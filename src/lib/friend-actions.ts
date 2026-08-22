@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from './db';
+import { FRIEND_REQUEST_PER_USER, rateLimit, recordAttempt } from './rate-limit';
 import { requireUser } from './session';
 
 export type FriendResult = { error?: string };
@@ -20,6 +21,12 @@ export async function requestFriendship(
   if (addresseeId === user.id) {
     return { error: 'error.cannotAddYourself' };
   }
+
+  // Each request puts a notification in front of somebody else. Unbounded,
+  // that is a way to fill a stranger's alerts from a script.
+  const budget = await rateLimit('friend:request', user.id, FRIEND_REQUEST_PER_USER);
+  if (!budget.allowed) return { error: 'error.tooManyRequests' };
+  await recordAttempt('friend:request', user.id);
 
   const target = await db.user.findUnique({
     where: { id: addresseeId },

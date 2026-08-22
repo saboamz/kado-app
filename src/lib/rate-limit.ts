@@ -56,6 +56,23 @@ export const SIGNUP_PER_IP: Limit = { attempts: 10, windowSeconds: 60 * 60 };
  */
 export const LINK_FETCH_PER_USER: Limit = { attempts: 40, windowSeconds: 60 * 60 };
 
+/**
+ * Writes that cost storage or somebody else's attention.
+ *
+ * None of these had a limit. An upload is 4MB of disk or Blob per call and
+ * there is no quota behind it; a friend request and a report both put
+ * something in front of another person; a chat message is a row nobody else
+ * asked for. All four are cheap to fire in a loop and none of them is
+ * something a person does dozens of times an hour.
+ *
+ * Deliberately generous: these are ceilings against a script, not pacing for
+ * a human. Somebody adding photos to a new list should never meet them.
+ */
+export const UPLOAD_PER_USER: Limit = { attempts: 60, windowSeconds: 60 * 60 };
+export const FRIEND_REQUEST_PER_USER: Limit = { attempts: 40, windowSeconds: 60 * 60 };
+export const REPORT_PER_USER: Limit = { attempts: 20, windowSeconds: 24 * 60 * 60 };
+export const CHAT_PER_USER: Limit = { attempts: 120, windowSeconds: 60 * 60 };
+
 export type LimitResult = { allowed: true } | { allowed: false; retryAfter: number };
 
 /** Lower-cased and namespaced, so two limits never share a bucket. */

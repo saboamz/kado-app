@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from './db';
-import { hashPassword, verifyPassword } from './password';
+import { dummyHash, hashPassword, needsRehash, verifyPassword } from './password';
 import {
   LOGIN_PER_EMAIL,
   LOGIN_PER_IP,
@@ -169,8 +169,16 @@ export async function login(
   };
 
   if (!user) {
-    // Spend comparable time so the response does not reveal the miss either.
-    await verifyPassword(parsed.data.password, 'scrypt:00:00');
+    /*
+     * A real hash, so the miss costs what a hit costs.
+     *
+     * This used to verify against the literal 'scrypt:00:00', which is
+     * rejected on shape before scrypt is ever called — an unknown address
+     * answered in microseconds and a known one in hundreds of milliseconds.
+     * Measured at ~4850x, which is a stopwatch away from telling anybody
+     * which addresses are registered, and undoes the identical messages above.
+     */
+    await verifyPassword(parsed.data.password, await dummyHash());
     return fail();
   }
   if (!(await verifyPassword(parsed.data.password, user.passwordHash))) {
@@ -180,6 +188,19 @@ export async function login(
   // A successful sign-in clears the failures that preceded it, so someone who
   // mistyped twice is not refused on their next legitimate attempt.
   await clearAttempts('login:email', parsed.data.email);
+
+  /*
+   * Sign-in is the only moment the plaintext exists, so it is the only moment
+   * a hash made at an older cost can be brought up to the current one. Failure
+   * is swallowed: an upgrade that did not happen is worth retrying next time,
+   * never worth refusing a correct password over.
+   */
+  if (needsRehash(user.passwordHash)) {
+    const upgraded = await hashPassword(parsed.data.password);
+    await db.user
+      .update({ where: { id: user.id }, data: { passwordHash: upgraded } })
+      .catch(() => {});
+  }
 
   await createSession(user.id);
   await applyInvite(formData);
