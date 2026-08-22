@@ -1,5 +1,6 @@
 'use server';
 
+import { z } from 'zod';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from './db';
@@ -15,10 +16,10 @@ import {
 } from './rate-limit';
 import { acceptInvite } from './invite-actions';
 import { getLocale, getT } from './i18n/server';
-import { createSession, destroySession } from './session';
-import { fieldErrors, loginSchema, signupSchema } from './validation';
+import { createSession, destroySession, requireUser } from './session';
+import { fieldErrors, loginSchema, passwordSchema, signupSchema } from './validation';
 
-export type FormState = { errors?: Record<string, string> };
+export type FormState = { errors?: Record<string, string>; done?: boolean };
 
 /**
  * The caller's address, for rate limiting.
@@ -210,4 +211,64 @@ export async function login(
 export async function logout(): Promise<void> {
   await destroySession();
   redirect('/login');
+}
+
+/**
+ * Changing a password from inside the account.
+ *
+ * There is no reset flow — that needs e-mail, which the app does not send.
+ * This is the half that needs nothing: somebody who is signed in and suspects
+ * their password is known can replace it. Before this, the only remedy the
+ * product offered was deleting the account.
+ *
+ * The current password is required. A session left open on a shared machine
+ * would otherwise be enough to lock its owner out of their own account.
+ */
+export async function changePassword(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await requireUser();
+
+  const parsed = z
+    .object({
+      current: z.string().min(1, 'error.passwordRequired'),
+      next: passwordSchema,
+    })
+    .safeParse({
+      current: formData.get('current'),
+      next: formData.get('next'),
+    });
+  if (!parsed.success) return { errors: fieldErrors(parsed.error) };
+
+  const row = await db.user.findUniqueOrThrow({
+    where: { id: user.id },
+    select: { passwordHash: true },
+  });
+
+  if (!(await verifyPassword(parsed.data.current, row.passwordHash))) {
+    return { errors: { current: 'error.badCredentials' } };
+  }
+
+  if (parsed.data.next === parsed.data.current) {
+    return { errors: { next: 'error.passwordUnchanged' } };
+  }
+
+  const hash = await hashPassword(parsed.data.next);
+
+  /*
+   * Every other session goes with it.
+   *
+   * Changing a password because somebody else may have it is pointless if the
+   * session they are already holding keeps working. The current one is spared
+   * and reissued, so the person doing this is not signed out of the tab they
+   * are typing in.
+   */
+  await db.$transaction([
+    db.user.update({ where: { id: user.id }, data: { passwordHash: hash } }),
+    db.session.deleteMany({ where: { userId: user.id } }),
+  ]);
+  await createSession(user.id);
+
+  return { done: true };
 }
