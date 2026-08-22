@@ -69,18 +69,6 @@ export const metadata: Metadata = {
     default: 'Kadlio — liste de cadeaux en ligne, entre proches',
     template: '%s · Kadlio',
   },
-  /*
-   * Which language this page is in, and where the other one lives.
-   *
-   * Both point at the same URL: the language follows the account preference
-   * and Accept-Language, not the path, so there is no /fr or /en to name.
-   * Saying so explicitly stops a crawler treating the two renderings of one
-   * address as duplicate content.
-   */
-  alternates: {
-    canonical: '/',
-    languages: { fr: '/', en: '/', 'x-default': '/' },
-  },
   description: DESCRIPTION,
   applicationName: 'Kadlio',
   /*

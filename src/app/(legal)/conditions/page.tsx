@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { getT } from '@/lib/i18n/server';
+import { pageAlternates } from '@/lib/site';
 import styles from '../legal.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t('legal.termsTitle') };
+  return { title: t('legal.termsTitle'), alternates: pageAlternates('/conditions') };
 }
 
 export default async function TermsPage() {
