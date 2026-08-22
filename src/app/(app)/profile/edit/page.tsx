@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { ProfileForm } from '@/components/ProfileForm';
 import { db } from '@/lib/db';
 import { requireUser } from '@/lib/session';
+import { categoriesForInterests } from '@/lib/taxonomy';
 import { getT } from '@/lib/i18n/server';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,7 +43,13 @@ export default async function EditProfilePage() {
           name: profile.name,
           bio: profile.bio,
           avatarUrl: profile.avatarUrl,
-          interests: profile.interests.map((i) => i.label).join(', '),
+          /*
+             Derived rather than read straight through, so an interest stored
+             before the list closed — "Café", typed when this was free text —
+             arrives as the categories it maps to and is preserved by the next
+             save instead of being dropped on the floor.
+          */
+          interests: categoriesForInterests(profile.interests.map((i) => i.label)),
           gender: profile.gender ?? '',
           ageBracket: profile.ageBracket ?? '',
         }}

@@ -89,7 +89,7 @@ export const fr = {
   // ── Lists ────────────────────────────────────────────────────────────────
   'lists.title': 'Mes listes',
   'lists.subtitle': 'Ce que vous aimeriez recevoir, rangé par occasion.',
-  'lists.emptyBody': 'Créez une liste — anniversaire, ou simplement vos envies du moment.',
+  'lists.emptyBody': 'Créez une liste pour vos envies du moment.',
   'lists.newList': 'Nouvelle liste',
   'lists.emptyListTitle': 'Cette liste est vide',
   'lists.emptyListBody': 'Ajoutez ce qui vous ferait plaisir.',
@@ -143,7 +143,7 @@ export const fr = {
   'events.mine': 'Mes dates',
   'events.add': 'Ajouter une date',
   'events.label': 'Intitulé',
-  'events.labelPlaceholder': 'Anniversaire, mariage, remise de diplôme…',
+  'events.labelPlaceholder': 'Mariage, remise de diplôme, crémaillère…',
   'events.labelHint': 'C’est vous qui choisissez ce que vous publiez, et son nom.',
   'events.day': 'Jour',
   'events.month': 'Mois',
@@ -209,14 +209,13 @@ export const fr = {
   'form.details': 'Précisions',
   'form.detailsPlaceholder': 'Taille, couleur, modèle exact…',
   'form.listName': 'Nom de la liste',
-  'form.listNamePlaceholder': 'Anniversaire, Mariage…',
+  'form.listNamePlaceholder': 'Mariage, Crémaillère…',
   'form.occasion': 'Occasion',
   'form.avatar': 'Photo de profil',
   'form.about': 'À propos',
   'form.aboutPlaceholder': 'Ce que vous aimez, en une phrase.',
   'form.interests': "Centres d'intérêt",
-  'form.interestsPlaceholder': 'Café, céramique, randonnée',
-  'form.interestsHint': 'Séparés par des virgules — de quoi inspirer vos proches.',
+  'form.interestsHint': 'Cochez ce qui vous ressemble — de quoi inspirer vos proches.',
   'form.appearance': 'Apparence',
   'form.privacy': 'Confidentialité',
   'form.publicProfile': 'Profil public',
@@ -255,7 +254,7 @@ export const fr = {
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Ajoutez une envie : un lien, un prix, ou simplement une idée.',
   'lists.newTitle': 'Nouvelle liste',
-  'lists.newSubtitle': 'Une liste par occasion : anniversaire, ou vos envies du moment.',
+  'lists.newSubtitle': 'Une liste par occasion, ou pour vos envies du moment.',
   'lists.create': 'Créer la liste',
   'lists.editTitle': 'Modifier la liste',
   'lists.deleteList': 'Supprimer cette liste',
@@ -474,7 +473,7 @@ export const fr = {
   'legal.collectedAccount':
     'Compte : votre adresse e-mail, votre nom, et votre mot de passe sous forme chiffrée — jamais en clair, y compris pour nous.',
   'legal.collectedOptional':
-    'Facultatif : une courte présentation, une photo de profil, vos centres d’intérêt, les dates que vous choisissez de publier (anniversaire, mariage, ce que vous voulez), un GIF de décoration. Rien de tout cela n’est obligatoire, et tout est modifiable ou supprimable à tout moment.',
+    'Facultatif : une courte présentation, une photo de profil, vos centres d’intérêt, les dates que vous choisissez de publier (un mariage, une remise de diplôme, ce que vous voulez), un GIF de décoration. Rien de tout cela n’est obligatoire, et tout est modifiable ou supprimable à tout moment.',
   'legal.collectedSurvey':
     'Questionnaire d’inscription : à la création du compte, nous vous proposons d’indiquer vos centres d’intérêt, votre sexe et votre tranche d’âge. Les trois sont facultatifs, l’étape entière peut être passée, et ne pas répondre est enregistré comme une absence de réponse — pas comme une catégorie. Ces informations servent uniquement à vous proposer des idées de cadeaux : elles ne sont affichées nulle part, ni sur votre profil, ni à vos proches. Une tranche d’âge est demandée plutôt qu’une date de naissance parce qu’une date identifie une personne, ce dont les suggestions n’ont pas besoin. Aucune donnée sensible au sens de l’article 9 du RGPD n’est demandée : ni religion, ni santé, ni origine, ni opinion politique, ni orientation sexuelle.',
   'legal.collectedUse':
@@ -548,7 +547,7 @@ export const fr = {
   'invite.rotating': 'Un instant…',
   'upload.tooLarge': 'Cette image dépasse 4 Mo.',
   'search.placeholder': 'Nom ou adresse e-mail',
-  'gif.placeholder': 'Chercher : chat, merci, anniversaire…',
+  'gif.placeholder': 'Chercher : chat, merci, bravo…',
   'gif.choose': 'Choisir ce GIF',
   'gif.chooseNamed': 'Choisir le GIF : {title}',
   'gif.unconfigured':

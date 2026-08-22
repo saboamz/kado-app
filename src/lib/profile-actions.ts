@@ -7,6 +7,7 @@ import { db } from './db';
 import { LOCALES } from './i18n/locales';
 import { rateLimit, recordAttempt, UPLOAD_PER_USER } from './rate-limit';
 import { requireUser } from './session';
+import { SURVEY_CATEGORIES } from './taxonomy';
 import { deleteUpload, storeUpload } from './uploads';
 import { fieldErrors } from './validation';
 
@@ -36,7 +37,6 @@ const profileSchema = z.object({
     'AGE_55_64',
     'AGE_65_PLUS',
   ]),
-  interests: optionalText(200),
 });
 
 export async function updateProfile(
@@ -50,11 +50,10 @@ export async function updateProfile(
     bio: formData.get('bio'),
     gender: formData.get('gender') ?? '',
     ageBracket: formData.get('ageBracket') ?? '',
-    interests: formData.get('interests'),
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
 
-  const { name, bio, gender, ageBracket, interests } = parsed.data;
+  const { name, bio, gender, ageBracket } = parsed.data;
 
   const current = await db.user.findUniqueOrThrow({
     where: { id: user.id },
@@ -79,15 +78,21 @@ export async function updateProfile(
     avatarUrl = null;
   }
 
-  // Interests arrive as a comma-separated line; store them as rows so they
-  // can be searched and counted later.
+  /*
+   * Ticked boxes, checked against the closed list rather than trusted.
+   *
+   * This was a comma-separated line anybody could type into, which is what
+   * the closed category list exists to end: content_facet matches on the
+   * value, so "tech", "Tech" and "high-tech" are three buckets nobody shares.
+   * Free text now lives in the bio, which nothing matches on.
+   */
+  const offered = new Set<string>(SURVEY_CATEGORIES);
   const labels = [
     ...new Set(
-      interests
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean)
-        .slice(0, 12),
+      formData
+        .getAll('interests')
+        .filter((v): v is string => typeof v === 'string')
+        .filter((v) => offered.has(v)),
     ),
   ];
 
