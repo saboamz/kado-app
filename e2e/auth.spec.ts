@@ -102,8 +102,8 @@ test('the sign-up questionnaire saves what is ticked, and skips cleanly', async 
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
   await expect(page).toHaveURL(/\/welcome$/);
 
-  await page.getByText('Café', { exact: true }).click();
-  await page.getByText('Randonnée', { exact: true }).click();
+  await page.getByText('Gourmandise', { exact: true }).click();
+  await page.getByText('Sport', { exact: true }).click();
   await page.getByText('Une femme', { exact: true }).click();
   await page.getByText('25 – 34', { exact: true }).click();
 
@@ -113,7 +113,7 @@ test('the sign-up questionnaire saves what is ticked, and skips cleanly', async 
   // Stored, and editable afterwards — which is what the privacy policy
   // promises about withdrawing consent.
   await page.goto('/profile/edit');
-  await expect(page.getByLabel(/Centres d'intérêt/)).toHaveValue(/Café/);
+  await expect(page.getByLabel(/Centres d'intérêt/)).toHaveValue(/Gourmandise/);
   await expect(page.getByLabel('Vous êtes…')).toHaveValue('FEMALE');
   await expect(page.getByLabel('Votre tranche d’âge')).toHaveValue('AGE_25_34');
 });

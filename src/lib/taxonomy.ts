@@ -115,55 +115,20 @@ const INTEREST_TO_CATEGORIES: Record<string, Category[]> = {
 };
 
 /**
- * The interests offered at sign-up, as a grid to tick.
+ * What the sign-up questionnaire offers, as a grid to tick.
  *
- * A subset of the mapping table above, not the whole of it: forty-odd
- * checkboxes is a form nobody finishes, and several of the entries are
- * near-synonyms that exist so free text still matches ("course" and
- * "running", "livres" and "lecture"). One of each is enough here.
+ * The categories themselves rather than the fine-grained interests below
+ * them. Thirty-six checkboxes was a form people abandon, and the extra
+ * precision bought nothing: content_facet filters products by category, so
+ * "Café" and "Gourmandise" reach the same shelf. Somebody who wants to be
+ * more specific can still write it in their profile, where interests are free
+ * text and the mapping table does its work.
  *
- * Every value must be a key of INTEREST_TO_CATEGORIES, or it produces an
- * interest the recommender cannot map — the silent failure the mapping table
- * was built to end. A test holds them to that.
+ * "Autre" is left out. It is the escape hatch for filing a product nobody can
+ * classify; as a statement of taste it means nothing, and it would match
+ * everything filed there for want of anywhere better.
  */
-export const SURVEY_INTERESTS = [
-  'Café',
-  'Cuisine',
-  'Pâtisserie',
-  'Céramique',
-  'Design',
-  'Décoration',
-  'Jardinage',
-  'Plantes',
-  'Bricolage',
-  'Randonnée',
-  'Course',
-  'Vélo',
-  'Escalade',
-  'Yoga',
-  'Natation',
-  'Ski',
-  'Lecture',
-  'Cinéma',
-  'Photographie',
-  'Jeux vidéo',
-  'Jeux de société',
-  'Informatique',
-  'Voyage',
-  'Camping',
-  'Mode',
-  'Bijoux',
-  'Montres',
-  'Parfum',
-  'Maquillage',
-  'Méditation',
-  'Écriture',
-  'Papeterie',
-  'Dessin',
-  'Chats',
-  'Chiens',
-  'Enfants',
-] as const;
+export const SURVEY_CATEGORIES = CATEGORIES.filter((c) => c !== 'Autre');
 
 /**
  * Normalises a label for lookup: case-folded, de-accented, whitespace
@@ -182,6 +147,11 @@ export function normalizeLabel(label: string): string {
     .trim();
 }
 
+/** The categories themselves, reachable by the same folded lookup. */
+const CATEGORY_BY_NORMALIZED: Map<string, Category> = new Map(
+  CATEGORIES.map((c) => [normalizeLabel(c), c]),
+);
+
 /** Lookup table keyed by the normalised form, built once. */
 const NORMALIZED: Map<string, Category[]> = new Map(
   Object.entries(INTEREST_TO_CATEGORIES).map(([k, v]) => [normalizeLabel(k), v]),
@@ -196,7 +166,21 @@ const NORMALIZED: Map<string, Category[]> = new Map(
  * unmappedInterests() so the table can be grown from real data.
  */
 export function categoriesForInterest(label: string): Category[] {
-  return NORMALIZED.get(normalizeLabel(label)) ?? [];
+  const mapped = NORMALIZED.get(normalizeLabel(label));
+  if (mapped) return mapped;
+
+  /*
+   * An interest that IS a category means that category.
+   *
+   * The sign-up questionnaire stores category names directly — "Maison",
+   * "Sport" — and none of them is a key of the table above, whose keys are
+   * the fine-grained things people say. Without this they would map to
+   * nothing, and content_facet would go quietly empty for everybody who
+   * answered it: the exact silent failure the table was built to end,
+   * reintroduced through the form that fills it.
+   */
+  const canonical = CATEGORY_BY_NORMALIZED.get(normalizeLabel(label));
+  return canonical ? [canonical] : [];
 }
 
 /** The categories a whole set of interests maps to, de-duplicated. */

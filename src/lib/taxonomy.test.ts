@@ -4,7 +4,7 @@ import {
   categoriesForInterest,
   categoriesForInterests,
   normalizeLabel,
-  SURVEY_INTERESTS,
+  SURVEY_CATEGORIES,
   unmappedInterests,
 } from './taxonomy';
 
@@ -141,24 +141,41 @@ describe('unmappedInterests keeps the table honest', () => {
 });
 
 describe('the sign-up questionnaire', () => {
-  it('offers only interests the table can map', () => {
-    // An offered interest that maps to nothing produces an Interest row
-    // content_facet cannot use — the silent failure this table exists to end,
-    // reintroduced through the one form that fills the table for new accounts.
-    expect(unmappedInterests([...SURVEY_INTERESTS])).toEqual([]);
-  });
+  it('offers every category but the escape hatch', () => {
+    // A category nobody can tick is a shelf of products that can never be
+    // suggested to somebody whose only answer was this form.
+    const offered = new Set<string>(SURVEY_CATEGORIES);
+    const missing = CATEGORIES.filter((c) => c !== 'Autre' && !offered.has(c));
 
-  it('offers no duplicates, including across accents and case', () => {
-    const normalized = SURVEY_INTERESTS.map(normalizeLabel);
-    expect(new Set(normalized).size).toBe(SURVEY_INTERESTS.length);
-  });
-
-  it('reaches most of the catalogue, so a ticked box is worth ticking', () => {
-    // Every category bar the escape hatch should be reachable from the grid;
-    // one that is not means products filed there can never be suggested to
-    // somebody who answered the questionnaire and nothing else.
-    const reached = new Set(categoriesForInterests([...SURVEY_INTERESTS]));
-    const missing = CATEGORIES.filter((c) => c !== 'Autre' && !reached.has(c));
     expect(missing).toEqual([]);
+    expect(offered.has('Autre')).toBe(false);
+  });
+
+  it('stores values the recommender resolves to themselves', () => {
+    /*
+     * The form writes category names into Interest.label, and none of them is
+     * a key of INTEREST_TO_CATEGORIES — its keys are the fine things people
+     * say. Without the identity rule in categoriesForInterest they would map
+     * to nothing and content_facet would go quietly empty for everybody who
+     * answered: the silent failure the taxonomy exists to end, arriving
+     * through the form that fills it.
+     */
+    for (const category of SURVEY_CATEGORIES) {
+      expect(categoriesForInterest(category)).toContain(category);
+    }
+    expect(unmappedInterests([...SURVEY_CATEGORIES])).toEqual([]);
+  });
+
+  it('still resolves a fine-grained interest through the table', () => {
+    // The identity rule is a fallback, not a replacement: free text typed in
+    // a profile must keep reaching the categories it always did.
+    expect(categoriesForInterest('Café')).toEqual(
+      expect.arrayContaining(['Gourmandise']),
+    );
+    // A word that is both a table key and a category takes the table's richer
+    // answer, because the table is consulted first.
+    expect(categoriesForInterest('Bijoux')).toEqual(
+      expect.arrayContaining(['Bijoux', 'Mode']),
+    );
   });
 });

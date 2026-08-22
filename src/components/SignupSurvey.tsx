@@ -3,8 +3,9 @@
 import { useActionState } from 'react';
 import Link from 'next/link';
 import { saveSurvey, type SurveyState } from '@/lib/survey-actions';
-import { useT } from '@/lib/i18n/client';
-import { SURVEY_INTERESTS } from '@/lib/taxonomy';
+import { useLocale, useT } from '@/lib/i18n/client';
+import { categoryName } from '@/lib/i18n/categories';
+import { SURVEY_CATEGORIES } from '@/lib/taxonomy';
 import type { TFunction } from '@/lib/i18n/t';
 import { SubmitButton } from './SubmitButton';
 import styles from './survey.module.css';
@@ -34,6 +35,7 @@ const AGES = [
 
 export function SignupSurvey() {
   const t = useT();
+  const locale = useLocale();
   const [state, action] = useActionState<SurveyState, FormData>(saveSurvey, {});
 
   return (
@@ -42,14 +44,17 @@ export function SignupSurvey() {
         <legend className={styles.legend}>{t('survey.interestsTitle')}</legend>
         <p className={styles.hint}>{t('survey.interestsHint')}</p>
 
-        {/* A grid of checkboxes rather than free text: the words have to be
-            ones the interest→category table knows, and typing does not
-            guarantee that. A test holds the list to it. */}
+        {/* Checkboxes rather than free text: the value has to be one the
+            recommender can match, and typing does not guarantee that.
+
+            The stored value is the canonical French category — the same
+            string Product.categoryId holds — and only the label is
+            translated, exactly as the category dropdown does it. */}
         <div className={styles.chips}>
-          {SURVEY_INTERESTS.map((interest) => (
-            <label key={interest} className={styles.chip}>
-              <input type="checkbox" name="interests" value={interest} />
-              <span>{interest}</span>
+          {SURVEY_CATEGORIES.map((category) => (
+            <label key={category} className={styles.chip}>
+              <input type="checkbox" name="interests" value={category} />
+              <span>{categoryName(category, locale)}</span>
             </label>
           ))}
         </div>
