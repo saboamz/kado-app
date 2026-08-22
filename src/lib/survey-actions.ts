@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { db } from './db';
 import { requireUser } from './session';
-import { SURVEY_INTERESTS } from './taxonomy';
+import { SURVEY_CATEGORIES } from './taxonomy';
 import { fieldErrors } from './validation';
 
 export type SurveyState = { errors?: Record<string, string> };
@@ -59,16 +59,19 @@ export async function saveSurvey(
   /*
    * Checked against the offered list rather than trusted.
    *
-   * These are form values, so they are whatever the caller sends. An interest
-   * outside the mapping table maps to no category, which makes content_facet
-   * quietly return less — the exact silent failure the table exists to stop.
+   * These are form values, so they are whatever the caller sends. Anything
+   * outside the closed list maps to no category, which makes content_facet
+   * quietly return less — the exact silent failure the taxonomy exists to
+   * stop. The stored value stays the canonical French one, as it does for
+   * Product.categoryId: the recommender matches on it, so it must not change
+   * with the reader's language.
    */
-  const offered = new Set<string>(SURVEY_INTERESTS);
+  const offered = new Set<string>(SURVEY_CATEGORIES);
   const interests = formData
     .getAll('interests')
     .filter((v): v is string => typeof v === 'string')
     .filter((v) => offered.has(v))
-    .slice(0, SURVEY_INTERESTS.length);
+    .slice(0, SURVEY_CATEGORIES.length);
 
   await db.$transaction([
     db.user.update({
