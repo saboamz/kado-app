@@ -4,6 +4,7 @@ import {
   categoriesForInterest,
   categoriesForInterests,
   normalizeLabel,
+  SURVEY_INTERESTS,
   unmappedInterests,
 } from './taxonomy';
 
@@ -136,5 +137,28 @@ describe('unmappedInterests keeps the table honest', () => {
 
     expect(unmappedInterests(labels)).toEqual([]);
     await db.$disconnect();
+  });
+});
+
+describe('the sign-up questionnaire', () => {
+  it('offers only interests the table can map', () => {
+    // An offered interest that maps to nothing produces an Interest row
+    // content_facet cannot use — the silent failure this table exists to end,
+    // reintroduced through the one form that fills the table for new accounts.
+    expect(unmappedInterests([...SURVEY_INTERESTS])).toEqual([]);
+  });
+
+  it('offers no duplicates, including across accents and case', () => {
+    const normalized = SURVEY_INTERESTS.map(normalizeLabel);
+    expect(new Set(normalized).size).toBe(SURVEY_INTERESTS.length);
+  });
+
+  it('reaches most of the catalogue, so a ticked box is worth ticking', () => {
+    // Every category bar the escape hatch should be reachable from the grid;
+    // one that is not means products filed there can never be suggested to
+    // somebody who answered the questionnaire and nothing else.
+    const reached = new Set(categoriesForInterests([...SURVEY_INTERESTS]));
+    const missing = CATEGORIES.filter((c) => c !== 'Autre' && !reached.has(c));
+    expect(missing).toEqual([]);
   });
 });

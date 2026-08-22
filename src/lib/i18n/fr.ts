@@ -152,6 +152,27 @@ export const fr = {
   'events.delete': 'Retirer',
   'events.adding': 'Ajout…',
 
+  // ── Sign-up questionnaire ────────────────────────────────────────────────
+  'survey.title': 'Deux questions, et c’est tout',
+  'survey.subtitle':
+    'Elles servent à vous proposer des idées de cadeaux. Rien n’est obligatoire, et vous pourrez tout modifier dans votre profil.',
+  'survey.interestsTitle': 'Qu’est-ce qui vous plaît ?',
+  'survey.interestsHint': 'Cochez ce que vous voulez, autant que vous voulez.',
+  'survey.aboutTitle': 'À propos de vous',
+  'survey.aboutHint':
+    'Facultatif. Ces réponses affinent les suggestions et ne sont montrées à personne — ni sur votre profil, ni à vos proches.',
+  'survey.gender': 'Vous êtes…',
+  'survey.genderFemale': 'Une femme',
+  'survey.genderMale': 'Un homme',
+  'survey.genderOther': 'Autre',
+  'survey.age': 'Votre tranche d’âge',
+  'survey.noAnswer': 'Je préfère ne pas répondre',
+  'survey.submit': 'Enregistrer et continuer',
+  'survey.saving': 'Enregistrement…',
+  'survey.skip': 'Passer cette étape',
+  'survey.privacy':
+    'Vous pouvez modifier ou effacer ces réponses à tout moment, et supprimer votre compte efface tout.',
+
   // ── Profile and settings ─────────────────────────────────────────────────
   'profile.title': 'Profil',
   'profile.lists': 'Listes',
@@ -453,7 +474,9 @@ export const fr = {
   'legal.collectedAccount':
     'Compte : votre adresse e-mail, votre nom, et votre mot de passe sous forme chiffrée — jamais en clair, y compris pour nous.',
   'legal.collectedOptional':
-    'Facultatif : une courte présentation, votre date de naissance, une photo de profil, vos centres d’intérêt, un GIF de décoration. Rien de tout cela n’est obligatoire, et tout est modifiable ou supprimable à tout moment.',
+    'Facultatif : une courte présentation, une photo de profil, vos centres d’intérêt, les dates que vous choisissez de publier (anniversaire, mariage, ce que vous voulez), un GIF de décoration. Rien de tout cela n’est obligatoire, et tout est modifiable ou supprimable à tout moment.',
+  'legal.collectedSurvey':
+    'Questionnaire d’inscription : à la création du compte, nous vous proposons d’indiquer vos centres d’intérêt, votre sexe et votre tranche d’âge. Les trois sont facultatifs, l’étape entière peut être passée, et ne pas répondre est enregistré comme une absence de réponse — pas comme une catégorie. Ces informations servent uniquement à vous proposer des idées de cadeaux : elles ne sont affichées nulle part, ni sur votre profil, ni à vos proches. Une tranche d’âge est demandée plutôt qu’une date de naissance parce qu’une date identifie une personne, ce dont les suggestions n’ont pas besoin. Aucune donnée sensible au sens de l’article 9 du RGPD n’est demandée : ni religion, ni santé, ni origine, ni opinion politique, ni orientation sexuelle.',
   'legal.collectedUse':
     'Usage : vos listes, vos envies, vos amis, vos réservations, vos participations aux cagnottes et vos messages dans les salons privés.',
   'legal.collectedTech':
@@ -463,7 +486,7 @@ export const fr = {
     'Quand vous ouvrez le lien d’une boutique depuis une envie, nous enregistrons que ce clic a eu lieu : la date, la boutique concernée et votre compte. Cela sert à deux choses — améliorer les suggestions de cadeaux, et savoir combien de visites nous envoyons à chaque boutique. Ce journal n’est jamais montré au propriétaire de la liste : s’il pouvait voir qu’on a cliqué sur le lien d’une de ses envies, il apprendrait qu’elle intéresse quelqu’un. Vos propres clics sur vos propres envies ne sont pas enregistrés. Aucun identifiant n’est ajouté au lien : la boutique reçoit exactement l’adresse que vous avez collée, et n’apprend rien de nous.',
   'legal.why': 'Pourquoi, et sur quelle base',
   'legal.whyBody':
-    'Pour exécuter le service que vous avez demandé en créant un compte (article 6.1.b du RGPD) : sans ces données, il n’y a ni liste, ni ami, ni cadeau. La limitation des tentatives de connexion repose sur l’intérêt légitime à protéger les comptes (article 6.1.f).',
+    'Pour exécuter le service que vous avez demandé en créant un compte (article 6.1.b du RGPD) : sans ces données, il n’y a ni liste, ni ami, ni cadeau. Les réponses au questionnaire d’inscription reposent sur votre consentement (article 6.1.a), donné en répondant et retirable à tout moment en effaçant vos réponses depuis votre profil — le service fonctionne à l’identique sans elles. La limitation des tentatives de connexion repose sur l’intérêt légitime à protéger les comptes (article 6.1.f).',
   'legal.retention': 'Combien de temps',
   'legal.retentionBody':
     'Vos données sont conservées tant que votre compte existe. Une session expire au bout de 30 jours. Les tentatives de connexion sont effacées au bout de 24 heures. À la suppression de votre compte, tout est effacé immédiatement : listes, envies, réservations, participations, messages, photos et journal d’activité. Rien n’est conservé sous forme anonymisée.',

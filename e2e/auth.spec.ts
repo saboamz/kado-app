@@ -83,8 +83,58 @@ test('signing up creates an account with a default list', async ({ page }) => {
   await page.getByLabel('Mot de passe').fill('motdepasse123');
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
 
+  // A new account lands on the questionnaire, not the app. Skipping is a link.
+  await expect(page).toHaveURL(/\/welcome$/);
+  await page.getByRole('link', { name: 'Passer cette étape' }).click();
+
   await expect(page).toHaveURL(/\/app$/);
   await expect(page.getByText('Mes envies')).toBeVisible();
+});
+
+test('the sign-up questionnaire saves what is ticked, and skips cleanly', async ({
+  page,
+}) => {
+  const email = `enquete-${Date.now()}@example.com`;
+  await page.goto('/signup');
+  await page.getByLabel('Nom').fill('Personne Curieuse');
+  await page.getByLabel('Adresse e-mail').fill(email);
+  await page.getByLabel('Mot de passe').fill('motdepasse123');
+  await page.getByRole('button', { name: 'Créer mon compte' }).click();
+  await expect(page).toHaveURL(/\/welcome$/);
+
+  await page.getByText('Café', { exact: true }).click();
+  await page.getByText('Randonnée', { exact: true }).click();
+  await page.getByText('Une femme', { exact: true }).click();
+  await page.getByText('25 – 34', { exact: true }).click();
+
+  await page.getByRole('button', { name: 'Enregistrer et continuer' }).click();
+  await expect(page).toHaveURL(/\/app$/, { timeout: 15_000 });
+
+  // Stored, and editable afterwards — which is what the privacy policy
+  // promises about withdrawing consent.
+  await page.goto('/profile/edit');
+  await expect(page.getByLabel(/Centres d'intérêt/)).toHaveValue(/Café/);
+  await expect(page.getByLabel('Vous êtes…')).toHaveValue('FEMALE');
+  await expect(page.getByLabel('Votre tranche d’âge')).toHaveValue('AGE_25_34');
+});
+
+test('not answering the questionnaire stores nothing', async ({ page }) => {
+  const email = `muet-${Date.now()}@example.com`;
+  await page.goto('/signup');
+  await page.getByLabel('Nom').fill('Personne Discrète');
+  await page.getByLabel('Adresse e-mail').fill(email);
+  await page.getByLabel('Mot de passe').fill('motdepasse123');
+  await page.getByRole('button', { name: 'Créer mon compte' }).click();
+  await expect(page).toHaveURL(/\/welcome$/);
+
+  // Submitting untouched: every question defaults to "rather not say", which
+  // is stored as an absence rather than as a category.
+  await page.getByRole('button', { name: 'Enregistrer et continuer' }).click();
+  await expect(page).toHaveURL(/\/app$/, { timeout: 15_000 });
+
+  await page.goto('/profile/edit');
+  await expect(page.getByLabel('Vous êtes…')).toHaveValue('');
+  await expect(page.getByLabel('Votre tranche d’âge')).toHaveValue('');
 });
 
 test('signing up rejects a password under eight characters', async ({ page }) => {

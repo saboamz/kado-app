@@ -150,6 +150,27 @@ export const en: Dictionary = {
   'events.delete': 'Remove',
   'events.adding': 'Adding…',
 
+  // ── Sign-up questionnaire ────────────────────────────────────────────────
+  'survey.title': 'Two questions, and that is all',
+  'survey.subtitle':
+    'They are used to suggest gift ideas. Nothing is required, and you can change all of it from your profile.',
+  'survey.interestsTitle': 'What do you like?',
+  'survey.interestsHint': 'Tick whatever you want, as many as you want.',
+  'survey.aboutTitle': 'About you',
+  'survey.aboutHint':
+    'Optional. These answers sharpen the suggestions and are shown to nobody — not on your profile, not to your friends.',
+  'survey.gender': 'You are…',
+  'survey.genderFemale': 'A woman',
+  'survey.genderMale': 'A man',
+  'survey.genderOther': 'Other',
+  'survey.age': 'Your age range',
+  'survey.noAnswer': 'I would rather not say',
+  'survey.submit': 'Save and carry on',
+  'survey.saving': 'Saving…',
+  'survey.skip': 'Skip this step',
+  'survey.privacy':
+    'You can change or erase these answers at any time, and deleting your account erases everything.',
+
   // ── Profile and settings ─────────────────────────────────────────────────
   'profile.title': 'Profile',
   'profile.lists': 'Lists',
@@ -446,7 +467,9 @@ export const en: Dictionary = {
   'legal.collectedAccount':
     'Account: your email address, your name, and your password in hashed form — never in the clear, including to us.',
   'legal.collectedOptional':
-    'Optional: a short description, your date of birth, a profile photo, your interests, a decorative GIF. None of it is required, and all of it can be changed or removed at any time.',
+    'Optional: a short description, a profile photo, your interests, the dates you choose to publish (a birthday, a wedding, whatever you like), a decorative GIF. None of it is required, and all of it can be changed or removed at any time.',
+  'legal.collectedSurvey':
+    'Sign-up questionnaire: when you create an account we offer you the chance to give your interests, your sex and your age range. All three are optional, the whole step can be skipped, and not answering is stored as the absence of an answer — not as a category. This is used only to suggest gift ideas: none of it is displayed anywhere, not on your profile and not to your friends. An age range is asked for rather than a date of birth because a date identifies a person, which suggestions do not need. Nothing sensitive within the meaning of Article 9 of the GDPR is asked for: no religion, health, ethnic origin, political opinion or sexual orientation.',
   'legal.collectedUse':
     'Use: your lists, your wishes, your friends, what you have claimed, what you have chipped in, and your messages in the private chats.',
   'legal.collectedTech':
@@ -456,7 +479,7 @@ export const en: Dictionary = {
     'When you open a shop link from a wish, we record that the click happened: the date, which shop, and your account. It serves two purposes — improving gift suggestions, and knowing how many visits we send each shop. This log is never shown to the list’s owner: if they could see that someone clicked the link on one of their wishes, they would learn that it interests somebody. Your own clicks on your own wishes are not recorded. No identifier is added to the link: the shop receives exactly the address you pasted, and learns nothing from us.',
   'legal.why': 'Why, and on what basis',
   'legal.whyBody':
-    'To perform the service you asked for by creating an account (GDPR article 6.1.b): without this data there is no list, no friend and no gift. Rate-limiting sign-in attempts rests on the legitimate interest in protecting accounts (article 6.1.f).',
+    'To perform the service you asked for by creating an account (GDPR article 6.1.b): without this data there is no list, no friend and no gift. The sign-up questionnaire answers rest on your consent (article 6.1.a), given by answering and withdrawable at any time by clearing them from your profile — the service works identically without them. Rate-limiting sign-in attempts rests on the legitimate interest in protecting accounts (article 6.1.f).',
   'legal.retention': 'For how long',
   'legal.retentionBody':
     'Your data is kept for as long as your account exists. A session expires after 30 days. Sign-in attempts are erased after 24 hours. When you delete your account, everything goes at once: lists, wishes, claims, contributions, messages, photos and activity log. Nothing is kept in anonymised form.',

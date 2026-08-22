@@ -25,6 +25,15 @@ model User {
   passwordHash  String
   name          String
   bio           String?
+  /// Answers to the sign-up questionnaire. Both optional, and NULL is the
+  /// answer "I would rather not say" — a refusal is not a category, so it is
+  /// not one here either.
+  ///
+  /// Ordinary personal data under the GDPR, not a special category: no
+  /// religion, health, ethnicity or orientation is asked for anywhere. They
+  /// exist to feed recommendations and are never shown on a profile.
+  gender        Gender?
+  ageBracket    AgeBracket?
   /// An uploaded photo. Absent, the avatar falls back to the person's
   /// initials on a tint derived from their name — see avatarTint() in
   /// format.ts. There is no stored colour: it was removed once nothing
@@ -66,6 +75,26 @@ model User {
 
   // No @@index([email]): `email @unique` above already creates a B-tree, so a
   // second index on the same column only cost writes and storage.
+}
+
+/// How somebody describes themselves, when they choose to.
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
+}
+
+/// An age range rather than a date of birth.
+///
+/// A birthday identifies a person; a decade does not, and the recommender
+/// cannot tell the difference. Starts at 15 because the terms require it.
+enum AgeBracket {
+  AGE_15_24
+  AGE_25_34
+  AGE_35_44
+  AGE_45_54
+  AGE_55_64
+  AGE_65_PLUS
 }
 
 enum Theme {
