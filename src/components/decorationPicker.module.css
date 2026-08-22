@@ -82,14 +82,24 @@
   border-color: var(--ink3);
 }
 
+/* Quiet type, hittable box — see .rotate in inviteLink for the same trade. */
 .remove {
-  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 12px;
   color: var(--ink3);
   text-decoration: underline;
 }
 
-.remove:hover {
+.remove:hover,
+.remove:active {
+  color: var(--danger);
+}
+
+.error {
+  margin: 0;
+  font-size: 12.5px;
   color: var(--danger);
 }
 
@@ -146,10 +156,20 @@
   overflow: hidden;
   background: var(--card2);
   border: 2px solid transparent;
+  transition:
+    border-color 0.16s ease,
+    transform 0.1s ease;
 }
 
 .gifButton:hover:not(:disabled),
 .gifButton:focus-visible {
+  border-color: var(--acc);
+}
+
+/* The target IS the image, so without this there is no way to tell which one
+   of a dozen near-identical tiles took the press. */
+.gifButton:active:not(:disabled) {
+  transform: scale(0.95);
   border-color: var(--acc);
 }
 

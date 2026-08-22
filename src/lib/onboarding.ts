@@ -60,7 +60,7 @@ export async function getOnboarding(
 ): Promise<Onboarding | null> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { birthday: true, onboardingDismissedAt: true },
+    select: { onboardingDismissedAt: true },
   });
   if (!user || user.onboardingDismissedAt) return null;
 
@@ -108,9 +108,10 @@ export async function getOnboarding(
       body: t('onboarding.profileBody'),
       href: '/profile/edit',
       cta: t('onboarding.profileCta'),
-      // Deliberately not the avatar: a photo is a preference, while a birthday
-      // and a few interests are what someone hunting for a present needs.
-      done: Boolean(user.birthday) && interestCount > 0,
+      // Interests alone, now that a date is something people opt into rather
+      // than a column everybody carries: making the step depend on one would
+      // leave it permanently unfinished for anybody who publishes none.
+      done: interestCount > 0,
     },
     {
       id: 'decoration',

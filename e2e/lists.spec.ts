@@ -7,6 +7,20 @@ import {
   type Scenario,
 } from './fixtures';
 
+/*
+ * KNOWN: "a full list lifecycle" still fails roughly one run in three.
+ *
+ * The waits below are correct and were worth adding — a click followed
+ * straight by a fill times out on the field, which reads as a slow form when
+ * the truth is a navigation that never started. With them the failure at
+ * least names the right step.
+ *
+ * It is not fixed. waitForURL itself times out, so the click genuinely does
+ * not navigate sometimes. `waitUntil: 'networkidle'` before the click was
+ * tried and changed nothing, so a pre-hydration click is not the whole story
+ * either. The next step is a full Playwright trace of a failing run.
+ */
+
 /** Specs that add or remove wishes work on their own list, never the seed's. */
 let scenario: Scenario;
 
@@ -40,6 +54,10 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   // Create.
   await page.goto('/lists');
   await page.getByRole('link', { name: /Nouvelle liste/ }).click();
+  // Wait for the route, not for the field. Filling a form on a page still in
+  // flight times out on a locator that is about to exist, which reads as a
+  // slow form rather than as the navigation it actually is.
+  await page.waitForURL('**/lists/new');
   await page.getByLabel('Nom de la liste').fill(listName);
   await page.getByLabel('Occasion').fill('Pour tester');
   await page.getByRole('button', { name: 'Créer la liste' }).click();
@@ -47,8 +65,12 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   await expect(page.getByRole('heading', { name: listName })).toBeVisible();
   await expect(page.getByText('Cette liste est vide')).toBeVisible();
 
-  // Add a wish.
+  // Add a wish. Wait for the form's own route rather than assuming the click
+  // landed: on mobile the empty state and the header both offer "Ajouter",
+  // and filling a field on a page that has not arrived yet times out on a
+  // locator that is about to exist.
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
+  await page.waitForURL('**/gifts/new');
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(wish);
   await page.getByLabel('Lien').fill('boutique.fr/theiere');
   await page.getByLabel('Prix').fill('42,50');
@@ -58,14 +80,23 @@ test('a full list lifecycle: create, add a wish, edit it, delete the list', asyn
   await expect(page.getByText('42,50 €')).toBeVisible();
 
   // The bare domain became a real link and the shop was derived from it.
+  //
+  // Wait for the gift page before asserting on the merchant link. The card on
+  // the list page carries the shop name in its own accessible name, so
+  // /boutique\.fr/ matches the card too — and while the navigation is still in
+  // flight it matches it first, then fails on the card's own /gifts/… href.
   await page.getByText(wish).click();
-  await expect(page.getByText('boutique.fr', { exact: false })).toBeVisible();
+  await page.waitForURL(/\/gifts\/[a-z0-9]+$/);
+  // Exact match: the card shows the shop name and the full URL, and both
+  // contain "boutique.fr", so a substring match resolves to two elements.
+  await expect(page.getByText('boutique.fr', { exact: true })).toBeVisible();
   await expect(
     page.getByRole('link', { name: /boutique\.fr/ }),
   ).toHaveAttribute('href', 'https://boutique.fr/theiere');
 
   // Edit the wish.
   await page.getByRole('link', { name: 'Modifier' }).click();
+  await page.waitForURL(/\/gifts\/[a-z0-9]+\/edit$/);
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill(`${wish} en fonte`);
   await page.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(
@@ -90,6 +121,7 @@ test('a wish needs only a name', async ({ page }) => {
   await signIn(page, scenario.ownerEmail);
   await page.goto(`/lists/${scenario.listId}`);
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
+  await page.waitForURL('**/gifts/new');
 
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Une idée libre');
   await page.getByRole('button', { name: 'Ajouter à ma liste' }).click();
@@ -117,6 +149,7 @@ test('an unreadable price is reported rather than silently dropped', async ({
   await signIn(page, scenario.ownerEmail);
   await page.goto(`/lists/${scenario.listId}`);
   await page.getByRole('link', { name: /Ajouter/ }).first().click();
+  await page.waitForURL('**/gifts/new');
 
   await page.getByLabel(/Qu'est-ce qui vous ferait plaisir/).fill('Prix douteux');
   await page.getByLabel('Prix').fill('beaucoup');
@@ -138,7 +171,7 @@ test('a friend can read a list but not shape it', async ({ page }) => {
 
   // …and the route itself refuses, so hiding the button is not the defence.
   await page.goto(`${listUrl}/edit`);
-  await expect(page.getByText('404')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '404' })).toBeVisible();
 });
 
 test('a stranger cannot see a friends-only list at all', async ({ page }) => {

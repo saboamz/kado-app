@@ -14,6 +14,7 @@ import type { Plural } from './t';
 export const fr = {
   // ── Navigation and chrome ────────────────────────────────────────────────
   'nav.main': 'Navigation principale',
+  'nav.skip': 'Aller au contenu',
   'nav.home': 'Accueil',
   'nav.lists': 'Mes listes',
   'nav.search': 'Rechercher',
@@ -51,7 +52,7 @@ export const fr = {
   // ── Home ─────────────────────────────────────────────────────────────────
   'home.greeting': 'Bonjour {name}',
   'home.subtitle': 'Vos listes, et ce que préparent vos proches.',
-  'home.birthdays': 'Anniversaires',
+  'home.events': 'À venir',
   'home.myLists': 'Mes listes',
   'home.aroundYou': 'Chez vos proches',
   'home.noListsTitle': 'Aucune liste pour l’instant',
@@ -78,7 +79,7 @@ export const fr = {
   'onboarding.friendCta': 'Obtenir mon lien',
   'onboarding.profileTitle': 'Complétez votre profil',
   'onboarding.profileBody':
-    'Date de naissance et centres d’intérêt : de quoi guider ceux qui cherchent une idée.',
+    'Vos centres d’intérêt : de quoi guider ceux qui cherchent une idée.',
   'onboarding.profileCta': 'Compléter',
   'onboarding.decorationTitle': 'Décorez votre profil',
   'onboarding.decorationBody':
@@ -88,7 +89,7 @@ export const fr = {
   // ── Lists ────────────────────────────────────────────────────────────────
   'lists.title': 'Mes listes',
   'lists.subtitle': 'Ce que vous aimeriez recevoir, rangé par occasion.',
-  'lists.emptyBody': 'Créez une liste — anniversaire, Noël, ou simplement vos envies du moment.',
+  'lists.emptyBody': 'Créez une liste — anniversaire, ou simplement vos envies du moment.',
   'lists.newList': 'Nouvelle liste',
   'lists.emptyListTitle': 'Cette liste est vide',
   'lists.emptyListBody': 'Ajoutez ce qui vous ferait plaisir.',
@@ -122,20 +123,34 @@ export const fr = {
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
+  'notifications.markAll': 'Tout marquer comme lu',
+  'notifications.markingAll': 'Marquage…',
+  'notifications.markAllFailed': 'Le marquage n’a pas abouti. Réessayez.',
   'notifications.emptyTitle': 'Rien de neuf',
   'notifications.emptyBody':
-    'Les anniversaires, nouvelles listes et demandes d’amis apparaîtront ici.',
+    'Les dates à venir, nouvelles listes et demandes d’amis apparaîtront ici.',
   'notifications.unread': 'Non lue',
 
-  // ── Birthdays ────────────────────────────────────────────────────────────
-  'birthdays.title': 'Anniversaires',
-  'birthdays.subtitle': 'Qui fête quoi, et quand — pour ne plus jamais s’y prendre trop tard.',
-  'birthdays.emptyTitle': 'Aucun anniversaire connu',
-  'birthdays.emptyBody':
-    'Vos amis n’ont pas renseigné leur date de naissance, ou vous n’avez pas encore d’amis.',
-  'birthdays.findPeople': 'Trouver des proches',
-  'birthdays.thisMonth': 'Dans le mois',
-  'birthdays.later': 'Plus tard',
+  // ── Events ───────────────────────────────────────────────────────────────
+  'events.title': 'À venir',
+  'events.subtitle': 'Les dates que vos proches ont choisi de publier.',
+  'events.emptyTitle': 'Aucune date à venir',
+  'events.emptyBody':
+    'Vos proches n’ont publié aucune date, ou vous n’avez pas encore d’amis.',
+  'events.findPeople': 'Trouver des proches',
+  'events.thisMonth': 'Dans le mois',
+  'events.later': 'Plus tard',
+  'events.mine': 'Mes dates',
+  'events.add': 'Ajouter une date',
+  'events.label': 'Intitulé',
+  'events.labelPlaceholder': 'Anniversaire, mariage, remise de diplôme…',
+  'events.labelHint': 'C’est vous qui choisissez ce que vous publiez, et son nom.',
+  'events.day': 'Jour',
+  'events.month': 'Mois',
+  'events.visibility': 'Qui peut la voir',
+  'events.none': 'Vous n’avez publié aucune date.',
+  'events.delete': 'Retirer',
+  'events.adding': 'Ajout…',
 
   // ── Profile and settings ─────────────────────────────────────────────────
   'profile.title': 'Profil',
@@ -150,6 +165,13 @@ export const fr = {
   'settings.language': 'Langue',
   'settings.languageHint': 'La langue dans laquelle vous lisez Kado.',
   'settings.deleteAccount': 'Supprimer mon compte',
+  'settings.password': 'Mot de passe',
+  'password.current': 'Mot de passe actuel',
+  'password.next': 'Nouveau mot de passe',
+  'password.save': 'Changer le mot de passe',
+  'password.saving': 'Enregistrement…',
+  'password.done':
+    'Mot de passe changé. Vos autres sessions ont été déconnectées.',
 
   // ── Forms ────────────────────────────────────────────────────────────────
   'form.giftName': "Qu'est-ce qui vous ferait plaisir ?",
@@ -166,13 +188,11 @@ export const fr = {
   'form.details': 'Précisions',
   'form.detailsPlaceholder': 'Taille, couleur, modèle exact…',
   'form.listName': 'Nom de la liste',
-  'form.listNamePlaceholder': 'Anniversaire, Noël, Mariage…',
+  'form.listNamePlaceholder': 'Anniversaire, Mariage…',
   'form.occasion': 'Occasion',
   'form.avatar': 'Photo de profil',
   'form.about': 'À propos',
   'form.aboutPlaceholder': 'Ce que vous aimez, en une phrase.',
-  'form.birthday': 'Date de naissance',
-  'form.birthdayHint': 'Vos amis verront le jour, jamais l’année.',
   'form.interests': "Centres d'intérêt",
   'form.interestsPlaceholder': 'Café, céramique, randonnée',
   'form.interestsHint': 'Séparés par des virgules — de quoi inspirer vos proches.',
@@ -194,6 +214,7 @@ export const fr = {
   'action.signingIn': 'Connexion…',
   'action.copied': 'Copié',
   'action.searching': 'Recherche…',
+  'action.loading': 'Chargement…',
   'action.nothingYet': 'Rien pour l’instant',
 
   // ── Reserving and pots ───────────────────────────────────────────────────
@@ -213,7 +234,7 @@ export const fr = {
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Ajoutez une envie : un lien, un prix, ou simplement une idée.',
   'lists.newTitle': 'Nouvelle liste',
-  'lists.newSubtitle': 'Une liste par occasion : anniversaire, Noël, ou vos envies du moment.',
+  'lists.newSubtitle': 'Une liste par occasion : anniversaire, ou vos envies du moment.',
   'lists.create': 'Créer la liste',
   'lists.editTitle': 'Modifier la liste',
   'lists.deleteList': 'Supprimer cette liste',
@@ -243,11 +264,16 @@ export const fr = {
   'error.passwordShort': 'Le mot de passe doit contenir au moins 8 caractères.',
   'error.passwordLong': 'Le mot de passe est trop long.',
   'error.passwordRequired': 'Renseignez votre mot de passe.',
+  'error.passwordUnchanged': 'Choisissez un mot de passe différent de l’actuel.',
   'error.nameRequired': 'Renseignez votre nom.',
   'error.nameLong': 'Ce nom est trop long.',
   'error.textLong': 'Ce texte est trop long.',
   'error.giftNameRequired': 'Donnez un nom à cette envie.',
   'error.listNameRequired': 'Donnez un nom à votre liste.',
+  'error.eventLabelRequired': 'Donnez un nom à cette date.',
+  'error.eventDateInvalid': 'Cette date n’existe pas.',
+  'error.eventTooMany': 'Vous avez atteint le nombre maximum de dates.',
+  'error.eventNotFound': 'Date introuvable.',
   'error.categoryRequired': 'Choisissez une catégorie.',
   'error.giftNotFound': 'Cadeau introuvable',
   'error.messageNotFound': 'Message introuvable.',
@@ -302,6 +328,10 @@ export const fr = {
   'error.emailTaken': 'Un compte existe déjà avec cette adresse.',
   'error.badCredentials': 'E-mail ou mot de passe incorrect.',
   'error.tooManyAttempts': 'Trop de tentatives. Réessayez dans quelques minutes.',
+  'error.tooManyUploads': 'Trop d’images envoyées d’affilée. Réessayez plus tard.',
+  'error.tooManyRequests': 'Trop de demandes d’affilée. Réessayez plus tard.',
+  'error.tooManyReports': 'Trop de signalements d’affilée. Réessayez demain.',
+  'error.tooManyMessages': 'Trop de messages d’affilée. Réessayez dans un instant.',
   'lists.defaultName': 'Mes envies',
 
   'error.retryMinutes': {
@@ -325,6 +355,9 @@ export const fr = {
   'auth.signupLede': 'Vos listes, vos amis, et des surprises qui le restent vraiment.',
 
   'pot.contribute': 'Participer',
+  'pot.contributing': 'Envoi…',
+  'pot.withdraw': 'Retirer ma participation',
+  'pot.withdrawing': 'Retrait…',
 
   'gift.estimatedPrice': '~{price}',
   'gift.estimatedNote': 'Prix relevé sur la boutique, à titre indicatif — {name} ne l’a pas renseigné.',
@@ -489,9 +522,19 @@ export const fr = {
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',
+  'invite.rotating': 'Un instant…',
   'upload.tooLarge': 'Cette image dépasse 4 Mo.',
   'search.placeholder': 'Nom ou adresse e-mail',
   'gif.placeholder': 'Chercher : chat, merci, anniversaire…',
+  'gif.choose': 'Choisir ce GIF',
+  'gif.chooseNamed': 'Choisir le GIF : {title}',
+  'gif.unconfigured':
+    'La recherche de GIFs n’est pas encore configurée sur ce serveur.',
+  'gif.failed': 'La recherche n’a pas répondu. Réessayez dans un instant.',
+  'gif.resultCount': {
+    one: '{count} GIF trouvé',
+    other: '{count} GIFs trouvés',
+  },
   'account.confirmDelete':
     'Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.',
 

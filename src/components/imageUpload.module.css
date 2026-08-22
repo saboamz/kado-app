@@ -44,10 +44,12 @@
   min-width: 0;
 }
 
+/* The primary interaction of the photo field on two forms; 38px was under
+   the 44px floor for something pressed that often. */
 .button {
   display: inline-flex;
   align-items: center;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -55,9 +57,17 @@
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background 0.16s ease,
+    transform 0.1s ease;
 }
 
 .button:hover {
+  background: var(--card2);
+}
+
+.button:active {
+  transform: scale(0.97);
   background: var(--card2);
 }
 

@@ -48,7 +48,7 @@ export default function robots(): MetadataRoute.Robots {
         '/friends',
         '/notifications',
         '/search',
-        '/birthdays',
+        '/events',
         '/app',
         '/uploads/',
         '/api/',

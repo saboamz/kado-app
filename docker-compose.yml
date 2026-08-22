@@ -48,7 +48,6 @@ services:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://kado:kado@postgres:5432/kado
-      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET before starting the app}
       NODE_ENV: production
       UPLOAD_DIR: /data/uploads
     ports:

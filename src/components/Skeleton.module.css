@@ -1,0 +1,77 @@
+/*
+ * The shape of a page that has not arrived yet.
+ *
+ * Every route here is dynamic, so a navigation used to leave the previous
+ * screen on display until the whole server tree resolved — the app looked
+ * frozen, and the slowest query set the pace for everything. These blocks
+ * stand in for the header and the first rows so the frame appears at once
+ * and only the content streams in.
+ *
+ * The shimmer uses kShimmer from globals.css, which was declared there and
+ * never referenced by anything.
+ */
+.block {
+  border-radius: var(--radius);
+  background: linear-gradient(
+    90deg,
+    var(--card2) 0%,
+    var(--line2) 50%,
+    var(--card2) 100%
+  );
+  background-size: 600px 100%;
+  animation: kShimmer 1.4s linear infinite;
+}
+
+/*
+ * Reduced motion keeps the placeholder, drops the travelling highlight: a
+ * band sweeping the width of the screen is exactly the kind of large moving
+ * surface the preference exists to stop. The global rule already cuts the
+ * duration; this also removes the gradient so nothing appears to crawl.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .block {
+    background: var(--card2);
+    animation: none;
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.title {
+  height: clamp(30px, 5.5vw, 40px);
+  width: min(62%, 320px);
+}
+
+.subtitle {
+  height: 15px;
+  width: min(86%, 460px);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.row {
+  height: 78px;
+}
+
+/* The eye reads the first rows and infers the rest, so later placeholders
+   fade back rather than insisting they are content. */
+.row:nth-child(2) {
+  opacity: 0.72;
+}
+
+.row:nth-child(3) {
+  opacity: 0.46;
+}
+
+.row:nth-child(4) {
+  opacity: 0.24;
+}

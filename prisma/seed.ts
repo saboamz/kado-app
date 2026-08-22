@@ -8,6 +8,11 @@ const DEMO_PASSWORD = 'kado1234';
 
 const DAY = 24 * 60 * 60 * 1000;
 const daysFromNow = (n: number) => new Date(Date.now() + n * DAY);
+/** The day and month n days out, which is all an event stores. */
+const dateInDays = (n: number) => {
+  const d = daysFromNow(n);
+  return { day: d.getDate(), month: d.getMonth() + 1 };
+};
 const daysAgo = (n: number) => new Date(Date.now() - n * DAY);
 
 async function main() {
@@ -27,7 +32,6 @@ async function main() {
       passwordHash,
       name: 'Sophie Marchand',
       bio: 'Café filtre, céramique et randonnées.',
-      birthday: daysFromNow(12),
       interests: {
         create: [
           { label: 'Céramique' },
@@ -45,8 +49,7 @@ async function main() {
       passwordHash,
       name: 'Thomas Bel',
       bio: 'Vélo, cuisine et vieux synthés.',
-      birthday: daysFromNow(24),
-      interests: { create: [{ label: 'Vélo' }, { label: 'Musique' }] },
+      interests: { create: [{ label: 'Vélo' }, { label: 'Cuisine' }] },
     },
   });
 
@@ -56,7 +59,6 @@ async function main() {
       passwordHash,
       name: 'Emma Roux',
       bio: 'Jardinage et romans policiers.',
-      birthday: daysFromNow(45),
       interests: { create: [{ label: 'Jardinage' }, { label: 'Lecture' }] },
     },
   });
@@ -67,7 +69,6 @@ async function main() {
       passwordHash,
       name: 'Lucas Ferrand',
       bio: 'Jeux de société et photographie argentique.',
-      birthday: daysFromNow(80),
     },
   });
 
@@ -169,7 +170,7 @@ async function main() {
 
   // An empty list, so the empty state is reachable without faking it.
   await db.giftList.create({
-    data: { name: 'Noël', occasion: 'Noël', ownerId: sophie.id },
+    data: { name: 'Crémaillère', occasion: 'Crémaillère', ownerId: sophie.id },
   });
 
   await db.giftList.create({
@@ -256,13 +257,25 @@ async function main() {
     ],
   });
 
+  // Dates people published about themselves. Deliberately not all the same
+  // kind: the label is free text, and the demo should show that rather than
+  // four rows that all say "Anniversaire".
+  console.log('Adding life events…');
+  await db.lifeEvent.createMany({
+    data: [
+      { ownerId: thomas.id, label: 'Anniversaire', ...dateInDays(24) },
+      { ownerId: emma.id, label: 'Mariage', ...dateInDays(45) },
+      { ownerId: lucas.id, label: 'Crémaillère', ...dateInDays(80), visibility: 'PUBLIC' },
+    ],
+  });
+
   console.log('Adding notifications…');
   await db.notification.createMany({
     data: [
       {
         userId: sophie.id,
-        type: 'BIRTHDAY_SOON',
-        body: 'Thomas fête son anniversaire dans 24 jours.',
+        type: 'EVENT_SOON',
+        body: 'Thomas a un événement dans 24 jours : Anniversaire.',
         href: '/u/' + thomas.id,
       },
       {

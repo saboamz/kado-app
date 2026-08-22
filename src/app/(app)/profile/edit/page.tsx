@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DecorationPicker } from '@/components/DecorationPicker';
+import { LifeEvents } from '@/components/LifeEvents';
 import { SectionTitle } from '@/components/display';
 import { PageHeader } from '@/components/PageHeader';
 import { ProfileForm } from '@/components/ProfileForm';
@@ -20,6 +21,7 @@ export default async function EditProfilePage() {
     include: {
       interests: { orderBy: { label: 'asc' } },
       decorations: true,
+      events: { orderBy: [{ month: 'asc' }, { day: 'asc' }] },
     },
   });
 
@@ -39,14 +41,15 @@ export default async function EditProfilePage() {
         initial={{
           name: profile.name,
           bio: profile.bio,
-          // The input wants YYYY-MM-DD; the column stores a full timestamp.
-          birthday: profile.birthday
-            ? profile.birthday.toISOString().slice(0, 10)
-            : '',
           avatarUrl: profile.avatarUrl,
           interests: profile.interests.map((i) => i.label).join(', '),
         }}
       />
+
+      <section style={{ marginTop: 32 }}>
+        <SectionTitle>{t('events.mine')}</SectionTitle>
+        <LifeEvents events={profile.events} />
+      </section>
 
       <section style={{ marginTop: 32 }}>
         <SectionTitle>{t('profile.decorate')}</SectionTitle>

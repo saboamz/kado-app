@@ -127,7 +127,7 @@ const PRODUCTS: Record<string, { title: string; brand: string; cents: number }[]
 };
 
 const INTERESTS = [
-  'Café', 'Céramique', 'Randonnée', 'Design', 'Vélo', 'Musique', 'Jardinage',
+  'Café', 'Céramique', 'Randonnée', 'Design', 'Vélo', 'Jardinage',
   'Lecture', 'Cuisine', 'Voyage', 'Photographie', 'Yoga', 'Escalade', 'Thé',
   'Mode', 'Méditation', 'Bijoux', 'Cinéma',
 ];
@@ -141,7 +141,9 @@ const LAST = ['Dubois', 'Moreau', 'Laurent', 'Simon', 'Michel', 'Lefebvre',
 
 const COLORS = ['#FF6A55', '#6C5CE7', '#00B894', '#FDCB6E', '#0984E3', '#E17055', '#00CEC9'];
 
-const OCCASIONS = ['Anniversaire', 'Noël', 'Crémaillère', 'Liste de naissance', null];
+const EVENT_LABELS = ['Anniversaire', 'Mariage', 'Crémaillère', 'Remise de diplôme'];
+
+const OCCASIONS = ['Anniversaire', 'Crémaillère', 'Liste de naissance', null];
 
 /** Free-text wishes with no product behind them. Invisible to the CF. */
 const FREE_WISHES = [
@@ -230,9 +232,14 @@ async function main() {
         passwordHash,
         name: `${first} ${last}`,
         bio: `${labels.join(', ')}.`,
-        birthday: daysAgo(int(7000, 18000)),
         profilePublic: rnd() < 0.3,
         interests: { create: labels.map((label) => ({ label })) },
+        // Two thirds publish a date; the rest publish none, which is the
+        // case the old required column could not represent.
+        events:
+          rnd() < 0.66
+            ? { create: [{ label: pick(EVENT_LABELS), day: int(1, 28), month: int(1, 12) }] }
+            : undefined,
       },
     });
     users.push({ id: user.id, categories });
@@ -272,7 +279,7 @@ async function main() {
       const list = await db.giftList.create({
         data: {
           ownerId: user.id,
-          name: l === 0 ? 'Mes envies' : pick(['Anniversaire', 'Noël', 'Cadeaux utiles']),
+          name: l === 0 ? 'Mes envies' : pick(['Anniversaire', 'Cadeaux utiles']),
           occasion: pick(OCCASIONS),
           visibility: rnd() < 0.85 ? 'FRIENDS' : 'PUBLIC',
           isDefault: l === 0,

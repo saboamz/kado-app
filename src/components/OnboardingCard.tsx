@@ -49,7 +49,22 @@ export function OnboardingCard({
           type="button"
           className={styles.dismiss}
           disabled={dismissing}
-          onClick={() => startDismiss(() => void dismissOnboarding())}
+          aria-busy={dismissing}
+          /*
+           * The rejection was previously discarded by `void`, which left an
+           * unhandled promise. A failure here is benign — the card simply
+           * stays, which is itself the honest signal — so it needs catching,
+           * not reporting.
+           */
+          onClick={() =>
+            startDismiss(async () => {
+              try {
+                await dismissOnboarding();
+              } catch {
+                /* The card stays put; the next load will offer it again. */
+              }
+            })
+          }
         >
           {dismissing ? '…' : labels.dismiss}
         </button>

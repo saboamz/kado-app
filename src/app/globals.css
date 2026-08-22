@@ -24,7 +24,10 @@
   --card2: oklch(0.968 0.008 45);
   --ink: oklch(0.235 0.015 40);
   --ink2: oklch(0.475 0.013 40);
-  --ink3: oklch(0.615 0.011 40);
+  /* 0.615 gave 3.4–3.7:1 on the three surfaces — under the 4.5:1 AA floor for
+     body text, and this token sets 11–13px hints and quiet actions. 0.545
+     clears it everywhere, worst case 4.53:1 on --card2. */
+  --ink3: oklch(0.545 0.011 40);
   --line: oklch(0.895 0.008 40);
   --line2: oklch(0.935 0.006 40);
   --acc: oklch(0.5 0.098 195);
@@ -80,7 +83,9 @@
   --card2: oklch(0.278 0.01 40);
   --ink: oklch(0.955 0.006 60);
   --ink2: oklch(0.775 0.008 60);
-  --ink3: oklch(0.635 0.008 60);
+  /* Same floor from the other side: 0.635 failed only on --card2 (4.29:1).
+     0.650 clears all three, worst case 4.55:1. */
+  --ink3: oklch(0.65 0.008 60);
   --line: oklch(0.345 0.01 40);
   --line2: oklch(0.3 0.01 40);
   --acc: oklch(0.775 0.105 195);
@@ -133,9 +138,31 @@ h2,
 h3 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
   text-wrap: balance;
+}
+
+/*
+ * Tracking and leading are functions of size, not constants.
+ *
+ * One pair of values (-0.015em / 1.15) used to serve every heading from a
+ * 46px hero to a 15px card title. Letters drift apart as type grows and
+ * crowd as it shrinks, so a single value is necessarily wrong at both ends:
+ * the hero read loose, the small display-face titles read cramped. Lora ships
+ * no optical axis, so the compensation is manual, per level.
+ */
+h1 {
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+}
+
+h2 {
+  line-height: 1.16;
+  letter-spacing: -0.018em;
+}
+
+h3 {
+  line-height: 1.25;
+  letter-spacing: -0.008em;
 }
 
 button {

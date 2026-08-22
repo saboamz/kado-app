@@ -31,6 +31,7 @@ const TABS = [
 
 export type NavLabels = {
   main: string;
+  skip: string;
   home: string;
   lists: string;
   search: string;
@@ -62,6 +63,15 @@ export function AppShell({
 
   return (
     <div className={styles.shell}>
+      {/*
+        The nav precedes the content in the DOM whatever its visual position,
+        so without this a keyboard or screen-reader user crossed the wordmark,
+        five destinations and the profile link on every single page load
+        before reaching what they came for.
+      */}
+      <a href="#main" className={styles.skip}>
+        {labels.skip}
+      </a>
       <div className={styles.body}>
         <nav className={styles.nav} aria-label={labels.main}>
           <Link href="/app" className={styles.brand}>
@@ -110,7 +120,7 @@ export function AppShell({
           )}
         </nav>
 
-        <main className={styles.main}>
+        <main id="main" tabIndex={-1} className={styles.main}>
           <div className={styles.container}>{children}</div>
         </main>
       </div>

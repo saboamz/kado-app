@@ -19,12 +19,21 @@ export default async function NotificationsPage() {
   const t = await getT();
   const user = await requireUser();
 
-  const notifications = await db.notification.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-  });
-  const unread = notifications.filter((n) => !n.read).length;
+  /*
+   * The count is asked of the database, not derived from the page.
+   *
+   * Counting unread rows within the 50 fetched missed any that had fallen
+   * past the cutoff, so somebody with a long history saw "tout marquer comme
+   * lu" disappear while unread notifications were still waiting behind it.
+   */
+  const [notifications, unread] = await Promise.all([
+    db.notification.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    }),
+    db.notification.count({ where: { userId: user.id, read: false } }),
+  ]);
 
   return (
     <>
@@ -57,7 +66,15 @@ export default async function NotificationsPage() {
                 className={styles.item}
                 data-unread={n.read ? undefined : ''}
               >
-                {!n.read && <span className={styles.dot} aria-label={t('notifications.unread')} />}
+                {/* aria-label on a bare span with no role is not reliably
+                    exposed, so the unread state rested on colour alone. The
+                    dot is decorative now and the word carries the meaning. */}
+                {!n.read && (
+                  <>
+                    <span className={styles.dot} aria-hidden />
+                    <span className="srOnly">{t('notifications.unread')}</span>
+                  </>
+                )}
                 {n.href ? (
                   <Link href={n.href} className={styles.link}>
                     {body}

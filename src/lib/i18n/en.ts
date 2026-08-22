@@ -16,6 +16,7 @@ import type { Dictionary } from './t';
 export const en: Dictionary = {
   // ── Navigation and chrome ────────────────────────────────────────────────
   'nav.main': 'Main navigation',
+  'nav.skip': 'Skip to content',
   'nav.home': 'Home',
   'nav.lists': 'My lists',
   'nav.search': 'Search',
@@ -53,7 +54,7 @@ export const en: Dictionary = {
   // ── Home ─────────────────────────────────────────────────────────────────
   'home.greeting': 'Hello {name}',
   'home.subtitle': 'Your lists, and what your friends are planning.',
-  'home.birthdays': 'Birthdays',
+  'home.events': 'Coming up',
   'home.myLists': 'My lists',
   'home.aroundYou': 'Around you',
   'home.noListsTitle': 'No lists yet',
@@ -78,7 +79,7 @@ export const en: Dictionary = {
   'onboarding.friendCta': 'Get my link',
   'onboarding.profileTitle': 'Complete your profile',
   'onboarding.profileBody':
-    'Birthday and interests: enough to guide anyone looking for an idea.',
+    'Your interests: enough to guide anyone looking for an idea.',
   'onboarding.profileCta': 'Complete',
   'onboarding.decorationTitle': 'Decorate your profile',
   'onboarding.decorationBody': 'A GIF at the foot of the page, so your profile looks like you.',
@@ -88,7 +89,7 @@ export const en: Dictionary = {
   'lists.title': 'My lists',
   'lists.subtitle': 'What you would like to receive, sorted by occasion.',
   'lists.emptyBody':
-    'Create a list — a birthday, Christmas, or simply what you feel like right now.',
+    'Create a list — a birthday, or simply what you feel like right now.',
   'lists.newList': 'New list',
   'lists.emptyListTitle': 'This list is empty',
   'lists.emptyListBody': 'Add what would make you happy.',
@@ -121,19 +122,33 @@ export const en: Dictionary = {
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
+  'notifications.markAll': 'Mark all as read',
+  'notifications.markingAll': 'Marking…',
+  'notifications.markAllFailed': 'Could not mark them read. Try again.',
   'notifications.emptyTitle': 'Nothing new',
-  'notifications.emptyBody': 'Birthdays, new lists and friend requests will show up here.',
+  'notifications.emptyBody': 'Dates, new lists and friend requests will show up here.',
   'notifications.unread': 'Unread',
 
-  // ── Birthdays ────────────────────────────────────────────────────────────
-  'birthdays.title': 'Birthdays',
-  'birthdays.subtitle': 'Who is celebrating what, and when — so you are never caught out again.',
-  'birthdays.emptyTitle': 'No birthdays known',
-  'birthdays.emptyBody':
-    'Your friends have not given their date of birth, or you have no friends yet.',
-  'birthdays.findPeople': 'Find people',
-  'birthdays.thisMonth': 'Within the month',
-  'birthdays.later': 'Later',
+  // ── Events ───────────────────────────────────────────────────────────────
+  'events.title': 'Coming up',
+  'events.subtitle': 'The dates your friends chose to publish.',
+  'events.emptyTitle': 'No dates coming up',
+  'events.emptyBody':
+    'Your friends have published no dates, or you have no friends yet.',
+  'events.findPeople': 'Find people',
+  'events.thisMonth': 'Within the month',
+  'events.later': 'Later',
+  'events.mine': 'My dates',
+  'events.add': 'Add a date',
+  'events.label': 'Name',
+  'events.labelPlaceholder': 'Birthday, wedding, graduation…',
+  'events.labelHint': 'You choose what you publish, and what to call it.',
+  'events.day': 'Day',
+  'events.month': 'Month',
+  'events.visibility': 'Who can see it',
+  'events.none': 'You have published no dates.',
+  'events.delete': 'Remove',
+  'events.adding': 'Adding…',
 
   // ── Profile and settings ─────────────────────────────────────────────────
   'profile.title': 'Profile',
@@ -148,6 +163,12 @@ export const en: Dictionary = {
   'settings.language': 'Language',
   'settings.languageHint': 'The language you read Kado in.',
   'settings.deleteAccount': 'Delete my account',
+  'settings.password': 'Password',
+  'password.current': 'Current password',
+  'password.next': 'New password',
+  'password.save': 'Change password',
+  'password.saving': 'Saving…',
+  'password.done': 'Password changed. Your other sessions were signed out.',
 
   // ── Forms ────────────────────────────────────────────────────────────────
   'form.giftName': 'What would make you happy?',
@@ -164,13 +185,11 @@ export const en: Dictionary = {
   'form.details': 'Details',
   'form.detailsPlaceholder': 'Size, colour, exact model…',
   'form.listName': 'List name',
-  'form.listNamePlaceholder': 'Birthday, Christmas, Wedding…',
+  'form.listNamePlaceholder': 'Birthday, Wedding…',
   'form.occasion': 'Occasion',
   'form.avatar': 'Profile photo',
   'form.about': 'About',
   'form.aboutPlaceholder': 'What you like, in one sentence.',
-  'form.birthday': 'Date of birth',
-  'form.birthdayHint': 'Your friends will see the day, never the year.',
   'form.interests': 'Interests',
   'form.interestsPlaceholder': 'Coffee, ceramics, hiking',
   'form.interestsHint': 'Separated by commas — enough to inspire your friends.',
@@ -192,6 +211,7 @@ export const en: Dictionary = {
   'action.signingIn': 'Signing in…',
   'action.copied': 'Copied',
   'action.searching': 'Searching…',
+  'action.loading': 'Loading…',
   'action.nothingYet': 'Nothing yet',
 
   // ── Reserving and pots ───────────────────────────────────────────────────
@@ -211,7 +231,7 @@ export const en: Dictionary = {
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Add a wish: a link, a price, or simply an idea.',
   'lists.newTitle': 'New list',
-  'lists.newSubtitle': 'One list per occasion: a birthday, Christmas, or what you fancy now.',
+  'lists.newSubtitle': 'One list per occasion: a birthday, or what you fancy now.',
   'lists.create': 'Create the list',
   'lists.editTitle': 'Edit the list',
   'lists.deleteList': 'Delete this list',
@@ -238,11 +258,16 @@ export const en: Dictionary = {
   'error.passwordShort': 'The password must be at least 8 characters.',
   'error.passwordLong': 'That password is too long.',
   'error.passwordRequired': 'Enter your password.',
+  'error.passwordUnchanged': 'Choose a password different from the current one.',
   'error.nameRequired': 'Enter your name.',
   'error.nameLong': 'That name is too long.',
   'error.textLong': 'That text is too long.',
   'error.giftNameRequired': 'Give this wish a name.',
   'error.listNameRequired': 'Give your list a name.',
+  'error.eventLabelRequired': 'Give this date a name.',
+  'error.eventDateInvalid': 'That date does not exist.',
+  'error.eventTooMany': 'You have reached the maximum number of dates.',
+  'error.eventNotFound': 'Date not found.',
   'error.categoryRequired': 'Choose a category.',
   'error.giftNotFound': 'Gift not found',
   'error.messageNotFound': 'Message not found.',
@@ -297,6 +322,10 @@ export const en: Dictionary = {
   'error.emailTaken': 'An account already exists with that address.',
   'error.badCredentials': 'Wrong email address or password.',
   'error.tooManyAttempts': 'Too many attempts. Try again in a few minutes.',
+  'error.tooManyUploads': 'Too many images in a row. Try again later.',
+  'error.tooManyRequests': 'Too many requests in a row. Try again later.',
+  'error.tooManyReports': 'Too many reports in a row. Try again tomorrow.',
+  'error.tooManyMessages': 'Too many messages in a row. Try again in a moment.',
   'lists.defaultName': 'My wishes',
 
   'error.retryMinutes': {
@@ -319,6 +348,9 @@ export const en: Dictionary = {
   'auth.signupLede': 'Your lists, your friends, and surprises that stay surprises.',
 
   'pot.contribute': 'Chip in',
+  'pot.contributing': 'Sending…',
+  'pot.withdraw': 'Withdraw my contribution',
+  'pot.withdrawing': 'Withdrawing…',
 
   'gift.estimatedPrice': '~{price}',
   'gift.estimatedNote': 'Price read from the shop, as a guide — {name} did not give one.',
@@ -483,9 +515,18 @@ export const en: Dictionary = {
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',
+  'invite.rotating': 'One moment…',
   'upload.tooLarge': 'This image is larger than 4 MB.',
   'search.placeholder': 'Name or email address',
   'gif.placeholder': 'Search: cat, thanks, birthday…',
+  'gif.choose': 'Choose this GIF',
+  'gif.chooseNamed': 'Choose the GIF: {title}',
+  'gif.unconfigured': 'GIF search is not configured on this server yet.',
+  'gif.failed': 'The search did not respond. Try again in a moment.',
+  'gif.resultCount': {
+    one: '{count} GIF found',
+    other: '{count} GIFs found',
+  },
   'account.confirmDelete':
     'Permanently delete your account and all your data? This cannot be undone.',
 

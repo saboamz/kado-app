@@ -1,9 +1,10 @@
 'use server';
 
+import { z } from 'zod';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from './db';
-import { hashPassword, verifyPassword } from './password';
+import { dummyHash, hashPassword, needsRehash, verifyPassword } from './password';
 import {
   LOGIN_PER_EMAIL,
   LOGIN_PER_IP,
@@ -15,10 +16,10 @@ import {
 } from './rate-limit';
 import { acceptInvite } from './invite-actions';
 import { getLocale, getT } from './i18n/server';
-import { createSession, destroySession } from './session';
-import { fieldErrors, loginSchema, signupSchema } from './validation';
+import { createSession, destroySession, requireUser } from './session';
+import { fieldErrors, loginSchema, passwordSchema, signupSchema } from './validation';
 
-export type FormState = { errors?: Record<string, string> };
+export type FormState = { errors?: Record<string, string>; done?: boolean };
 
 /**
  * The caller's address, for rate limiting.
@@ -169,8 +170,16 @@ export async function login(
   };
 
   if (!user) {
-    // Spend comparable time so the response does not reveal the miss either.
-    await verifyPassword(parsed.data.password, 'scrypt:00:00');
+    /*
+     * A real hash, so the miss costs what a hit costs.
+     *
+     * This used to verify against the literal 'scrypt:00:00', which is
+     * rejected on shape before scrypt is ever called — an unknown address
+     * answered in microseconds and a known one in hundreds of milliseconds.
+     * Measured at ~4850x, which is a stopwatch away from telling anybody
+     * which addresses are registered, and undoes the identical messages above.
+     */
+    await verifyPassword(parsed.data.password, await dummyHash());
     return fail();
   }
   if (!(await verifyPassword(parsed.data.password, user.passwordHash))) {
@@ -181,6 +190,19 @@ export async function login(
   // mistyped twice is not refused on their next legitimate attempt.
   await clearAttempts('login:email', parsed.data.email);
 
+  /*
+   * Sign-in is the only moment the plaintext exists, so it is the only moment
+   * a hash made at an older cost can be brought up to the current one. Failure
+   * is swallowed: an upgrade that did not happen is worth retrying next time,
+   * never worth refusing a correct password over.
+   */
+  if (needsRehash(user.passwordHash)) {
+    const upgraded = await hashPassword(parsed.data.password);
+    await db.user
+      .update({ where: { id: user.id }, data: { passwordHash: upgraded } })
+      .catch(() => {});
+  }
+
   await createSession(user.id);
   await applyInvite(formData);
   redirect('/app');
@@ -189,4 +211,64 @@ export async function login(
 export async function logout(): Promise<void> {
   await destroySession();
   redirect('/login');
+}
+
+/**
+ * Changing a password from inside the account.
+ *
+ * There is no reset flow — that needs e-mail, which the app does not send.
+ * This is the half that needs nothing: somebody who is signed in and suspects
+ * their password is known can replace it. Before this, the only remedy the
+ * product offered was deleting the account.
+ *
+ * The current password is required. A session left open on a shared machine
+ * would otherwise be enough to lock its owner out of their own account.
+ */
+export async function changePassword(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await requireUser();
+
+  const parsed = z
+    .object({
+      current: z.string().min(1, 'error.passwordRequired'),
+      next: passwordSchema,
+    })
+    .safeParse({
+      current: formData.get('current'),
+      next: formData.get('next'),
+    });
+  if (!parsed.success) return { errors: fieldErrors(parsed.error) };
+
+  const row = await db.user.findUniqueOrThrow({
+    where: { id: user.id },
+    select: { passwordHash: true },
+  });
+
+  if (!(await verifyPassword(parsed.data.current, row.passwordHash))) {
+    return { errors: { current: 'error.badCredentials' } };
+  }
+
+  if (parsed.data.next === parsed.data.current) {
+    return { errors: { next: 'error.passwordUnchanged' } };
+  }
+
+  const hash = await hashPassword(parsed.data.next);
+
+  /*
+   * Every other session goes with it.
+   *
+   * Changing a password because somebody else may have it is pointless if the
+   * session they are already holding keeps working. The current one is spared
+   * and reissued, so the person doing this is not signed out of the tab they
+   * are typing in.
+   */
+  await db.$transaction([
+    db.user.update({ where: { id: user.id }, data: { passwordHash: hash } }),
+    db.session.deleteMany({ where: { userId: user.id } }),
+  ]);
+  await createSession(user.id);
+
+  return { done: true };
 }

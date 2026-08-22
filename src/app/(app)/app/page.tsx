@@ -14,12 +14,12 @@ import { OnboardingCard } from '@/components/OnboardingCard';
 import { PageHeader } from '@/components/PageHeader';
 import { db } from '@/lib/db';
 import {
-  daysUntilBirthday,
-  formatBirthdayCountdown,
+  formatDateCountdown,
   formatRelative,
 } from '@/lib/format';
 import { getT } from '@/lib/i18n/server';
 import { getOnboarding } from '@/lib/onboarding';
+import { upcomingForFriends } from '@/lib/life-events';
 import { friendIds } from '@/lib/relations';
 import { requireUser } from '@/lib/session';
 import styles from './home.module.css';
@@ -42,17 +42,9 @@ export default async function AppHomePage() {
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
       take: 4,
     }),
-    // Birthdays are stored with their original year, so ordering has to happen
-    // in JavaScript on the day-of-year rather than in SQL on the date.
-    db.user.findMany({
-      where: { id: { in: friends }, birthday: { not: null } },
-      select: {
-        id: true,
-        name: true,
-        avatarUrl: true,
-        birthday: true,
-      },
-    }),
+    // Ordered by next occurrence, which an event's day and month cannot
+    // express in SQL — see upcomingForFriends.
+    upcomingForFriends(friends, 6),
     db.giftList.findMany({
       where: { ownerId: { in: friends } },
       include: {
@@ -65,11 +57,6 @@ export default async function AppHomePage() {
       take: 5,
     }),
   ]);
-
-  const birthdays = upcoming
-    .map((f) => ({ ...f, days: daysUntilBirthday(f.birthday!) }))
-    .sort((a, b) => a.days - b.days)
-    .slice(0, 6);
 
   return (
     <>
@@ -96,29 +83,34 @@ export default async function AppHomePage() {
         />
       )}
 
-      {birthdays.length > 0 && (
+      {upcoming.length > 0 && (
         <section className={styles.section}>
           <div className={styles.sectionHead}>
-            <SectionTitle>{t('home.birthdays')}</SectionTitle>
-            <ButtonLink href="/birthdays" variant="ghost">
+            <SectionTitle>{t('home.events')}</SectionTitle>
+            <ButtonLink href="/events" variant="ghost">
               {t('common.seeAll')}
             </ButtonLink>
           </div>
           <ul className={styles.birthdays}>
-            {birthdays.map((b) => (
-              <li key={b.id}>
-                <CardLink href={`/u/${b.id}`} plain className={styles.birthday}>
-                  <Avatar
-                    name={b.name}
-                    url={b.avatarUrl}
-                    size={40}
-                  />
-                  <span className={styles.birthdayName}>{b.name}</span>
+            {upcoming.map((e) => (
+              <li key={e.id}>
+                <CardLink
+                  href={`/u/${e.owner.id}`}
+                  plain
+                  className={styles.birthday}
+                >
+                  <Avatar name={e.owner.name} url={e.owner.avatarUrl} size={40} />
+                  <span className={styles.birthdayName}>
+                    {e.owner.name}
+                    {/* The label is what its owner called it, so it is shown
+                        as written rather than mapped onto a category. */}
+                    <span className={styles.eventLabel}>{e.label}</span>
+                  </span>
                   <span
                     className={styles.birthdayWhen}
-                    data-soon={b.days <= 14 ? '' : undefined}
+                    data-soon={e.days <= 14 ? '' : undefined}
                   >
-                    {formatBirthdayCountdown(b.days, t)}
+                    {formatDateCountdown(e.days, t)}
                   </span>
                 </CardLink>
               </li>
