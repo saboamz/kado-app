@@ -3,6 +3,7 @@
 import { extractProduct } from './extract';
 import { fetchHtml } from './fetch-page';
 import { findOrCreateProduct } from './product-resolve';
+import { LINK_FETCH_PER_USER, rateLimit, recordAttempt } from './rate-limit';
 import { requireUser } from './session';
 import { checkUrl } from './ssrf';
 
@@ -22,7 +23,23 @@ export type PreviewResult = {
 };
 
 export async function previewProduct(rawUrl: string): Promise<PreviewResult> {
-  await requireUser();
+  const user = await requireUser();
+
+  /*
+   * Throttled, because this is the action that makes our server fetch a URL
+   * somebody else chose.
+   *
+   * LINK_FETCH_PER_USER was written for exactly this and its comment says so,
+   * but the only caller was the GIF search — the preview, which is the more
+   * direct outbound relay of the two, was unthrottled. In a loop it is a free
+   * authenticated way to point our traffic at a host of the caller's choosing,
+   * and to burn the function budget doing it.
+   */
+  const budget = await rateLimit('link:preview', user.id, LINK_FETCH_PER_USER);
+  if (!budget.allowed) {
+    return { product: null, error: 'Trop de liens d’affilée. Réessayez dans un instant.' };
+  }
+  await recordAttempt('link:preview', user.id);
 
   const verdict = await checkUrl(rawUrl);
   if (!verdict.ok) return { product: null, error: verdict.reason };
