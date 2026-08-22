@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { db } from './db';
 import { LOCALES } from './i18n/locales';
+import { rateLimit, recordAttempt, UPLOAD_PER_USER } from './rate-limit';
 import { requireUser } from './session';
 import { deleteUpload, storeUpload } from './uploads';
 import { fieldErrors } from './validation';
@@ -51,6 +52,11 @@ export async function updateProfile(
   let avatarUrl: string | null | undefined;
   const file = formData.get('avatar');
   if (file instanceof File && file.size > 0) {
+    // Same ceiling as a gift photo — see resolveImage in gift-actions.
+    const budget = await rateLimit('upload', user.id, UPLOAD_PER_USER);
+    if (!budget.allowed) return { errors: { avatar: 'error.tooManyUploads' } };
+    await recordAttempt('upload', user.id);
+
     const stored = await storeUpload(file, 'avatars');
     if (!stored.ok) return { errors: { avatar: stored.error } };
     await deleteUpload(current.avatarUrl);

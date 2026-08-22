@@ -2,6 +2,7 @@
 
 import { db } from './db';
 import { canViewList, relationTo } from './relations';
+import { rateLimit, recordAttempt, REPORT_PER_USER } from './rate-limit';
 import { requireUser } from './session';
 
 export type ReportResult = { error?: string; done?: boolean };
@@ -92,6 +93,18 @@ async function save(data: {
   reason: string;
 }): Promise<ReportResult> {
   const reason = data.reason.trim().slice(0, 500);
+
+  /*
+   * Both entry points come through here, so the ceiling lives here too.
+   *
+   * The unique index already refuses a second report of the same thing by the
+   * same person; what it does not stop is one person reporting a hundred
+   * different things in an evening, which is how the queue becomes useless to
+   * whoever reads it.
+   */
+  const budget = await rateLimit('report', data.reporterId, REPORT_PER_USER);
+  if (!budget.allowed) return { error: 'error.tooManyReports' };
+  await recordAttempt('report', data.reporterId);
 
   try {
     await db.report.create({ data: { ...data, reason } });

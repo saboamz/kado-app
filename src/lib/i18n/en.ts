@@ -315,6 +315,10 @@ export const en: Dictionary = {
   'error.emailTaken': 'An account already exists with that address.',
   'error.badCredentials': 'Wrong email address or password.',
   'error.tooManyAttempts': 'Too many attempts. Try again in a few minutes.',
+  'error.tooManyUploads': 'Too many images in a row. Try again later.',
+  'error.tooManyRequests': 'Too many requests in a row. Try again later.',
+  'error.tooManyReports': 'Too many reports in a row. Try again tomorrow.',
+  'error.tooManyMessages': 'Too many messages in a row. Try again in a moment.',
   'lists.defaultName': 'My wishes',
 
   'error.retryMinutes': {

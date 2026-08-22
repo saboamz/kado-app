@@ -320,6 +320,10 @@ export const fr = {
   'error.emailTaken': 'Un compte existe déjà avec cette adresse.',
   'error.badCredentials': 'E-mail ou mot de passe incorrect.',
   'error.tooManyAttempts': 'Trop de tentatives. Réessayez dans quelques minutes.',
+  'error.tooManyUploads': 'Trop d’images envoyées d’affilée. Réessayez plus tard.',
+  'error.tooManyRequests': 'Trop de demandes d’affilée. Réessayez plus tard.',
+  'error.tooManyReports': 'Trop de signalements d’affilée. Réessayez demain.',
+  'error.tooManyMessages': 'Trop de messages d’affilée. Réessayez dans un instant.',
   'lists.defaultName': 'Mes envies',
 
   'error.retryMinutes': {

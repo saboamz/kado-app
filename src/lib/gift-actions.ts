@@ -6,6 +6,7 @@ import { db } from './db';
 import { logEvent } from './events';
 import { deleteUpload, storeUpload } from './uploads';
 import { parseMoney } from './format';
+import { rateLimit, recordAttempt, UPLOAD_PER_USER } from './rate-limit';
 import { requireUser } from './session';
 import { linkGiftToProduct } from './gift-product-link';
 import { fieldErrors, giftSchema, type GiftInput } from './validation';
@@ -100,10 +101,17 @@ async function resolveImage(
   formData: FormData,
   field: string,
   current: string | null,
+  ownerId: string,
 ): Promise<{ url?: string | null; error?: string }> {
   const file = formData.get(field);
 
   if (file instanceof File && file.size > 0) {
+    // 4MB a call with nothing counting them: a loop of saves is a way to fill
+    // the disk, or the Blob bill, on somebody else's money.
+    const budget = await rateLimit('upload', ownerId, UPLOAD_PER_USER);
+    if (!budget.allowed) return { error: 'error.tooManyUploads' };
+    await recordAttempt('upload', ownerId);
+
     const stored = await storeUpload(file, 'gifts');
     if (!stored.ok) return { error: stored.error };
     // The replaced file is not needed once the new one is saved.
@@ -134,7 +142,7 @@ export async function createGift(
     return { errors: { price: 'error.amountInvalid' } };
   }
 
-  const image = await resolveImage(formData, 'image', null);
+  const image = await resolveImage(formData, 'image', null, user.id);
   if (image.error) return { errors: { image: image.error } };
 
   // add_wish is evidence about the person who ADDED it — themselves — not
@@ -197,7 +205,7 @@ export async function updateGift(
     return { errors: { price: 'error.amountInvalid' } };
   }
 
-  const image = await resolveImage(formData, 'image', gift.imageUrl);
+  const image = await resolveImage(formData, 'image', gift.imageUrl, user.id);
   if (image.error) return { errors: { image: image.error } };
 
   const next = giftData(parsed.data);
