@@ -21,13 +21,19 @@ const rules = () => {
 const indexable = (path: string) => !rules().some((d) => path.startsWith(d));
 
 describe('what a crawler may reach', () => {
-  it.each(['/', '/mentions-legales', '/confidentialite', '/conditions'])(
-    'opens %s',
-    (path) => {
-      // Everything this app has to say to a stranger.
-      expect(indexable(path)).toBe(true);
-    },
-  );
+  it.each([
+    '/',
+    '/liste-de-souhaits',
+    '/liste-de-naissance',
+    '/liste-de-mariage',
+    '/cadeau-commun',
+    '/mentions-legales',
+    '/confidentialite',
+    '/conditions',
+  ])('opens %s', (path) => {
+    // Everything this app has to say to a stranger.
+    expect(indexable(path)).toBe(true);
+  });
 
   it.each([
     ['/u/abc123', 'a profile: somebody’s name, photo and interests'],
@@ -72,6 +78,7 @@ describe('the sitemap', () => {
   });
 
   it('stays small, because everything else is somebody’s private list', () => {
-    expect(sitemap()).toHaveLength(4);
+    // Landing, four intent pages, three legal pages.
+    expect(sitemap()).toHaveLength(8);
   });
 });

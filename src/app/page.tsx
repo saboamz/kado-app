@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { getCurrentUser } from '@/lib/session';
 import { LegalFooter } from '@/components/LegalFooter';
 import { getT } from '@/lib/i18n/server';
+import { INTENT_PAGES } from '@/lib/intent-pages';
 import { pageAlternates, siteUrl } from '@/lib/site';
 import styles from './landing.module.css';
 
@@ -152,6 +154,22 @@ export default async function LandingPage() {
           <h2 className={styles.secretTitle}>{t('landing.secretTitle')}</h2>
           <p className={styles.secretBody}>{t('landing.secretBody')}</p>
         </section>
+
+        {/* The intent pages are only findable if something links to them:
+            a crawler discovers by following links, and a page no page points
+            to is treated as a page nobody vouches for. */}
+        <nav className={styles.occasions} aria-label={t('landing.occasionsTitle')}>
+          <h2 className={styles.occasionsTitle}>{t('landing.occasionsTitle')}</h2>
+          <ul className={styles.occasionsList}>
+            {INTENT_PAGES.map((entry) => (
+              <li key={entry.slug}>
+                <Link href={entry.slug} className={styles.occasionLink}>
+                  {t(`seo.${entry.key}.navLabel`)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         {/* Mentions légales only count as published if the public can reach
             them, so the links have to exist somewhere signed out. */}

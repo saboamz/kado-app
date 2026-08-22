@@ -448,6 +448,135 @@ export const fr = {
   'landing.demoNothing': 'Aucune information de réservation sur cette page.',
   'landing.demoTaken': 'Déjà réservé par un proche',
   'landing.demoPot': '45 € réunis sur 60 €',
+  'landing.occasionsTitle': 'Kadlio pour chaque occasion',
+
+  // ── Intent pages, one per thing somebody searches for ────────────────────
+  //
+  // Written like the landing: sober, factual, and only about what the app
+  // actually does. A page that promises a feature we do not have ranks for a
+  // week and disappoints forever.
+  'seo.faqTitle': 'Questions fréquentes',
+  'seo.othersTitle': 'Kadlio pour d’autres occasions',
+  'seo.ctaTitle': 'Créez votre liste en quelques minutes',
+  'seo.ctaBody': 'Gratuit, sans publicité, sans commission. Vos proches rejoignent par un simple lien.',
+
+  // Meta titles: short, because the layout template appends « · Kadlio » and
+  // a result past ~60 characters is cut mid-word.
+  'seo.wishlist.title': 'Liste de souhaits en ligne, libre et gratuite',
+  'seo.wishlist.metaDescription':
+    'Créez votre liste de souhaits en ligne : un lien de boutique, un prix, ou juste une idée. Vos proches réservent en secret, sans doublons. Gratuit, sans publicité.',
+  'seo.wishlist.navLabel': 'Liste de souhaits',
+  'seo.wishlist.h1': 'Une liste de souhaits en ligne, libre et gratuite',
+  'seo.wishlist.lede':
+    'Notez vos envies où qu’elles se trouvent : un lien vers n’importe quelle boutique, un prix, une photo — ou juste une phrase. Vos proches y réservent en secret ce qu’ils comptent offrir, et vous ne voyez jamais qui a pris quoi.',
+  'seo.wishlist.s1Title': 'Aucune boutique imposée',
+  'seo.wishlist.s1Body':
+    'Une envie peut venir de n’importe où : un site marchand, une brocante, ou aucun magasin du tout — « un week-end en Islande » est un souhait parfaitement valable. Kadlio n’est lié à aucune enseigne et ne touche aucune commission.',
+  'seo.wishlist.s2Title': 'Vous choisissez qui voit quoi',
+  'seo.wishlist.s2Body':
+    'Chaque liste a sa visibilité : privée, réservée à vos proches, ou accessible à quiconque a le lien. Vous pouvez tenir une liste pour vous et en partager une autre.',
+  'seo.wishlist.s3Title': 'Des priorités, pas des consignes',
+  'seo.wishlist.s3Body':
+    'Marquez ce qui vous ferait vraiment plaisir et ce qui serait simplement bienvenu. Vos proches choisissent en connaissance de cause, sans que vous ayez rien organisé pour eux.',
+  'seo.wishlist.faq1q': 'Est-ce vraiment gratuit ?',
+  'seo.wishlist.faq1a':
+    'Oui. Kadlio n’a ni publicité, ni abonnement, ni commission sur quoi que ce soit.',
+  'seo.wishlist.faq2q': 'Mes proches doivent-ils créer un compte ?',
+  'seo.wishlist.faq2a':
+    'Oui, un compte gratuit : c’est ce qui permet de savoir qu’une envie est déjà réservée sans jamais le montrer à la personne concernée. Ils rejoignent par un lien d’invitation, en quelques instants.',
+  'seo.wishlist.faq3q': 'Puis-je ajouter une envie sans lien de boutique ?',
+  'seo.wishlist.faq3a':
+    'Oui. Le nom suffit — le prix, la photo et la description sont optionnels. Beaucoup d’envies n’ont pas de produit derrière elles.',
+  'seo.wishlist.faq4q': 'Qui peut voir ma liste ?',
+  'seo.wishlist.faq4a':
+    'Ce que vous décidez : vous seul, vos proches, ou toute personne disposant du lien. Ce que vous ne voyez jamais, en revanche, ce sont les réservations sur votre propre liste.',
+
+  'seo.birth.title': 'Liste de naissance en ligne, sans magasin imposé',
+  'seo.birth.metaDescription':
+    'Une liste de naissance libre : la poussette d’une boutique, la veilleuse d’une autre, ou de la seconde main. Cagnotte pour l’équipement cher, sans commission.',
+  'seo.birth.navLabel': 'Liste de naissance',
+  'seo.birth.h1': 'Une liste de naissance sans magasin imposé',
+  'seo.birth.lede':
+    'Les listes de naissance classiques vous enferment dans le catalogue d’une enseigne. Sur Kadlio, chaque envie vient d’où vous voulez : une boutique en ligne, un artisan, de la seconde main — ou simplement « des couches taille 1 ».',
+  'seo.birth.s1Title': 'Tout au même endroit, de n’importe où',
+  'seo.birth.s1Body':
+    'La poussette d’un site, le siège auto d’un autre, la gigoteuse cousue par une amie : une seule liste rassemble tout, avec un lien et un prix quand il y en a, une simple phrase quand il n’y en a pas.',
+  'seo.birth.s2Title': 'L’équipement cher se finance à plusieurs',
+  'seo.birth.s2Body':
+    'Sur une poussette à 400 €, un proche réserve puis ouvre une cagnotte : chacun promet ce qu’il veut, l’objectif est affiché, une personne achète. L’argent ne transite jamais par Kadlio — pas de commission, pas de frais cachés.',
+  'seo.birth.s3Title': 'Toute la famille, même loin',
+  'seo.birth.s3Body':
+    'Un lien d’invitation suffit pour que les grands-parents, les oncles et les amis rejoignent la liste. Chacun voit ce qui est déjà pris, personne n’offre deux fois la même veilleuse.',
+  'seo.birth.faq1q': 'La liste de naissance est-elle gratuite ?',
+  'seo.birth.faq1a':
+    'Oui, entièrement : pas d’abonnement, pas de publicité, et aucune commission sur les cagnottes.',
+  'seo.birth.faq2q': 'Faut-il choisir un magasin partenaire ?',
+  'seo.birth.faq2a':
+    'Non. Kadlio n’a aucun partenariat marchand : vous ajoutez un lien vers n’importe quelle boutique, ou aucun lien du tout.',
+  'seo.birth.faq3q': 'Comment fonctionne la cagnotte pour un gros achat ?',
+  'seo.birth.faq3a':
+    'Les proches promettent chacun un montant jusqu’à l’objectif. Une personne achète l’article et voit alors qui a promis quoi, pour se faire rembourser directement. Aucun paiement ne passe par le site.',
+  'seo.birth.faq4q': 'Voit-on ce que les proches ont choisi d’offrir ?',
+  'seo.birth.faq4a':
+    'Non : les réservations restent invisibles pour les parents, comme sur toute liste Kadlio. Vous gardez la main sur la liste elle-même — envies, priorités, visibilité — et découvrez les cadeaux quand on vous les offre.',
+
+  'seo.wedding.title': 'Liste de mariage en ligne, sans commission',
+  'seo.wedding.metaDescription':
+    'Votre liste de mariage sans enseigne ni commission : des envies de n’importe où, une cagnotte pour le voyage de noces, des invités qui s’organisent sans doublons.',
+  'seo.wedding.navLabel': 'Liste de mariage',
+  'seo.wedding.h1': 'Une liste de mariage sans enseigne et sans commission',
+  'seo.wedding.lede':
+    'Les listes de mariage traditionnelles prélèvent leur part ou vous limitent à un catalogue. Kadlio ne vend rien et ne prélève rien : vous décrivez ce qui vous ferait plaisir, vos invités s’organisent entre eux.',
+  'seo.wedding.s1Title': 'Des envies, pas un catalogue',
+  'seo.wedding.s1Body':
+    'Ajoutez ce que vous voulez vraiment : de la vaisselle repérée quelque part, une contribution au voyage de noces, un meuble chez un artisan. Un lien et un prix si vous les avez, une simple phrase sinon.',
+  'seo.wedding.s2Title': 'Les invités se regroupent sur les grandes envies',
+  'seo.wedding.s2Body':
+    'Un invité réserve « Voyage de noces » et ouvre la cagnotte aux autres, avec l’objectif que vous avez indiqué. Les promesses s’additionnent à l’abri de vos regards ; l’argent circule entre eux, jamais par Kadlio.',
+  'seo.wedding.s3Title': 'Un seul lien à partager',
+  'seo.wedding.s3Body':
+    'Votre liste s’ouvre par un lien d’invitation que vous diffusez comme vous voulez : aux témoins d’abord, à tous les invités ensuite. Chacun voit ce qui est déjà pris et ce qui reste.',
+  'seo.wedding.faq1q': 'Combien coûte une liste de mariage sur Kadlio ?',
+  'seo.wedding.faq1a':
+    'Rien. Pas de frais d’ouverture, pas d’abonnement, et surtout aucune commission sur les cagnottes — ce qui est promis va intégralement au cadeau.',
+  'seo.wedding.faq2q': 'Les invités paient-ils en ligne ?',
+  'seo.wedding.faq2a':
+    'Non. Une contribution est une promesse : une personne achète ou offre le montant, les autres la remboursent directement — virement, espèces, comme ils veulent. Kadlio tient le compte, pas la caisse.',
+  'seo.wedding.faq3q': 'Peut-on mettre le voyage de noces sur la liste ?',
+  'seo.wedding.faq3a':
+    'Oui : ajoutez-le comme une envie, avec le montant en guise de prix. Vos invités réserveront et ouvriront la cagnotte dessus.',
+  'seo.wedding.faq4q': 'Les invités doivent-ils créer un compte ?',
+  'seo.wedding.faq4a':
+    'Oui, gratuit et rapide — c’est ce qui permet de suivre qui a réservé quoi sans jamais vous le montrer.',
+
+  'seo.group.title': 'Cadeau commun : la cagnotte sans commission',
+  'seo.group.metaDescription':
+    'Organisez un cadeau commun sans tableur ni relances : réservation, cagnotte avec objectif, promesses de chacun, un acheteur remboursé directement. Sans commission.',
+  'seo.group.navLabel': 'Cadeau commun',
+  'seo.group.h1': 'Le cadeau commun, sans tableur ni relances',
+  'seo.group.lede':
+    'Un cadeau à plusieurs, c’est d’habitude un fil de messages, un tableur et quelqu’un qui avance l’argent sans oser réclamer. Kadlio structure exactement ça — et rien de plus.',
+  'seo.group.s1Title': 'Une réservation, puis une cagnotte ouverte',
+  'seo.group.s1Body':
+    'Le premier décidé réserve l’envie, puis l’ouvre aux autres avec un objectif — le prix, confirmé par celui qui a le lien de la boutique sous les yeux. Chacun promet alors le montant de son choix.',
+  'seo.group.s2Title': 'Personne n’annonce son montant au groupe',
+  'seo.group.s2Body':
+    'Tant que le cadeau n’est pas acheté, la cagnotte n’affiche qu’un total et un nombre de participants. On choisit ce qu’on donne sans le faire sous le regard des autres.',
+  'seo.group.s3Title': 'Celui qui achète est le seul à voir les comptes',
+  'seo.group.s3Body':
+    'Une personne achète le cadeau et le déclare. Elle seule voit alors qui a promis quoi — c’est elle qui est sortie d’argent — et chacun la rembourse directement. Aucun paiement ne transite par Kadlio.',
+  'seo.group.faq1q': 'L’argent passe-t-il par Kadlio ?',
+  'seo.group.faq1a':
+    'Jamais. Les contributions sont des promesses ; le remboursement se fait entre vous, par virement ou autrement. Il n’y a donc ni commission ni frais.',
+  'seo.group.faq2q': 'La personne à qui l’on offre peut-elle voir la cagnotte ?',
+  'seo.group.faq2a':
+    'Non. Sur sa propre liste, les réservations et les cagnottes ne sont jamais chargées — elle découvre le cadeau le jour venu.',
+  'seo.group.faq3q': 'Que se passe-t-il si l’objectif n’est pas atteint ?',
+  'seo.group.faq3a':
+    'Rien d’automatique : la cagnotte reste ouverte et le groupe décide — compléter, ajuster l’objectif, ou en parler dans la conversation liée au cadeau.',
+  'seo.group.faq4q': 'Comment le groupe se coordonne-t-il ?',
+  'seo.group.faq4a':
+    'Chaque cadeau a sa conversation, invisible pour la personne concernée. On s’y répartit qui achète, qui emballe, qui apporte.',
 
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Retour à l’accueil',

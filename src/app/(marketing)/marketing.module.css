@@ -1,0 +1,113 @@
+/*
+ * The intent pages: one search query answered per page.
+ *
+ * Same reading column as the legal pages — these are paragraphs too — with
+ * the additions a landing needs: a question rhythm for the FAQ, a call to
+ * action, and the quiet links to the sibling pages.
+ */
+.page {
+  min-height: 100dvh;
+  padding: clamp(24px, 5vw, 56px) var(--gutter) clamp(48px, 9vw, 88px);
+  background: var(--canvas);
+}
+
+.inner {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 13.5px;
+  color: var(--ink2);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.article {
+  color: var(--ink);
+}
+
+.title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 6vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0 0 28px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
+.heading {
+  margin: 28px 0 8px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink2);
+  text-wrap: pretty;
+}
+
+/* A question reads as a sub-heading: smaller than a section, but a reader
+   scanning for their own doubt has to be able to catch it. */
+.question {
+  margin: 18px 0 4px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cta {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid color-mix(in srgb, var(--ink3) 25%, transparent);
+}
+
+.ctaBody {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.others {
+  margin-top: 36px;
+}
+
+.othersList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.othersLink {
+  font-size: 13.5px;
+  color: var(--acc);
+}
