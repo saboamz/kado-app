@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * ── Why no name appears here ───────────────────────────────────────────────
  *
  * 6-III-2 lets a NON-PROFESSIONAL publisher stay anonymous to the public,
- * provided the host holds their identity and can hand it to a court. Kado is
+ * provided the host holds their identity and can hand it to a court. Kadlio is
  * free, carries no advertising and earns nothing, so that applies.
  *
  * It stops applying the day the service monetises — advertising, affiliate

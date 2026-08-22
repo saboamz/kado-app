@@ -60,8 +60,8 @@ export default function LoginPage() {
       </p>
 
       <p className={styles.demo}>
-        Compte de démonstration : <code>sophie@kado.app</code> — mot de passe{' '}
-        <code>kado1234</code>. Essayez aussi <code>thomas@kado.app</code>, qui a
+        Compte de démonstration : <code>sophie@kadlio.app</code> — mot de passe{' '}
+        <code>kadlio1234</code>. Essayez aussi <code>thomas@kadlio.app</code>, qui a
         réservé un cadeau de Sophie.
       </p>
     </>

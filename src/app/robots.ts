@@ -11,7 +11,7 @@ import { siteUrl } from '@/lib/site';
  * "in Google". Somebody ticking that box is sharing with the people they send
  * it to, and would not expect their name and photo in a search result. So the
  * whole site was closed, which was right by default and wrong in the end: it
- * also hid the one page that exists to explain what Kado is.
+ * also hid the one page that exists to explain what Kadlio is.
  *
  * ── What is open, and what stays shut ──────────────────────────────────────
  *

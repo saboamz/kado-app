@@ -15,7 +15,7 @@ import { hashPassword } from '../src/lib/password';
 const db = new PrismaClient();
 
 /** Every generated account uses the same password as the demo accounts. */
-export const TEST_PASSWORD = 'kado1234';
+export const TEST_PASSWORD = 'kadlio1234';
 
 // Hashing is deliberately slow, so do it once per process rather than per user.
 let cachedHash: Promise<string> | null = null;

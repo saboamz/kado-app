@@ -75,7 +75,7 @@ export function AppShell({
       <div className={styles.body}>
         <nav className={styles.nav} aria-label={labels.main}>
           <Link href="/app" className={styles.brand}>
-            Kado
+            Kadlio
           </Link>
 
           {TABS.map(({ href, key, Icon }) => {

@@ -161,7 +161,7 @@ export const en: Dictionary = {
   'profile.decorate': 'Decorate my profile',
   'settings.title': 'Settings',
   'settings.language': 'Language',
-  'settings.languageHint': 'The language you read Kado in.',
+  'settings.languageHint': 'The language you read Kadlio in.',
   'settings.deleteAccount': 'Delete my account',
   'settings.password': 'Password',
   'password.current': 'Current password',
@@ -403,7 +403,7 @@ export const en: Dictionary = {
   'landing.tagline': 'Gift lists, among friends',
   'landing.h1': 'Say what would make you happy. Your friends sort it out without you knowing.',
   'landing.intro':
-    'Kado is an online gift list. You write down what you would like; your friends claim what they mean to give, club together for the big ones, and talk it over between themselves. You see none of it.',
+    'Kadlio is an online gift list. You write down what you would like; your friends claim what they mean to give, club together for the big ones, and talk it over between themselves. You see none of it.',
   'landing.step1Title': 'You write down your wishes',
   'landing.step1Body': 'A shop link, a price, or just an idea. The name is enough.',
   'landing.step2Title': 'Your friends claim them',
@@ -428,7 +428,7 @@ export const en: Dictionary = {
   'legal.noticeTitle': 'Legal notice',
   'legal.publisher': 'Publisher',
   'legal.publisherBody':
-    'Kado is published by a private individual, in a non-professional capacity, with no advertising and no revenue. Under article 6-III-2 of the French law on confidence in the digital economy, their identity is not published here: it is held by the host, who will disclose it at the request of a judicial authority.',
+    'Kadlio is published by a private individual, in a non-professional capacity, with no advertising and no revenue. Under article 6-III-2 of the French law on confidence in the digital economy, their identity is not published here: it is held by the host, who will disclose it at the request of a judicial authority.',
   'legal.director': 'Publication director',
   'legal.directorBody': 'The publisher, under the same terms of anonymity as above.',
   'legal.host': 'Host',
@@ -438,10 +438,10 @@ export const en: Dictionary = {
 
   'legal.privacyTitle': 'Privacy policy',
   'legal.privacyIntro':
-    'This page describes what Kado records about you, why, for how long, and what you can demand. It describes how the app actually works, not a template.',
+    'This page describes what Kadlio records about you, why, for how long, and what you can demand. It describes how the app actually works, not a template.',
   'legal.controller': 'Data controller',
   'legal.controllerBody':
-    'The publisher of Kado, reachable at sabri9595@gmail.com for any question or request about your data.',
+    'The publisher of Kadlio, reachable at sabri9595@gmail.com for any question or request about your data.',
   'legal.collected': 'What is recorded',
   'legal.collectedAccount':
     'Account: your email address, your name, and your password in hashed form — never in the clear, including to us.',
@@ -474,14 +474,14 @@ export const en: Dictionary = {
     'You may access your data, correct it, erase it, restrict its use or object to its processing. Most of that is in the app itself: your profile is editable, and deleting your account in Settings erases everything, with no delay and no email confirmation. For anything else, write to sabri9595@gmail.com. You may also complain to the CNIL.',
   'legal.secretNote': 'A note about the secret',
   'legal.secretNoteBody':
-    'Kado is built so that a list’s owner cannot learn who claimed what. This is not a promise of discretion: reservations are never loaded when it is the owner looking at the page. What you chip in to a pot is shown by name only to the person who declares they bought the gift, and only at that point.',
+    'Kadlio is built so that a list’s owner cannot learn who claimed what. This is not a promise of discretion: reservations are never loaded when it is the owner looking at the page. What you chip in to a pot is shown by name only to the person who declares they bought the gift, and only at that point.',
 
   'legal.termsTitle': 'Terms of use',
   'legal.termsIntro':
-    'By creating an account on Kado you accept the following. The service is free and provided as is.',
+    'By creating an account on Kadlio you accept the following. The service is free and provided as is.',
   'legal.termsAccess': 'Access to the service',
   'legal.termsAccessBody':
-    'Kado is free, carries no advertising and commits you to nothing. You must be at least 15 to create an account. You are responsible for keeping your password to yourself.',
+    'Kadlio is free, carries no advertising and commits you to nothing. You must be at least 15 to create an account. You are responsible for keeping your password to yourself.',
   'legal.termsContent': 'What you publish',
   'legal.termsContentBody':
     'You remain the owner of what you write and upload. You undertake not to publish anything unlawful, hateful or infringing on the rights of others, including in the private chats.',
@@ -493,7 +493,7 @@ export const en: Dictionary = {
     'A "Report" link sits under every profile and every wish you look at. Reporting is confidential: the person concerned is not told and cannot find out who reported them. Content clearly in breach is removed and the account may be suspended.',
   'legal.termsAvailability': 'Availability',
   'legal.termsAvailabilityBody':
-    'The service is provided with no guarantee of availability. It may be interrupted, changed or discontinued, in particular for maintenance. Prices shown from shop links are indications taken from external pages: they may be wrong or out of date, and bind neither Kado nor the merchant.',
+    'The service is provided with no guarantee of availability. It may be interrupted, changed or discontinued, in particular for maintenance. Prices shown from shop links are indications taken from external pages: they may be wrong or out of date, and bind neither Kadlio nor the merchant.',
   'legal.termsEnd': 'Ending',
   'legal.termsEndBody':
     'You may delete your account at any time from Settings; erasure is immediate and final. These terms are governed by French law.',

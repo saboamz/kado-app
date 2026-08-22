@@ -94,7 +94,7 @@ export async function signup(
    * An invitation rides along from the link they followed.
    *
    * Applied here so the friendship exists before they see the app for the
-   * first time: arriving to an empty Kado and having to search for the person
+   * first time: arriving to an empty Kadlio and having to search for the person
    * who invited you is precisely the friction the link removes.
    *
    * Failures are swallowed on purpose. The account is created and the session

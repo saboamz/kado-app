@@ -39,8 +39,8 @@ export function InviteLink({ code, uses }: { code: string; uses: number }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Kado',
-          text: 'Rejoins-moi sur Kado pour voir ma liste d’envies.',
+          title: 'Kadlio',
+          text: 'Rejoins-moi sur Kadlio pour voir ma liste d’envies.',
           url,
         });
         return;

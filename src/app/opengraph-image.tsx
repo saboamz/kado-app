@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 /**
- * The card a pasted Kado link shows in a group chat.
+ * The card a pasted Kadlio link shows in a group chat.
  *
  * Generated rather than a checked-in PNG: the wording lives in one place with
  * the rest of the copy, and a design change does not mean re-exporting an
@@ -12,7 +12,7 @@ import { ImageResponse } from 'next/og';
  * the palette literally instead of pretending to share the stylesheet.
  */
 export const runtime = 'edge';
-export const alt = 'Kado — dites ce qui vous ferait plaisir, vos proches s’organisent';
+export const alt = 'Kadlio — dites ce qui vous ferait plaisir, vos proches s’organisent';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -56,7 +56,7 @@ export default function OpengraphImage() {
           >
             K
           </div>
-          <div style={{ fontSize: 40, fontWeight: 700, color: INK }}>Kado</div>
+          <div style={{ fontSize: 40, fontWeight: 700, color: INK }}>Kadlio</div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>

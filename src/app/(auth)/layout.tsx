@@ -13,7 +13,7 @@ export default function AuthLayout({
           <span className={styles.mark} aria-hidden>
             K
           </span>
-          Kado
+          Kadlio
         </Link>
         {children}
       </main>

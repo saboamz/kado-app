@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const DEMO = { email: 'sophie@kado.app', password: 'kado1234' };
+const DEMO = { email: 'sophie@kadlio.app', password: 'kadlio1234' };
 
 test('the landing page pitches the product and offers both entry points', async ({
   page,
@@ -21,7 +21,7 @@ test('the landing page pitches the product and offers both entry points', async 
    * The <title> now carries the same phrase — that is the point of it, since
    * it is what somebody types — so an unscoped match finds two elements and
    * Playwright refuses the ambiguity. What this line is about is the visitor
-   * being TOLD what Kado is, which is the paragraph.
+   * being TOLD what Kadlio is, which is the paragraph.
    */
   await expect(
     page.locator('p').filter({ hasText: /liste de cadeaux en ligne/i }),
@@ -68,7 +68,7 @@ test('a wrong password is refused without revealing whether the account exists',
   // this asserts on a fresh response instead of the previous error still
   // being on screen.
   await page.goto('/login');
-  await page.getByLabel('Adresse e-mail').fill('personne@kado.app');
+  await page.getByLabel('Adresse e-mail').fill('personne@kadlio.app');
   await page.getByLabel('Mot de passe').fill('mauvais-mot-de-passe');
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await expect(error).toHaveText(message);

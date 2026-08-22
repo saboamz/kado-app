@@ -192,7 +192,7 @@ async function countUse(inviteId: string, ownerId: string, name: string) {
       data: {
         userId: ownerId,
         type: 'FRIEND_ACCEPTED',
-        body: `${name} a rejoint Kado grâce à votre invitation.`,
+        body: `${name} a rejoint Kadlio grâce à votre invitation.`,
         href: '/friends',
       },
     }),
