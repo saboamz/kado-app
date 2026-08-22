@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { updateProfile } from '@/lib/profile-actions';
 import { useT } from '@/lib/i18n/client';
 import { Field, SelectField, TextareaField } from './Field';
+import { CategoryPicker } from './CategoryPicker';
 import { ImageUpload } from './ImageUpload';
 import { SubmitButton } from './SubmitButton';
 import styles from './forms.module.css';
@@ -15,7 +16,7 @@ export function ProfileForm({
     name: string;
     bio: string | null;
     avatarUrl: string | null;
-    interests: string;
+    interests: readonly string[];
     gender: string;
     ageBracket: string;
   };
@@ -88,14 +89,12 @@ export function ProfileForm({
         error={state.errors?.ageBracket}
       />
 
-      <Field
-        id="interests"
-        name="interests"
-        label={t('form.interests')}
-        defaultValue={initial.interests}
-        placeholder={t('form.interestsPlaceholder')}
+      {/* Ticked, not typed. "À propos" above is where free text belongs —
+          it is prose nothing matches on, so a spelling costs nothing there. */}
+      <CategoryPicker
+        legend={t('form.interests')}
         hint={t('form.interestsHint')}
-        error={state.errors?.interests}
+        selected={initial.interests}
       />
 
       {/*

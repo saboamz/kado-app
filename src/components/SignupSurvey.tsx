@@ -3,10 +3,9 @@
 import { useActionState } from 'react';
 import Link from 'next/link';
 import { saveSurvey, type SurveyState } from '@/lib/survey-actions';
-import { useLocale, useT } from '@/lib/i18n/client';
-import { categoryName } from '@/lib/i18n/categories';
-import { SURVEY_CATEGORIES } from '@/lib/taxonomy';
+import { useT } from '@/lib/i18n/client';
 import type { TFunction } from '@/lib/i18n/t';
+import { CategoryPicker } from './CategoryPicker';
 import { SubmitButton } from './SubmitButton';
 import styles from './survey.module.css';
 
@@ -35,30 +34,15 @@ const AGES = [
 
 export function SignupSurvey() {
   const t = useT();
-  const locale = useLocale();
   const [state, action] = useActionState<SurveyState, FormData>(saveSurvey, {});
 
   return (
     <form action={action} className={styles.form}>
-      <fieldset className={styles.block}>
-        <legend className={styles.legend}>{t('survey.interestsTitle')}</legend>
-        <p className={styles.hint}>{t('survey.interestsHint')}</p>
+      <CategoryPicker
+        legend={t('survey.interestsTitle')}
+        hint={t('survey.interestsHint')}
+      />
 
-        {/* Checkboxes rather than free text: the value has to be one the
-            recommender can match, and typing does not guarantee that.
-
-            The stored value is the canonical French category — the same
-            string Product.categoryId holds — and only the label is
-            translated, exactly as the category dropdown does it. */}
-        <div className={styles.chips}>
-          {SURVEY_CATEGORIES.map((category) => (
-            <label key={category} className={styles.chip}>
-              <input type="checkbox" name="interests" value={category} />
-              <span>{categoryName(category, locale)}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
 
       <fieldset className={styles.block}>
         <legend className={styles.legend}>{t('survey.aboutTitle')}</legend>

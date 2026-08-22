@@ -89,7 +89,7 @@ export const en: Dictionary = {
   'lists.title': 'My lists',
   'lists.subtitle': 'What you would like to receive, sorted by occasion.',
   'lists.emptyBody':
-    'Create a list — a birthday, or simply what you feel like right now.',
+    'Create a list for whatever you feel like right now.',
   'lists.newList': 'New list',
   'lists.emptyListTitle': 'This list is empty',
   'lists.emptyListBody': 'Add what would make you happy.',
@@ -141,7 +141,7 @@ export const en: Dictionary = {
   'events.mine': 'My dates',
   'events.add': 'Add a date',
   'events.label': 'Name',
-  'events.labelPlaceholder': 'Birthday, wedding, graduation…',
+  'events.labelPlaceholder': 'Wedding, graduation, housewarming…',
   'events.labelHint': 'You choose what you publish, and what to call it.',
   'events.day': 'Day',
   'events.month': 'Month',
@@ -206,14 +206,13 @@ export const en: Dictionary = {
   'form.details': 'Details',
   'form.detailsPlaceholder': 'Size, colour, exact model…',
   'form.listName': 'List name',
-  'form.listNamePlaceholder': 'Birthday, Wedding…',
+  'form.listNamePlaceholder': 'Wedding, Housewarming…',
   'form.occasion': 'Occasion',
   'form.avatar': 'Profile photo',
   'form.about': 'About',
   'form.aboutPlaceholder': 'What you like, in one sentence.',
   'form.interests': 'Interests',
-  'form.interestsPlaceholder': 'Coffee, ceramics, hiking',
-  'form.interestsHint': 'Separated by commas — enough to inspire your friends.',
+  'form.interestsHint': 'Tick what sounds like you — enough to inspire your friends.',
   'form.appearance': 'Appearance',
   'form.privacy': 'Privacy',
   'form.publicProfile': 'Public profile',
@@ -252,7 +251,7 @@ export const en: Dictionary = {
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Add a wish: a link, a price, or simply an idea.',
   'lists.newTitle': 'New list',
-  'lists.newSubtitle': 'One list per occasion: a birthday, or what you fancy now.',
+  'lists.newSubtitle': 'One list per occasion, or for what you fancy now.',
   'lists.create': 'Create the list',
   'lists.editTitle': 'Edit the list',
   'lists.deleteList': 'Delete this list',
@@ -467,7 +466,7 @@ export const en: Dictionary = {
   'legal.collectedAccount':
     'Account: your email address, your name, and your password in hashed form — never in the clear, including to us.',
   'legal.collectedOptional':
-    'Optional: a short description, a profile photo, your interests, the dates you choose to publish (a birthday, a wedding, whatever you like), a decorative GIF. None of it is required, and all of it can be changed or removed at any time.',
+    'Optional: a short description, a profile photo, your interests, the dates you choose to publish (a wedding, a graduation, whatever you like), a decorative GIF. None of it is required, and all of it can be changed or removed at any time.',
   'legal.collectedSurvey':
     'Sign-up questionnaire: when you create an account we offer you the chance to give your interests, your sex and your age range. All three are optional, the whole step can be skipped, and not answering is stored as the absence of an answer — not as a category. This is used only to suggest gift ideas: none of it is displayed anywhere, not on your profile and not to your friends. An age range is asked for rather than a date of birth because a date identifies a person, which suggestions do not need. Nothing sensitive within the meaning of Article 9 of the GDPR is asked for: no religion, health, ethnic origin, political opinion or sexual orientation.',
   'legal.collectedUse':
@@ -541,7 +540,7 @@ export const en: Dictionary = {
   'invite.rotating': 'One moment…',
   'upload.tooLarge': 'This image is larger than 4 MB.',
   'search.placeholder': 'Name or email address',
-  'gif.placeholder': 'Search: cat, thanks, birthday…',
+  'gif.placeholder': 'Search: cat, thanks, well done…',
   'gif.choose': 'Choose this GIF',
   'gif.chooseNamed': 'Choose the GIF: {title}',
   'gif.unconfigured': 'GIF search is not configured on this server yet.',

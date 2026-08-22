@@ -113,7 +113,8 @@ test('the sign-up questionnaire saves what is ticked, and skips cleanly', async 
   // Stored, and editable afterwards — which is what the privacy policy
   // promises about withdrawing consent.
   await page.goto('/profile/edit');
-  await expect(page.getByLabel(/Centres d'intérêt/)).toHaveValue(/Gourmandise/);
+  await expect(page.getByRole('checkbox', { name: 'Gourmandise' })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Sport' })).toBeChecked();
   await expect(page.getByLabel('Vous êtes…')).toHaveValue('FEMALE');
   await expect(page.getByLabel('Votre tranche d’âge')).toHaveValue('AGE_25_34');
 });

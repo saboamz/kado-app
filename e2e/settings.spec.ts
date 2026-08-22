@@ -37,17 +37,26 @@ test('the profile can be edited and the changes show on the profile page', async
 
   await page.getByLabel('Nom').fill('Nom Modifié');
   await page.getByLabel('À propos').fill('J’aime le café filtre.');
-  await page.getByLabel("Centres d'intérêt").fill('Café, céramique');
+  // Ticked, not typed — free text lives in "À propos" above.
+  await page.getByText('Gourmandise', { exact: true }).click();
   await page.getByRole('button', { name: 'Enregistrer' }).click();
 
-  await page.waitForURL('**/profile');
+  /*
+   * toHaveURL, not waitForURL.
+   *
+   * waitForURL waits for a load state as well as the address, and the page it
+   * is waiting on has already arrived — the assertion hung while the URL read
+   * /profile the whole time. Polling the address is what this actually wants,
+   * and the taller form below made the race reproducible rather than rare.
+   */
+  await expect(page).toHaveURL(/\/profile$/, { timeout: 15_000 });
   // The name now also appears in the desktop nav, so target the heading.
   await expect(
     page.getByRole('heading', { name: 'Nom Modifié' }),
   ).toBeVisible();
   await expect(page.getByText('J’aime le café filtre.')).toBeVisible();
   await expect(
-    page.getByRole('listitem').filter({ hasText: /^Café$/ }),
+    page.getByRole('listitem').filter({ hasText: /^Gourmandise$/ }),
   ).toBeVisible();
 });
 
