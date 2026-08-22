@@ -25,6 +25,17 @@ const profileSchema = z.object({
     .min(1, 'error.nameRequired')
     .max(80, 'error.nameLong'),
   bio: optionalText(280),
+  // '' means "rather not say", and is stored as NULL — see survey-actions.
+  gender: z.enum(['', 'FEMALE', 'MALE', 'OTHER']),
+  ageBracket: z.enum([
+    '',
+    'AGE_15_24',
+    'AGE_25_34',
+    'AGE_35_44',
+    'AGE_45_54',
+    'AGE_55_64',
+    'AGE_65_PLUS',
+  ]),
   interests: optionalText(200),
 });
 
@@ -37,11 +48,13 @@ export async function updateProfile(
   const parsed = profileSchema.safeParse({
     name: formData.get('name'),
     bio: formData.get('bio'),
+    gender: formData.get('gender') ?? '',
+    ageBracket: formData.get('ageBracket') ?? '',
     interests: formData.get('interests'),
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error) };
 
-  const { name, bio, interests } = parsed.data;
+  const { name, bio, gender, ageBracket, interests } = parsed.data;
 
   const current = await db.user.findUniqueOrThrow({
     where: { id: user.id },
@@ -84,6 +97,8 @@ export async function updateProfile(
       data: {
         name,
         bio: bio || null,
+        gender: gender || null,
+        ageBracket: ageBracket || null,
         ...(avatarUrl !== undefined ? { avatarUrl } : {}),
       },
     }),

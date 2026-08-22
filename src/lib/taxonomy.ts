@@ -115,6 +115,57 @@ const INTEREST_TO_CATEGORIES: Record<string, Category[]> = {
 };
 
 /**
+ * The interests offered at sign-up, as a grid to tick.
+ *
+ * A subset of the mapping table above, not the whole of it: forty-odd
+ * checkboxes is a form nobody finishes, and several of the entries are
+ * near-synonyms that exist so free text still matches ("course" and
+ * "running", "livres" and "lecture"). One of each is enough here.
+ *
+ * Every value must be a key of INTEREST_TO_CATEGORIES, or it produces an
+ * interest the recommender cannot map — the silent failure the mapping table
+ * was built to end. A test holds them to that.
+ */
+export const SURVEY_INTERESTS = [
+  'Café',
+  'Cuisine',
+  'Pâtisserie',
+  'Céramique',
+  'Design',
+  'Décoration',
+  'Jardinage',
+  'Plantes',
+  'Bricolage',
+  'Randonnée',
+  'Course',
+  'Vélo',
+  'Escalade',
+  'Yoga',
+  'Natation',
+  'Ski',
+  'Lecture',
+  'Cinéma',
+  'Photographie',
+  'Jeux vidéo',
+  'Jeux de société',
+  'Informatique',
+  'Voyage',
+  'Camping',
+  'Mode',
+  'Bijoux',
+  'Montres',
+  'Parfum',
+  'Maquillage',
+  'Méditation',
+  'Écriture',
+  'Papeterie',
+  'Dessin',
+  'Chats',
+  'Chiens',
+  'Enfants',
+] as const;
+
+/**
  * Normalises a label for lookup: case-folded, de-accented, whitespace
  * collapsed.
  *

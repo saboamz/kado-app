@@ -43,6 +43,8 @@ export default async function EditProfilePage() {
           bio: profile.bio,
           avatarUrl: profile.avatarUrl,
           interests: profile.interests.map((i) => i.label).join(', '),
+          gender: profile.gender ?? '',
+          ageBracket: profile.ageBracket ?? '',
         }}
       />
 

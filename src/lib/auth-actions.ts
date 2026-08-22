@@ -103,7 +103,15 @@ export async function signup(
    */
   await applyInvite(formData);
 
-  redirect('/app');
+  /*
+   * A new account goes to the questionnaire; a returning one does not.
+   *
+   * It is the only moment somebody has nothing in the app yet, so it is the
+   * only moment asking is not an interruption — and content_facet, the tier
+   * that carries recommendations at launch, has nothing to read until they
+   * answer. Skipping it is a link on the page.
+   */
+  redirect('/welcome');
 }
 
 /** Consumes an invite code carried through an auth form, if there is one. */

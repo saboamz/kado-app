@@ -32,6 +32,7 @@ export default async function PrivacyPage() {
       <ul className={styles.list}>
         <li>{t('legal.collectedAccount')}</li>
         <li>{t('legal.collectedOptional')}</li>
+        <li>{t('legal.collectedSurvey')}</li>
         <li>{t('legal.collectedUse')}</li>
         <li>{t('legal.collectedTech')}</li>
       </ul>
