@@ -57,7 +57,7 @@ async function follow(
     redirect: 'manual',
     signal,
     headers: {
-      'user-agent': 'KadoBot/1.0 (+https://kado.app/bot)',
+      'user-agent': 'KadlioBot/1.0 (+https://kadlio.app/bot)',
       accept: 'text/html,application/xhtml+xml',
       'accept-language': 'fr-FR,fr;q=0.9',
     },

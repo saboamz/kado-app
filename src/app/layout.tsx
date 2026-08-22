@@ -41,7 +41,7 @@ const lora = Lora({
  * from a sentence read the wrong way.
  */
 const DESCRIPTION =
-  'Kado est une liste de cadeaux en ligne. Vous y notez vos envies, vos proches y réservent en secret — vous ne voyez jamais qui a pris quoi.';
+  'Kadlio est une liste de cadeaux en ligne. Vous y notez vos envies, vos proches y réservent en secret — vous ne voyez jamais qui a pris quoi.';
 
 export const metadata: Metadata = {
   /*
@@ -57,17 +57,17 @@ export const metadata: Metadata = {
   /*
    * The title is what a search result reads.
    *
-   * "Kado" alone said nothing: somebody who has been told about this app and
-   * types "kado liste cadeaux" saw a one-word result that could be anything.
+   * "Kadlio" alone said nothing: somebody who has been told about this app and
+   * types "kadlio liste cadeaux" saw a one-word result that could be anything.
    * The words after the name are the ones people actually type, and they are
    * a description of the product rather than a keyword list — a title that
    * reads as stuffing is worth less than a plain one.
    *
-   * The template keeps inner pages short: "Réglages · Kado".
+   * The template keeps inner pages short: "Réglages · Kadlio".
    */
   title: {
-    default: 'Kado — liste de cadeaux en ligne, entre proches',
-    template: '%s · Kado',
+    default: 'Kadlio — liste de cadeaux en ligne, entre proches',
+    template: '%s · Kadlio',
   },
   /*
    * Which language this page is in, and where the other one lives.
@@ -82,26 +82,26 @@ export const metadata: Metadata = {
     languages: { fr: '/', en: '/', 'x-default': '/' },
   },
   description: DESCRIPTION,
-  applicationName: 'Kado',
+  applicationName: 'Kadlio',
   /*
    * What a pasted link looks like in a group chat.
    *
    * This app spreads by somebody sharing a link with their family, so the
    * card that appears there is not decoration — it is the first thing anyone
-   * sees of Kado, and a bare URL converts far worse than a title and an
+   * sees of Kadlio, and a bare URL converts far worse than a title and an
    * image.
    */
   openGraph: {
     type: 'website',
-    siteName: 'Kado',
+    siteName: 'Kadlio',
     locale: 'fr_FR',
-    title: 'Kado — dites ce qui vous ferait plaisir, vos proches s’organisent',
+    title: 'Kadlio — dites ce qui vous ferait plaisir, vos proches s’organisent',
     description: DESCRIPTION,
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Kado' }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Kadlio' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kado — dites ce qui vous ferait plaisir, vos proches s’organisent',
+    title: 'Kadlio — dites ce qui vous ferait plaisir, vos proches s’organisent',
     description: DESCRIPTION,
     images: ['/opengraph-image'],
   },

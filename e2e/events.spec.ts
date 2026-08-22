@@ -13,7 +13,7 @@ test('the events page lists what friends published, soonest first', async ({
   page,
 }) => {
   // The seed publishes Thomas at 24 days and Emma at 45.
-  await signIn(page, 'sophie@kado.app');
+  await signIn(page, 'sophie@kadlio.app');
   await page.goto('/events');
 
   await expect(page.getByRole('heading', { name: 'À venir' })).toBeVisible();
@@ -29,7 +29,7 @@ test('the events page lists what friends published, soonest first', async ({
 });
 
 test('a date can be published and then removed', async ({ page }) => {
-  await signIn(page, 'sophie@kado.app');
+  await signIn(page, 'sophie@kadlio.app');
   await page.goto('/profile/edit');
 
   const label = `Test ${Date.now()}`;
@@ -51,7 +51,7 @@ test('a date can be published and then removed', async ({ page }) => {
 });
 
 test('home links through to the full event list', async ({ page }) => {
-  await signIn(page, 'sophie@kado.app');
+  await signIn(page, 'sophie@kadlio.app');
   await page.goto('/app');
 
   await page

@@ -4,7 +4,7 @@ import { hashPassword } from '../src/lib/password';
 const db = new PrismaClient();
 
 /** Every demo account shares this password so the app is easy to try. */
-const DEMO_PASSWORD = 'kado1234';
+const DEMO_PASSWORD = 'kadlio1234';
 
 const DAY = 24 * 60 * 60 * 1000;
 const daysFromNow = (n: number) => new Date(Date.now() + n * DAY);
@@ -28,7 +28,7 @@ async function main() {
   console.log('Creating accounts…');
   const sophie = await db.user.create({
     data: {
-      email: 'sophie@kado.app',
+      email: 'sophie@kadlio.app',
       passwordHash,
       name: 'Sophie Marchand',
       bio: 'Café filtre, céramique et randonnées.',
@@ -45,7 +45,7 @@ async function main() {
 
   const thomas = await db.user.create({
     data: {
-      email: 'thomas@kado.app',
+      email: 'thomas@kadlio.app',
       passwordHash,
       name: 'Thomas Bel',
       bio: 'Vélo, cuisine et vieux synthés.',
@@ -55,7 +55,7 @@ async function main() {
 
   const emma = await db.user.create({
     data: {
-      email: 'emma@kado.app',
+      email: 'emma@kadlio.app',
       passwordHash,
       name: 'Emma Roux',
       bio: 'Jardinage et romans policiers.',
@@ -65,7 +65,7 @@ async function main() {
 
   const lucas = await db.user.create({
     data: {
-      email: 'lucas@kado.app',
+      email: 'lucas@kadlio.app',
       passwordHash,
       name: 'Lucas Ferrand',
       bio: 'Jeux de société et photographie argentique.',
@@ -306,10 +306,10 @@ async function main() {
   };
   console.log('Seed complete:', counts);
   console.log(`\nSign in with any of these — password: ${DEMO_PASSWORD}`);
-  console.log('  sophie@kado.app   (owner of the demo lists)');
-  console.log('  thomas@kado.app   (friend, has reserved the AirPods)');
-  console.log('  emma@kado.app     (friend, has reserved the Chemex)');
-  console.log('  lucas@kado.app    (friend, contributed to the pot)');
+  console.log('  sophie@kadlio.app   (owner of the demo lists)');
+  console.log('  thomas@kadlio.app   (friend, has reserved the AirPods)');
+  console.log('  emma@kadlio.app     (friend, has reserved the Chemex)');
+  console.log('  lucas@kadlio.app    (friend, contributed to the pot)');
 }
 
 main()

@@ -14,7 +14,7 @@ import styles from './landing.module.css';
  * Not people who were invited — an invitation link lands on /i/[code] with
  * the inviter's name already on screen. This page gets search results, a URL
  * pasted without context, and word of mouth. Every one of them arrives
- * knowing nothing, so the first job is to say what Kado IS, in words that
+ * knowing nothing, so the first job is to say what Kadlio IS, in words that
  * need no decoding.
  *
  * The previous version opened with "des listes de souhaits que vos proches
@@ -54,7 +54,7 @@ export default async function LandingPage() {
   const structured = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Kado',
+    name: 'Kadlio',
     applicationCategory: 'LifestyleApplication',
     url: siteUrl(),
     inLanguage: ['fr', 'en'],
@@ -76,7 +76,7 @@ export default async function LandingPage() {
             <span className={styles.mark} aria-hidden>
               K
             </span>
-            Kado
+            Kadlio
           </span>
           {/* Says what kind of thing this is before the pitch does. */}
           <span className={styles.tagline}>{t('landing.tagline')}</span>

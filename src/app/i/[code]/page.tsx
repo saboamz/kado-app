@@ -81,7 +81,7 @@ export default async function InvitePage({
         <Avatar name={invite.owner.name} url={invite.owner.avatarUrl} size={72} />
 
         <h1 className={styles.title}>
-          {invite.owner.name} vous invite sur Kado
+          {invite.owner.name} vous invite sur Kadlio
         </h1>
         <p className={styles.body}>
           Vous verrez sa liste d’envies, et pourrez réserver un cadeau sans

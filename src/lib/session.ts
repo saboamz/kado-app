@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { db } from './db';
 
-const COOKIE = 'kado_session';
+const COOKIE = 'kadlio_session';
 const DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export type SessionUser = {

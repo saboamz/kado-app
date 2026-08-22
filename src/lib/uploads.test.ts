@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 // UPLOAD_DIR is read at import time, so it has to be set before the module
 // under test is loaded.
-const dir = await mkdtemp(join(tmpdir(), 'kado-uploads-'));
+const dir = await mkdtemp(join(tmpdir(), 'kadlio-uploads-'));
 process.env.UPLOAD_DIR = dir;
 
 const {

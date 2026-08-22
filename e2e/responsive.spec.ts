@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const DEMO = { email: 'sophie@kado.app', password: 'kado1234' };
+const DEMO = { email: 'sophie@kadlio.app', password: 'kadlio1234' };
 
 async function signIn(page: Page) {
   await page.goto('/login');

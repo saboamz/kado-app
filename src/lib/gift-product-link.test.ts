@@ -69,7 +69,7 @@ describe('a link we cannot resolve leaves the gift alone', () => {
     // the gift is already saved and stays exactly as it was.
     const linked = await linkGiftToProduct(
       gift.id,
-      'https://this-host-does-not-exist-kado-test.invalid/p/1',
+      'https://this-host-does-not-exist-kadlio-test.invalid/p/1',
       'Tech',
       owner.id,
     );
@@ -184,7 +184,7 @@ describe('an existing link is not overwritten', () => {
     // cannot clobber the newer decision.
     await linkGiftToProduct(
       gift.id,
-      'https://this-host-does-not-exist-kado-test.invalid/p/2',
+      'https://this-host-does-not-exist-kadlio-test.invalid/p/2',
       'Tech',
       owner.id,
     );
@@ -213,7 +213,7 @@ describe('outbound reads are budgeted per person', () => {
     const before = await db.authAttempt.count({ where: { key } });
     const linked = await linkGiftToProduct(
       gift.id,
-      'https://this-host-does-not-exist-kado-test.invalid/p/3',
+      'https://this-host-does-not-exist-kadlio-test.invalid/p/3',
       'Tech',
       owner.id,
     );
@@ -232,7 +232,7 @@ describe('outbound reads are budgeted per person', () => {
 
     await linkGiftToProduct(
       gift.id,
-      'https://this-host-does-not-exist-kado-test.invalid/p/4',
+      'https://this-host-does-not-exist-kadlio-test.invalid/p/4',
       'Tech',
       owner.id,
     );
@@ -253,7 +253,7 @@ describe('outbound reads are budgeted per person', () => {
     // Theirs is untouched, so their attempt is recorded rather than refused.
     await linkGiftToProduct(
       gift.id,
-      'https://this-host-does-not-exist-kado-test.invalid/p/5',
+      'https://this-host-does-not-exist-kadlio-test.invalid/p/5',
       'Tech',
       other.id,
     );
@@ -277,7 +277,7 @@ describe('the nightly sweep picks up what failed', () => {
     const withLink = await makeGift(listId, { name: 'Avec lien' });
     await db.gift.update({
       where: { id: withLink.id },
-      data: { url: 'https://nope-kado-sweep.invalid/p/1' },
+      data: { url: 'https://nope-kadlio-sweep.invalid/p/1' },
     });
     await makeGift(listId, { name: 'Sans lien' });
 
@@ -294,7 +294,7 @@ describe('the nightly sweep picks up what failed', () => {
     const gift = await makeGift(listId, { name: 'Balayage budget' });
     await db.gift.update({
       where: { id: gift.id },
-      data: { url: 'https://nope-kado-sweep.invalid/p/2' },
+      data: { url: 'https://nope-kadlio-sweep.invalid/p/2' },
     });
 
     await sweepUnlinkedGifts(10, 10_000);

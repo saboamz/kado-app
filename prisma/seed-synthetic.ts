@@ -29,7 +29,7 @@ import { loginSchema } from '../src/lib/validation';
 
 const db = new PrismaClient();
 
-const DEMO_PASSWORD = 'kado1234';
+const DEMO_PASSWORD = 'kadlio1234';
 const DAY = 24 * 60 * 60 * 1000;
 const daysAgo = (n: number) => new Date(Date.now() - n * DAY);
 
@@ -159,7 +159,7 @@ const FREE_WISHES = [
 async function main() {
   console.log('Suppression des données synthétiques précédentes…');
   await db.giftEvent.deleteMany({ where: { source: TAG } });
-  await db.user.deleteMany({ where: { email: { endsWith: '@synth.kado.app' } } });
+  await db.user.deleteMany({ where: { email: { endsWith: '@synth.kadlio.app' } } });
   await db.product.deleteMany({ where: { sourceUrl: { contains: '/synth/' } } });
   await db.merchant.deleteMany({ where: { slug: { in: MERCHANTS.map((m) => m.slug) } } });
 
@@ -228,7 +228,7 @@ async function main() {
         // address, so `léa1@…` created an account that could never sign in —
         // 11 of 40 on the first run. The row was valid, the form refused it
         // before the password was ever checked.
-        email: `${slugifyName(first)}${i}@synth.kado.app`,
+        email: `${slugifyName(first)}${i}@synth.kadlio.app`,
         passwordHash,
         name: `${first} ${last}`,
         bio: `${labels.join(', ')}.`,
@@ -463,7 +463,7 @@ async function main() {
   // right in the database and the app rejects them, which sends you hunting in
   // the wrong place. Found the hard way — 11 of 40 accounts on the first run.
   const created = await db.user.findMany({
-    where: { email: { endsWith: '@synth.kado.app' } },
+    where: { email: { endsWith: '@synth.kadlio.app' } },
     select: { email: true },
   });
   const unusable = created.filter(
@@ -497,7 +497,7 @@ async function main() {
   console.log('et un CF entraîné dessus produirait du non-sens confiant.');
   console.log('content_facet et popularity, eux, ont de quoi travailler.');
   console.log('─────────────────────────────────────────');
-  console.log(`\nComptes : prénom+index@synth.kado.app — mot de passe : ${DEMO_PASSWORD}`);
+  console.log(`\nComptes : prénom+index@synth.kadlio.app — mot de passe : ${DEMO_PASSWORD}`);
 }
 
 main()

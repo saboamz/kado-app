@@ -163,7 +163,7 @@ export const fr = {
   'profile.decorate': 'Décorer mon profil',
   'settings.title': 'Paramètres',
   'settings.language': 'Langue',
-  'settings.languageHint': 'La langue dans laquelle vous lisez Kado.',
+  'settings.languageHint': 'La langue dans laquelle vous lisez Kadlio.',
   'settings.deleteAccount': 'Supprimer mon compte',
   'settings.password': 'Mot de passe',
   'password.current': 'Mot de passe actuel',
@@ -410,7 +410,7 @@ export const fr = {
   'landing.tagline': 'Listes de cadeaux, entre proches',
   'landing.h1': 'Dites ce qui vous ferait plaisir. Vos proches s’organisent sans que vous le sachiez.',
   'landing.intro':
-    'Kado est une liste de cadeaux en ligne. Vous y notez vos envies ; vos proches y réservent ce qu’ils comptent offrir, se regroupent pour les gros cadeaux, et discutent entre eux. Vous, vous ne voyez rien de tout ça.',
+    'Kadlio est une liste de cadeaux en ligne. Vous y notez vos envies ; vos proches y réservent ce qu’ils comptent offrir, se regroupent pour les gros cadeaux, et discutent entre eux. Vous, vous ne voyez rien de tout ça.',
   'landing.step1Title': 'Vous notez vos envies',
   'landing.step1Body': 'Un lien de boutique, un prix, ou juste une idée. Le nom suffit.',
   'landing.step2Title': 'Vos proches réservent',
@@ -435,7 +435,7 @@ export const fr = {
   'legal.noticeTitle': 'Mentions légales',
   'legal.publisher': 'Éditeur',
   'legal.publisherBody':
-    'Kado est édité par un particulier, à titre non professionnel, sans publicité et sans revenus. Conformément à l’article 6-III-2 de la loi pour la confiance dans l’économie numérique, son identité n’est pas publiée ici : elle est détenue par l’hébergeur, qui la communiquera sur réquisition de l’autorité judiciaire.',
+    'Kadlio est édité par un particulier, à titre non professionnel, sans publicité et sans revenus. Conformément à l’article 6-III-2 de la loi pour la confiance dans l’économie numérique, son identité n’est pas publiée ici : elle est détenue par l’hébergeur, qui la communiquera sur réquisition de l’autorité judiciaire.',
   'legal.director': 'Directeur de la publication',
   'legal.directorBody': 'L’éditeur, dans les mêmes conditions d’anonymat que ci-dessus.',
   'legal.host': 'Hébergeur',
@@ -445,10 +445,10 @@ export const fr = {
 
   'legal.privacyTitle': 'Politique de confidentialité',
   'legal.privacyIntro':
-    'Cette page décrit ce que Kado enregistre à votre sujet, pourquoi, combien de temps, et ce que vous pouvez exiger. Elle décrit le fonctionnement réel de l’application, pas un modèle.',
+    'Cette page décrit ce que Kadlio enregistre à votre sujet, pourquoi, combien de temps, et ce que vous pouvez exiger. Elle décrit le fonctionnement réel de l’application, pas un modèle.',
   'legal.controller': 'Responsable de traitement',
   'legal.controllerBody':
-    'L’éditeur de Kado, joignable à sabri9595@gmail.com pour toute question ou demande relative à vos données.',
+    'L’éditeur de Kadlio, joignable à sabri9595@gmail.com pour toute question ou demande relative à vos données.',
   'legal.collected': 'Ce qui est enregistré',
   'legal.collectedAccount':
     'Compte : votre adresse e-mail, votre nom, et votre mot de passe sous forme chiffrée — jamais en clair, y compris pour nous.',
@@ -481,14 +481,14 @@ export const fr = {
     'Vous pouvez accéder à vos données, les corriger, les effacer, en limiter l’usage ou vous opposer à leur traitement. L’essentiel se fait directement dans l’application : votre profil est modifiable, et la suppression de compte dans les Réglages efface tout, sans délai ni confirmation par e-mail. Pour le reste, écrivez à sabri9595@gmail.com. Vous pouvez également saisir la CNIL.',
   'legal.secretNote': 'Une précision sur le secret',
   'legal.secretNoteBody':
-    'Kado est conçu pour que le propriétaire d’une liste ne puisse pas savoir qui a réservé quoi. Ce n’est pas une promesse de discrétion : les réservations ne sont jamais chargées lorsque c’est lui qui consulte la page. Vos participations à une cagnotte ne sont visibles nominativement que par la personne qui déclare avoir acheté le cadeau, et uniquement à ce moment-là.',
+    'Kadlio est conçu pour que le propriétaire d’une liste ne puisse pas savoir qui a réservé quoi. Ce n’est pas une promesse de discrétion : les réservations ne sont jamais chargées lorsque c’est lui qui consulte la page. Vos participations à une cagnotte ne sont visibles nominativement que par la personne qui déclare avoir acheté le cadeau, et uniquement à ce moment-là.',
 
   'legal.termsTitle': 'Conditions d’utilisation',
   'legal.termsIntro':
-    'En créant un compte sur Kado, vous acceptez ce qui suit. Le service est gratuit et fourni tel quel.',
+    'En créant un compte sur Kadlio, vous acceptez ce qui suit. Le service est gratuit et fourni tel quel.',
   'legal.termsAccess': 'Accès au service',
   'legal.termsAccessBody':
-    'Kado est gratuit, sans publicité et sans engagement. Il faut avoir au moins 15 ans pour créer un compte. Vous êtes responsable de la confidentialité de votre mot de passe.',
+    'Kadlio est gratuit, sans publicité et sans engagement. Il faut avoir au moins 15 ans pour créer un compte. Vous êtes responsable de la confidentialité de votre mot de passe.',
   'legal.termsContent': 'Ce que vous publiez',
   'legal.termsContentBody':
     'Vous restez propriétaire de ce que vous écrivez et envoyez. Vous vous engagez à ne rien publier d’illégal, haineux ou portant atteinte aux droits d’autrui, y compris dans les salons de discussion privés.',
@@ -500,7 +500,7 @@ export const fr = {
     'Un lien « Signaler » figure sous chaque profil et chaque envie que vous consultez. Le signalement est confidentiel : la personne concernée n’en est pas informée et ne peut pas savoir qui l’a signalée. Un contenu manifestement en infraction est retiré et le compte concerné peut être suspendu.',
   'legal.termsAvailability': 'Disponibilité',
   'legal.termsAvailabilityBody':
-    'Le service est fourni sans garantie de disponibilité. Il peut être interrompu, modifié ou arrêté, notamment pour maintenance. Les prix affichés à partir de liens marchands sont des indications reprises de pages externes : ils peuvent être faux ou périmés, et n’engagent ni Kado ni le marchand.',
+    'Le service est fourni sans garantie de disponibilité. Il peut être interrompu, modifié ou arrêté, notamment pour maintenance. Les prix affichés à partir de liens marchands sont des indications reprises de pages externes : ils peuvent être faux ou périmés, et n’engagent ni Kadlio ni le marchand.',
   'legal.termsEnd': 'Fin',
   'legal.termsEndBody':
     'Vous pouvez supprimer votre compte à tout moment depuis les Réglages ; l’effacement est immédiat et définitif. Ces conditions sont soumises au droit français.',
