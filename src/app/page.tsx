@@ -1,10 +1,17 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { getCurrentUser } from '@/lib/session';
 import { LegalFooter } from '@/components/LegalFooter';
 import { getT } from '@/lib/i18n/server';
-import { siteUrl } from '@/lib/site';
+import { pageAlternates, siteUrl } from '@/lib/site';
 import styles from './landing.module.css';
+
+// The canonical lives here rather than in the root layout: set there, every
+// page inherited it and declared itself a duplicate of the homepage.
+export const metadata: Metadata = {
+  alternates: pageAlternates('/'),
+};
 
 /**
  * The page for somebody who has never heard of this.
