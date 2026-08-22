@@ -163,6 +163,12 @@ export const en: Dictionary = {
   'settings.language': 'Language',
   'settings.languageHint': 'The language you read Kado in.',
   'settings.deleteAccount': 'Delete my account',
+  'settings.password': 'Password',
+  'password.current': 'Current password',
+  'password.next': 'New password',
+  'password.save': 'Change password',
+  'password.saving': 'Saving…',
+  'password.done': 'Password changed. Your other sessions were signed out.',
 
   // ── Forms ────────────────────────────────────────────────────────────────
   'form.giftName': 'What would make you happy?',
@@ -252,6 +258,7 @@ export const en: Dictionary = {
   'error.passwordShort': 'The password must be at least 8 characters.',
   'error.passwordLong': 'That password is too long.',
   'error.passwordRequired': 'Enter your password.',
+  'error.passwordUnchanged': 'Choose a password different from the current one.',
   'error.nameRequired': 'Enter your name.',
   'error.nameLong': 'That name is too long.',
   'error.textLong': 'That text is too long.',

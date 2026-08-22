@@ -165,6 +165,13 @@ export const fr = {
   'settings.language': 'Langue',
   'settings.languageHint': 'La langue dans laquelle vous lisez Kado.',
   'settings.deleteAccount': 'Supprimer mon compte',
+  'settings.password': 'Mot de passe',
+  'password.current': 'Mot de passe actuel',
+  'password.next': 'Nouveau mot de passe',
+  'password.save': 'Changer le mot de passe',
+  'password.saving': 'Enregistrement…',
+  'password.done':
+    'Mot de passe changé. Vos autres sessions ont été déconnectées.',
 
   // ── Forms ────────────────────────────────────────────────────────────────
   'form.giftName': "Qu'est-ce qui vous ferait plaisir ?",
@@ -257,6 +264,7 @@ export const fr = {
   'error.passwordShort': 'Le mot de passe doit contenir au moins 8 caractères.',
   'error.passwordLong': 'Le mot de passe est trop long.',
   'error.passwordRequired': 'Renseignez votre mot de passe.',
+  'error.passwordUnchanged': 'Choisissez un mot de passe différent de l’actuel.',
   'error.nameRequired': 'Renseignez votre nom.',
   'error.nameLong': 'Ce nom est trop long.',
   'error.textLong': 'Ce texte est trop long.',

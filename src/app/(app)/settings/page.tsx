@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/PageHeader';
+import { ChangePassword } from '@/components/ChangePassword';
+import { SectionTitle } from '@/components/display';
 import { SettingsForm } from '@/components/SettingsForm';
 import { DeleteAccount } from '@/components/DeleteAccount';
 import { db } from '@/lib/db';
@@ -29,6 +31,11 @@ export default async function SettingsPage() {
       />
 
       <SettingsForm initial={profile} />
+
+      <section style={{ marginTop: 32 }}>
+        <SectionTitle>{t('settings.password')}</SectionTitle>
+        <ChangePassword />
+      </section>
 
       <section className={styles.danger}>
         <p className={styles.dangerTitle}>{t('settings.deleteAccount')}</p>

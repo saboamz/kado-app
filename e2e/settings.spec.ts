@@ -144,3 +144,57 @@ test('deleting an account signs the person out and frees what they reserved', as
     page.getByRole('button', { name: 'Je réserve ce cadeau' }),
   ).toBeVisible();
 });
+
+test('a password can be changed, and the old one stops working', async ({ page }) => {
+  await signIn(page, scenario.ownerEmail);
+  await page.goto('/settings');
+
+  const next = `${TEST_PASSWORD}-changed`;
+  await page.getByLabel('Mot de passe actuel').fill(TEST_PASSWORD);
+  await page.getByLabel('Nouveau mot de passe').fill(next);
+  await page.getByRole('button', { name: 'Changer le mot de passe' }).click();
+
+  /*
+   * Generous, because this request does scrypt twice — once to check the
+   * current password and once to make the new hash — at N=2^17, about a
+   * second of deliberate work before the transaction even starts.
+   */
+  await expect(page.getByText(/Mot de passe changé/)).toBeVisible({ timeout: 30_000 });
+
+  // The session doing the changing survives it — otherwise the person is
+  // signed out of the tab they just typed in.
+  await page.goto('/app');
+  await expect(page).toHaveURL(/\/app$/);
+
+  // The old password is refused, the new one is not.
+  await page.goto('/profile');
+  await page.getByRole('button', { name: 'Se déconnecter' }).click();
+  await page.waitForURL('**/login');
+
+  // The old password is refused: still on /login, and nothing was signed in.
+  await page.getByLabel('Adresse e-mail').fill(scenario.ownerEmail);
+  await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+  await expect(page.getByText('E-mail ou mot de passe incorrect.')).toBeVisible({
+    timeout: 15_000,
+  });
+  await expect(page).toHaveURL(/\/login$/);
+
+  // The new one is not. Both fields again — the refused submit re-rendered
+  // the form and the address does not necessarily survive that round trip.
+  await page.getByLabel('Adresse e-mail').fill(scenario.ownerEmail);
+  await page.getByLabel('Mot de passe').fill(next);
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+  await page.waitForURL('**/app');
+});
+
+test('changing a password refuses a wrong current one', async ({ page }) => {
+  await signIn(page, scenario.friendEmail);
+  await page.goto('/settings');
+
+  await page.getByLabel('Mot de passe actuel').fill('not-the-password');
+  await page.getByLabel('Nouveau mot de passe').fill('a-brand-new-one');
+  await page.getByRole('button', { name: 'Changer le mot de passe' }).click();
+
+  await expect(page.locator('#current-error')).toBeVisible({ timeout: 15_000 });
+});
