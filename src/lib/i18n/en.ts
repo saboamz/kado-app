@@ -197,12 +197,17 @@ export const en: Dictionary = {
   'form.link': 'Link',
   'form.linkPlaceholder': 'Optional — paste the shop’s link',
   'form.linkHint':
-    'The shop, the photo and the price will be taken from the page if we can read it. If it refuses us, an outside reading service is asked for its name.',
+    'Paste a shop link: the name, the price and the photo fill themselves in when the page can be read.',
+  'form.linkReading': 'Reading the page…',
+  'form.linkFilled': 'Filled in from the page — check it before saving.',
+  'form.linkNothing': 'This page will not let itself be read — fill in the name yourself.',
   'form.price': 'Price',
   'form.optional': 'Optional',
   'form.category': 'Category',
   'form.choose': 'Choose…',
   'form.photo': 'Photo',
+  'form.photoFound': 'Photo found on the page — it will be used unless you pick another.',
+  'form.photoFoundIgnore': 'Don’t use it',
   'form.details': 'Details',
   'form.detailsPlaceholder': 'Size, colour, exact model…',
   'form.listName': 'List name',
@@ -565,7 +570,7 @@ export const en: Dictionary = {
 
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Back to the home page',
-  'legal.updated': 'Last updated: 9 August 2026.',
+  'legal.updated': 'Last updated: 23 August 2026.',
   'legal.noticeTitle': 'Legal notice',
   'legal.publisher': 'Publisher',
   'legal.publisherBody':
@@ -630,7 +635,7 @@ export const en: Dictionary = {
     'You remain the owner of what you write and upload. You undertake not to publish anything unlawful, hateful or infringing on the rights of others, including in the private chats.',
   'legal.termsImages': 'Photos',
   'legal.termsImagesBody':
-    'The photos you upload — profile picture, wish images — must be suitable for all audiences. Sexual, violent or shocking content is not allowed. These images are not scanned automatically: it is your responsibility, and that of the people who see them to report them to us.',
+    'The photos you upload — profile picture, wish images — must be suitable for all audiences. Sexual, violent or shocking content is not allowed. These images are not scanned automatically: it is your responsibility, and that of the people who see them to report them to us. Separately, when a wish points at a shop, the image that shop itself declares for its product may be shown to present the linked article. Those visuals remain their shops’ property; any rights holder can request removal at the contact address in the legal notice, and it will be carried out without delay.',
   'legal.termsReport': 'Reporting',
   'legal.termsReportBody':
     'A "Report" link sits under every profile and every wish you look at. Reporting is confidential: the person concerned is not told and cannot find out who reported them. Content clearly in breach is removed and the account may be suspended.',

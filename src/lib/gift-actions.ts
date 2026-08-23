@@ -115,16 +115,55 @@ async function resolveImage(
     const stored = await storeUpload(file, 'gifts');
     if (!stored.ok) return { error: stored.error };
     // The replaced file is not needed once the new one is saved.
-    await deleteUpload(current);
+    await deleteGiftImage(current);
     return { url: stored.path };
   }
 
   if (formData.get(`${field}Removed`) === '1') {
-    await deleteUpload(current);
+    await deleteGiftImage(current);
     return { url: null };
   }
 
   return {};
+}
+
+/**
+ * Deletes a gift's stored image — unless it is a product's shared copy.
+ *
+ * A picture adopted from the catalogue is one file referenced by the product
+ * row and by every gift that took it. Deleting it with the gift would tear it
+ * out of all of them; a file no product claims is this gift's own upload and
+ * goes as before.
+ */
+async function deleteGiftImage(path: string | null): Promise<void> {
+  if (!path) return;
+  const shared = await db.product.findFirst({
+    where: { imageStoredPath: path },
+    select: { id: true },
+  });
+  if (shared) return;
+  await deleteUpload(path);
+}
+
+/**
+ * Adopts the catalogue's stored picture onto a gift that has none.
+ *
+ * Only ever reads the path from the product row the LINK resolved — nothing
+ * client-sent names a file. The flag from the form says "the person saw the
+ * suggested picture and left it in place"; absent, a wish stays as they made
+ * it. Scoped to a still-imageless gift so a slower request cannot overwrite
+ * an upload that landed meanwhile.
+ */
+async function adoptProductImage(giftId: string, productId: string): Promise<void> {
+  const product = await db.product.findUnique({
+    where: { id: productId },
+    select: { imageStoredPath: true },
+  });
+  if (!product?.imageStoredPath) return;
+  await db.gift.updateMany({
+    where: { id: giftId, imageUrl: null },
+    data: { imageUrl: product.imageStoredPath },
+  });
 }
 
 export async function createGift(
@@ -179,6 +218,10 @@ export async function createGift(
     user.id,
   );
 
+  if (productId && image.url === undefined && formData.get('imageFromPage') === '1') {
+    await adoptProductImage(gift.id, productId);
+  }
+
   await logEvent({
     actorId: user.id,
     kind: 'add_wish',
@@ -231,7 +274,17 @@ export async function updateGift(
   });
 
   if (urlChanged) {
-    await linkGiftToProduct(giftId, next.url, next.category, user.id);
+    const productId = await linkGiftToProduct(giftId, next.url, next.category, user.id);
+    // Same adoption as on create, and just as guarded: only a gift that ends
+    // this edit without any image of its own takes the catalogue's picture.
+    if (
+      productId &&
+      image.url === undefined &&
+      gift.imageUrl === null &&
+      formData.get('imageFromPage') === '1'
+    ) {
+      await adoptProductImage(giftId, productId);
+    }
   }
 
   revalidatePath(`/lists/${gift.listId}`);
@@ -243,7 +296,7 @@ export async function deleteGift(giftId: string): Promise<void> {
   const { gift } = await requireOwnedGift(giftId);
   await db.gift.delete({ where: { id: giftId } });
   // The row is gone; its image would otherwise sit on disk forever.
-  await deleteUpload(gift.imageUrl);
+  await deleteGiftImage(gift.imageUrl);
   revalidatePath(`/lists/${gift.listId}`);
   redirect(`/lists/${gift.listId}`);
 }

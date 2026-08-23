@@ -1,7 +1,7 @@
 import { priceBand } from './catalogue';
 import { judge } from './catalogue-quality';
 import { db } from './db';
-import { extractProduct } from './extract';
+import { extractProduct, type Extracted } from './extract';
 import { fetchViaReader, normaliseCurrency } from './reader-fallback';
 import { findOrCreateProduct } from './product-resolve';
 import { fetchHtml } from './fetch-page';
@@ -30,6 +30,64 @@ import { checkUrl } from './ssrf';
  * A wish with no product row is a completely ordinary outcome — it is what
  * "un week-end en Islande" will always be.
  */
+
+/**
+ * Reads a merchant page and extracts the product it describes.
+ *
+ * One implementation for the two callers that read a pasted link — the
+ * after-save resolver below and the form's preview. It used to live only
+ * here, so the preview gave up exactly where the save succeeded: on the large
+ * share of shops that answer a server-side request with a 403 or a bot check.
+ *
+ * The direct read comes first. When it fails, one more attempt through the
+ * reading proxy, which gets past the refusals a server-side request
+ * collects. It asks for the page's own HTML, so this goes through the SAME
+ * extractor as a direct read — the merchant's json-ld and Open Graph, not a
+ * guess at prose.
+ *
+ * The catch stays deliberately narrow — around the reads, never around
+ * database work, whose errors must not be swallowed with the same silence.
+ *
+ * Returns null when nothing identifiable was found: a page with no title is
+ * not a product, and a wall that answers 200 is caught later by the quality
+ * judge.
+ */
+export async function readProductPage(
+  url: string,
+  useReader = true,
+): Promise<Extracted | null> {
+  let extracted: Extracted;
+  try {
+    extracted = extractProduct(await fetchHtml(url));
+  } catch {
+    if (!useReader) return null;
+
+    const viaReader = await fetchViaReader(url)
+      .then(extractProduct)
+      .catch(() => null);
+
+    if (!viaReader?.title) return null;
+
+    /*
+     * The currency is checked before the price is kept.
+     *
+     * The proxy does not always reach a shop from where we would: Suuupply
+     * answers it 243.00 USD for a jumper it sells at 165 €. Storing that as
+     * euros would put a number on somebody's wish that is wrong by half, and
+     * nothing downstream would ever question it. An unconfirmable currency
+     * takes its price with it — no price is honest, a wrong one is not.
+     */
+    const currency = normaliseCurrency(viaReader.currency);
+    extracted = {
+      ...viaReader,
+      extractedBy: 'reader' as const,
+      currency,
+      priceCents: currency ? viaReader.priceCents : null,
+    };
+  }
+
+  return extracted.title ? extracted : null;
+}
 
 /**
  * Resolves a gift's URL to a product row and attaches it.
@@ -76,54 +134,8 @@ export async function linkGiftToProduct(
   const verdict = await checkUrl(url);
   if (!verdict.ok) return null;
 
-  let extracted;
-  try {
-    extracted = extractProduct(await fetchHtml(verdict.url.href));
-  } catch {
-    /*
-     * The direct read failed — 403, a bot check, a timeout. Ordinary, and
-     * silent: the gift is already saved and must not depend on a shop being
-     * reachable.
-     *
-     * Before giving up, one more attempt through the reading proxy, which
-     * gets past the refusals a server-side request collects. It asks for the
-     * page's own HTML, so this goes through the SAME extractor as a direct
-     * read — the merchant's json-ld and Open Graph, not a guess at prose.
-     *
-     * The try block stays deliberately narrow. Wrapping the database work
-     * below in it as well — which this used to do — meant a Prisma error or a
-     * violated constraint was swallowed with the same silence, and the
-     * catalogue stayed empty with nothing to say why.
-     */
-    if (!useReader) return null;
-
-    const viaReader = await fetchViaReader(verdict.url.href)
-      .then(extractProduct)
-      .catch(() => null);
-
-    if (!viaReader?.title) return null;
-
-    /*
-     * The currency is checked before the price is kept.
-     *
-     * The proxy does not always reach a shop from where we would: Suuupply
-     * answers it 243.00 USD for a jumper it sells at 165 €. Storing that as
-     * euros would put a number on somebody's wish that is wrong by half, and
-     * nothing downstream would ever question it. An unconfirmable currency
-     * takes its price with it — no price is honest, a wrong one is not.
-     */
-    const currency = normaliseCurrency(viaReader.currency);
-    extracted = {
-      ...viaReader,
-      extractedBy: 'reader' as const,
-      currency,
-      priceCents: currency ? viaReader.priceCents : null,
-    };
-  }
-
-  // No title means nothing identifiable was found; a row with no name is not
-  // a product.
-  if (!extracted.title) return null;
+  const extracted = await readProductPage(verdict.url.href, useReader);
+  if (!extracted) return null;
 
   const product = await findOrCreateProduct({
     ...extracted,

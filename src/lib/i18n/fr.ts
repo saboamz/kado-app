@@ -200,12 +200,18 @@ export const fr = {
   'form.link': 'Lien',
   'form.linkPlaceholder': 'Facultatif — collez le lien de la boutique',
   'form.linkHint':
-    'La boutique, la photo et le prix seront repris de la page si nous arrivons à la lire. Si elle nous refuse, un service de lecture externe est sollicité pour en récupérer le nom.',
+    'Collez le lien d’une boutique : le nom, le prix et la photo se remplissent tout seuls quand la page se laisse lire.',
+  'form.linkReading': 'Lecture de la page…',
+  'form.linkFilled': 'Rempli depuis la page — vérifiez avant d’enregistrer.',
+  'form.linkNothing':
+    'Cette page ne se laisse pas lire — remplissez le nom vous-même.',
   'form.price': 'Prix',
   'form.optional': 'Facultatif',
   'form.category': 'Catégorie',
   'form.choose': 'Choisir…',
   'form.photo': 'Photo',
+  'form.photoFound': 'Photo trouvée sur la page — elle sera utilisée si vous n’en choisissez pas une autre.',
+  'form.photoFoundIgnore': 'Ne pas l’utiliser',
   'form.details': 'Précisions',
   'form.detailsPlaceholder': 'Taille, couleur, modèle exact…',
   'form.listName': 'Nom de la liste',
@@ -580,7 +586,7 @@ export const fr = {
 
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Retour à l’accueil',
-  'legal.updated': 'Dernière mise à jour : 9 août 2026.',
+  'legal.updated': 'Dernière mise à jour : 23 août 2026.',
   'legal.noticeTitle': 'Mentions légales',
   'legal.publisher': 'Éditeur',
   'legal.publisherBody':
@@ -645,7 +651,7 @@ export const fr = {
     'Vous restez propriétaire de ce que vous écrivez et envoyez. Vous vous engagez à ne rien publier d’illégal, haineux ou portant atteinte aux droits d’autrui, y compris dans les salons de discussion privés.',
   'legal.termsImages': 'Photos',
   'legal.termsImagesBody':
-    'Les photos que vous envoyez — photo de profil, images d’envies — doivent convenir à tout public. Sont notamment interdits les contenus à caractère sexuel, violents ou choquants. Ces images ne sont pas analysées automatiquement : c’est votre responsabilité, et celle des personnes qui les voient de nous les signaler.',
+    'Les photos que vous envoyez — photo de profil, images d’envies — doivent convenir à tout public. Sont notamment interdits les contenus à caractère sexuel, violents ou choquants. Ces images ne sont pas analysées automatiquement : c’est votre responsabilité, et celle des personnes qui les voient de nous les signaler. Par ailleurs, lorsqu’une envie renvoie vers une boutique, l’image que cette boutique déclare elle-même pour son produit peut être affichée afin de présenter l’article lié. Ces visuels restent la propriété de leurs boutiques ; tout ayant droit peut en demander le retrait à l’adresse de contact des mentions légales, et il sera effectué sans délai.',
   'legal.termsReport': 'Signalement',
   'legal.termsReportBody':
     'Un lien « Signaler » figure sous chaque profil et chaque envie que vous consultez. Le signalement est confidentiel : la personne concernée n’en est pas informée et ne peut pas savoir qui l’a signalée. Un contenu manifestement en infraction est retiré et le compte concerné peut être suspendu.',
