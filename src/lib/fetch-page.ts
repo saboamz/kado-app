@@ -34,13 +34,41 @@ const MAX_HOPS = 3;
  * that request with no check at all. Each hop is re-validated by checkUrl.
  */
 export async function fetchHtml(url: string): Promise<string> {
+  const buffer = await fetchGuarded(url, {
+    accept: 'text/html,application/xhtml+xml',
+    contentType: /text\/html|application\/xhtml/i,
+  });
+  // Truncating HTML is fine: everything the extractors read sits in the head.
+  return new TextDecoder('utf-8').decode(buffer.subarray(0, MAX_BYTES));
+}
+
+/**
+ * Fetches a merchant's product image, under the same guard as the page.
+ *
+ * `maxBytes` REJECTS rather than truncates — a truncated page still has its
+ * head, a truncated image is a corrupt file. The bytes are only fetched here;
+ * whether they are really an image is uploads.ts's judgement, by content.
+ */
+export async function fetchImageBytes(url: string, maxBytes: number): Promise<Buffer> {
+  const buffer = await fetchGuarded(url, {
+    accept: 'image/*',
+    contentType: /^image\//i,
+  });
+  if (buffer.length > maxBytes) throw new Error('image too large');
+  return buffer;
+}
+
+async function fetchGuarded(
+  url: string,
+  what: { accept: string; contentType: RegExp },
+): Promise<Buffer> {
   // One signal for the whole chain, including the body read. Aborting it stops
   // whichever stage is in flight.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TOTAL_BUDGET_MS);
 
   try {
-    return await follow(url, 0, controller.signal);
+    return await follow(url, 0, controller.signal, what);
   } finally {
     clearTimeout(timer);
   }
@@ -50,7 +78,8 @@ async function follow(
   url: string,
   hop: number,
   signal: AbortSignal,
-): Promise<string> {
+  what: { accept: string; contentType: RegExp },
+): Promise<Buffer> {
   if (hop > MAX_HOPS) throw new Error('too many redirects');
 
   const response = await fetch(url, {
@@ -58,7 +87,7 @@ async function follow(
     signal,
     headers: {
       'user-agent': 'KadlioBot/1.0 (+https://kadlio.app/bot)',
-      accept: 'text/html,application/xhtml+xml',
+      accept: what.accept,
       'accept-language': 'fr-FR,fr;q=0.9',
     },
   });
@@ -71,14 +100,14 @@ async function follow(
     // SSRF filter gets bypassed.
     const verdict = await checkUrl(next);
     if (!verdict.ok) throw new Error(verdict.reason);
-    return follow(verdict.url.href, hop + 1, signal);
+    return follow(verdict.url.href, hop + 1, signal, what);
   }
 
   if (!response.ok) throw new Error(`status ${response.status}`);
 
   const type = response.headers.get('content-type') ?? '';
-  if (!/text\/html|application\/xhtml/i.test(type)) {
-    throw new Error('not an HTML page');
+  if (!what.contentType.test(type)) {
+    throw new Error(`unexpected content-type: ${type}`);
   }
 
   /*
@@ -86,9 +115,8 @@ async function follow(
    *
    * The previous version cleared its timer before reading, so a merchant that
    * answered fast and then dripped the body one byte at a time was bounded by
-   * nothing at all. The 2MB cap did not help: it truncates what we keep, not
+   * nothing at all. The cap does not help there: it bounds what we keep, not
    * what we wait for.
    */
-  const buffer = await response.arrayBuffer();
-  return new TextDecoder('utf-8').decode(buffer.slice(0, MAX_BYTES));
+  return Buffer.from(await response.arrayBuffer());
 }

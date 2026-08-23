@@ -242,6 +242,11 @@ model Product {
   brand       String?
   description String?
   imageUrl    String?
+  /// Our own stored copy of imageUrl, made when a preview first reads the
+  /// page. imageUrl points at the merchant, which the CSP rightly refuses to
+  /// display; this is the same picture served from our origin, shareable by
+  /// every gift that links here. Written once — the first preview wins.
+  imageStoredPath String?
   sourceUrl   String?
   /// Normalised URL. Computed in TS before every write — Prisma has no
   /// generated columns, so this is not enforced by the database and a write

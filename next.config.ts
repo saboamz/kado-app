@@ -22,9 +22,19 @@ import type { NextConfig } from 'next';
  *  - frame-ancestors 'none' is the clickjacking answer, and covers what
  *    X-Frame-Options used to; the older header is kept for old browsers.
  */
+/*
+ * `next dev` runs the client through a runtime that eval()s modules —
+ * react-refresh and the dev bundler need it. Under the production CSP the
+ * browser refuses, React never hydrates, and every client-side handler in
+ * the app is silently dead in dev while plain form posts keep working: the
+ * kind of half-broken that reads as "the feature does nothing". The
+ * production policy is untouched — no eval ships.
+ */
+const dev = process.env.NODE_ENV === 'development';
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.giphy.com https://*.public.blob.vercel-storage.com",
   "font-src 'self'",
@@ -40,13 +50,21 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
   /*
-   * no-referrer, not the browser default.
+   * same-origin, not the browser default — and not no-referrer.
    *
    * The default leaks the origin cross-site, which is harmless. What is not
    * harmless is a gift page's URL travelling anywhere at all, and the app
-   * sends people out to merchants from exactly those pages.
+   * sends people out to merchants from exactly those pages. same-origin sends
+   * nothing at all cross-site, which is that guarantee; the merchant links in
+   * OutboundLink carry rel="noreferrer" on top of it.
+   *
+   * This WAS no-referrer, which promises nothing more — same-origin referrers
+   * never leave the site — and broke something real: under no-referrer the
+   * Fetch spec serialises the Origin header of every same-origin POST as
+   * "null" (whatwg/fetch #1030), and Next's dev server parses that header
+   * with new URL(), so every form in the app answered 500 under `next dev`.
    */
-  { key: 'Referrer-Policy', value: 'no-referrer' },
+  { key: 'Referrer-Policy', value: 'same-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
   {
     key: 'Strict-Transport-Security',

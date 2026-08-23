@@ -107,8 +107,19 @@ export async function storeUpload(
     return { ok: false, error: 'Cette image dépasse 4 Mo.' };
   }
 
-  const bytes = Buffer.from(await file.arrayBuffer());
+  return storeImageBytes(Buffer.from(await file.arrayBuffer()), kind);
+}
 
+/**
+ * The same validation and normalisation, for bytes that did not arrive as a
+ * form upload — a product picture our server fetched from a merchant. One
+ * path for both means a downloaded file cannot skip a check an uploaded one
+ * would have faced.
+ */
+export async function storeImageBytes(
+  bytes: Buffer,
+  kind: UploadKind,
+): Promise<UploadResult> {
   // The declared type is ignored: only the content decides.
   const type = detectImageType(bytes);
   if (!type) {

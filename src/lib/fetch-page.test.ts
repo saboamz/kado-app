@@ -77,7 +77,7 @@ describe('the whole attempt is budgeted, not each request', () => {
       res.end('%PDF-1.4');
     });
 
-    await expect(fetchHtml(`${base}/pdf`)).rejects.toThrow(/not an HTML page/);
+    await expect(fetchHtml(`${base}/pdf`)).rejects.toThrow(/unexpected content-type/);
   });
 
   it('refuses a redirect with nowhere to go', async () => {
