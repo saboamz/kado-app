@@ -8,7 +8,7 @@ import { deleteUpload, storeUpload } from './uploads';
 import { parseMoney } from './format';
 import { rateLimit, recordAttempt, UPLOAD_PER_USER } from './rate-limit';
 import { requireUser } from './session';
-import { linkGiftToProduct } from './gift-product-link';
+import { ensureStoredProductImage, linkGiftToProduct } from './gift-product-link';
 import { fieldErrors, giftSchema, type GiftInput } from './validation';
 
 export type FormState = { errors?: Record<string, string> };
@@ -56,6 +56,8 @@ async function requireOwnedGift(giftId: string) {
       // Compared against the submitted link, to know whether the product
       // this wish points at has changed.
       url: true,
+      // Lets the quick-add enrichment recognise a wish it already resolved.
+      productId: true,
       list: { select: { ownerId: true } },
     },
   });
@@ -233,6 +235,153 @@ export async function createGift(
 
   revalidatePath(`/lists/${listId}`);
   redirect(`/lists/${listId}`);
+}
+
+export type QuickAddResult = {
+  /** Set when the input was a link: the wish exists, the slow half remains. */
+  giftId?: string;
+  /** An error KEY, like every form error — the client renders the sentence. */
+  error?: string;
+};
+
+/**
+ * The single box at the top of a list: a link, or just words.
+ *
+ * The minimum a wish needs is a name — the form's other six fields are
+ * optional, and the save has never depended on a shop being readable. This
+ * takes the interface to the same place the data model always was: words make
+ * a wish immediately, and a link makes one named after its shop, so there is
+ * something on the list before any page has been read.
+ *
+ * The reading is NOT done here, on purpose: it can take seconds, and the
+ * point of this box is that the wish appears at once. The client calls
+ * enrichQuickGift() next, and the card fills in under the person's eyes.
+ * The full form remains the place to be precise; this is the place to be
+ * quick.
+ */
+export async function quickAddGift(
+  listId: string,
+  raw: string,
+): Promise<QuickAddResult> {
+  const { user } = await requireOwnedList(listId);
+
+  const input = raw.trim();
+  if (!input) return { error: 'error.giftNameRequired' };
+
+  const url = quickUrl(input);
+  if (!url) {
+    if (input.length > 140) return { error: 'error.nameLong' };
+    const gift = await db.gift.create({ data: { listId, name: input } });
+    // Same evidence as the form's add — see createGift on why recipientId
+    // stays null.
+    await logEvent({
+      actorId: user.id,
+      kind: 'add_wish',
+      giftId: gift.id,
+      productId: null,
+      priceCents: null,
+      categoryId: null,
+    });
+    revalidatePath(`/lists/${listId}`);
+    return {};
+  }
+
+  const gift = await db.gift.create({
+    data: {
+      listId,
+      // The shop's own name, until the page says better. merchantFromUrl only
+      // returns null for an unparseable URL, which quickUrl already refused.
+      name: merchantFromUrl(url) ?? input.slice(0, 140),
+      url,
+      merchant: merchantFromUrl(url),
+    },
+  });
+  revalidatePath(`/lists/${listId}`);
+  return { giftId: gift.id };
+}
+
+/**
+ * What the pasted input has to look like before it is treated as a link.
+ *
+ * Anything with a space is words — "1.5L en verre" is a wish, not an address.
+ * The bare-domain form matches what people actually paste from an address
+ * bar with the scheme stripped.
+ */
+function quickUrl(input: string): string | null {
+  if (/\s/.test(input)) return null;
+  if (/^https?:\/\/.+/.test(input)) return input;
+  if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(input)) return `https://${input}`;
+  return null;
+}
+
+/**
+ * The slow half of the quick add: reading the page behind the wish's link.
+ *
+ * Runs after the wish already exists, so nothing here can cost anybody their
+ * gift — the exact philosophy of linkGiftToProduct, which does the fetching
+ * and carries the rate limit and the SSRF guard. What is new is only that
+ * the GIFT learns what the page said: each field is written where the
+ * provisional value still stands, so a person who renamed or priced the wish
+ * meanwhile is never overwritten by a slower request.
+ */
+export async function enrichQuickGift(giftId: string): Promise<void> {
+  const { user, gift } = await requireOwnedGift(giftId);
+  // No link to read, or a previous call already resolved it: nothing to do,
+  // and no second add_wish event to pollute the training set with.
+  if (!gift.url || gift.productId) return;
+
+  const productId = await linkGiftToProduct(gift.id, gift.url, null, user.id);
+
+  const product = productId
+    ? await db.product.findUnique({
+        where: { id: productId },
+        select: {
+          id: true,
+          title: true,
+          priceCents: true,
+          imageUrl: true,
+          imageStoredPath: true,
+        },
+      })
+    : null;
+
+  if (product) {
+    const provisional = merchantFromUrl(gift.url);
+    if (provisional) {
+      await db.gift.updateMany({
+        where: { id: gift.id, name: provisional },
+        data: { name: product.title.slice(0, 140) },
+      });
+    }
+    if (product.priceCents != null) {
+      await db.gift.updateMany({
+        where: { id: gift.id, priceCents: null },
+        data: { priceCents: product.priceCents },
+      });
+    }
+    const stored = await ensureStoredProductImage(product);
+    if (stored) {
+      await db.gift.updateMany({
+        where: { id: gift.id, imageUrl: null },
+        data: { imageUrl: stored },
+      });
+    }
+  }
+
+  // Logged here rather than at creation, so the event carries the productId
+  // that collaborative filtering needs — the log is append-only and nothing
+  // backfills it.
+  await logEvent({
+    actorId: user.id,
+    kind: 'add_wish',
+    giftId: gift.id,
+    productId,
+    priceCents: product?.priceCents ?? null,
+    categoryId: null,
+  });
+
+  revalidatePath(`/lists/${gift.listId}`);
+  revalidatePath(`/gifts/${gift.id}`);
 }
 
 export async function updateGift(

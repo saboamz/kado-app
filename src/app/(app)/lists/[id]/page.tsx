@@ -10,6 +10,7 @@ import {
 } from '@/components/display';
 import { GiftIcon, PlusIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { QuickAdd } from '@/components/QuickAdd';
 import { ViewpointBanner } from '@/components/Viewpoint';
 import { UploadedImage } from '@/components/UploadedImage';
 import { distinctOccasion, formatMoney } from '@/lib/format';
@@ -105,6 +106,10 @@ export default async function ListPage({
           </span>
         )}
       </p>
+
+      {/* The fastest way in: a link or a few words, no form. Owners only —
+          a friend has no business writing onto somebody else's list. */}
+      {isOwner && <QuickAdd listId={id} />}
 
       {gifts.length === 0 ? (
         <EmptyState

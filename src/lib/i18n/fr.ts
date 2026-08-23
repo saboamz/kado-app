@@ -259,6 +259,10 @@ export const fr = {
 
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Ajoutez une envie : un lien, un prix, ou simplement une idée.',
+  'lists.quickAddPlaceholder': 'Collez un lien, ou écrivez une envie…',
+  // The box's own button. Named against the header's « Ajouter » : the two
+  // ways in tell themselves apart by their buttons, without a caption.
+  'lists.quickAddCta': 'Ajout rapide',
   'lists.newTitle': 'Nouvelle liste',
   'lists.newSubtitle': 'Une liste par occasion, ou pour vos envies du moment.',
   'lists.create': 'Créer la liste',
