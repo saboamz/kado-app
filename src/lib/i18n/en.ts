@@ -589,7 +589,7 @@ export const en: Dictionary = {
     'This page describes what Kadlio records about you, why, for how long, and what you can demand. It describes how the app actually works, not a template.',
   'legal.controller': 'Data controller',
   'legal.controllerBody':
-    'The publisher of Kadlio, reachable at sabri9595@gmail.com for any question or request about your data.',
+    'The publisher of Kadlio, reachable at contact@kadlio.com for any question or request about your data.',
   'legal.collected': 'What is recorded',
   'legal.collectedAccount':
     'Account: your email address, your name, and your password in hashed form — never in the clear, including to us.',
@@ -621,7 +621,7 @@ export const en: Dictionary = {
     'Two tools from Vercel, the host, are active. Speed Insights measures how quickly pages render: durations only, with no identifier and no following you from page to page. Web Analytics counts page views, countries and device types: it sets no cookie and keeps no IP address, but it derives a temporary identifier from one, renewed daily, to tell visits apart. These measurements exist to know whether the app is slow or used, never to profile you, and nothing is sold or shared for advertising. Any content blocker stops them without breaking the app.',
   'legal.rights': 'Your rights',
   'legal.rightsBody':
-    'You may access your data, correct it, erase it, restrict its use or object to its processing. Most of that is in the app itself: your profile is editable, and deleting your account in Settings erases everything, with no delay and no email confirmation. For anything else, write to sabri9595@gmail.com. You may also complain to the CNIL.',
+    'You may access your data, correct it, erase it, restrict its use or object to its processing. Most of that is in the app itself: your profile is editable, and deleting your account in Settings erases everything, with no delay and no email confirmation. For anything else, write to contact@kadlio.com. You may also complain to the CNIL.',
   'legal.secretNote': 'A note about the secret',
   'legal.secretNoteBody':
     'Kadlio is built so that a list’s owner cannot learn who claimed what. This is not a promise of discretion: reservations are never loaded when it is the owner looking at the page. What you chip in to a pot is shown by name only to the person who declares they bought the gift, and only at that point.',
