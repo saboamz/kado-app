@@ -41,7 +41,7 @@ const lora = Lora({
  * from a sentence read the wrong way.
  */
 const DESCRIPTION =
-  'Kadlio est une liste de cadeaux en ligne. Vous y notez vos envies, vos proches y réservent en secret — vous ne voyez jamais qui a pris quoi.';
+  'Kadlio est une liste de cadeaux en ligne, gratuite et sans publicité. Vos proches y réservent en secret — vous ne voyez jamais qui a pris quoi.';
 
 export const metadata: Metadata = {
   /*

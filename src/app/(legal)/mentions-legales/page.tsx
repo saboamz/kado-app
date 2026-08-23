@@ -49,8 +49,8 @@ export default async function LegalNoticePage() {
 
       <h2 className={styles.heading}>{t('legal.contact')}</h2>
       <p className={styles.body}>
-        <a href="mailto:sabri9595@gmail.com" className={styles.link}>
-          sabri9595@gmail.com
+        <a href="mailto:contact@kadlio.com" className={styles.link}>
+          contact@kadlio.com
         </a>
       </p>
     </article>

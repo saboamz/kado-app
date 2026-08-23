@@ -607,7 +607,7 @@ export const fr = {
     'Cette page décrit ce que Kadlio enregistre à votre sujet, pourquoi, combien de temps, et ce que vous pouvez exiger. Elle décrit le fonctionnement réel de l’application, pas un modèle.',
   'legal.controller': 'Responsable de traitement',
   'legal.controllerBody':
-    'L’éditeur de Kadlio, joignable à sabri9595@gmail.com pour toute question ou demande relative à vos données.',
+    'L’éditeur de Kadlio, joignable à contact@kadlio.com pour toute question ou demande relative à vos données.',
   'legal.collected': 'Ce qui est enregistré',
   'legal.collectedAccount':
     'Compte : votre adresse e-mail, votre nom, et votre mot de passe sous forme chiffrée — jamais en clair, y compris pour nous.',
@@ -639,7 +639,7 @@ export const fr = {
     'Deux outils de Vercel, l’hébergeur, sont actifs. Speed Insights mesure la vitesse d’affichage des pages : uniquement des durées, sans identifiant ni suivi d’une page à l’autre. Web Analytics compte les pages vues, les pays et les types d’appareils : il ne dépose pas de cookie et ne conserve pas votre adresse IP, mais il en dérive un identifiant temporaire, renouvelé chaque jour, pour distinguer les visites. Ces mesures servent à savoir si l’application est lente ou utilisée, jamais à vous profiler, et rien n’est revendu ni partagé à des fins publicitaires. Vous pouvez les bloquer avec n’importe quel bloqueur de contenu, sans que l’application cesse de fonctionner.',
   'legal.rights': 'Vos droits',
   'legal.rightsBody':
-    'Vous pouvez accéder à vos données, les corriger, les effacer, en limiter l’usage ou vous opposer à leur traitement. L’essentiel se fait directement dans l’application : votre profil est modifiable, et la suppression de compte dans les Réglages efface tout, sans délai ni confirmation par e-mail. Pour le reste, écrivez à sabri9595@gmail.com. Vous pouvez également saisir la CNIL.',
+    'Vous pouvez accéder à vos données, les corriger, les effacer, en limiter l’usage ou vous opposer à leur traitement. L’essentiel se fait directement dans l’application : votre profil est modifiable, et la suppression de compte dans les Réglages efface tout, sans délai ni confirmation par e-mail. Pour le reste, écrivez à contact@kadlio.com. Vous pouvez également saisir la CNIL.',
   'legal.secretNote': 'Une précision sur le secret',
   'legal.secretNoteBody':
     'Kadlio est conçu pour que le propriétaire d’une liste ne puisse pas savoir qui a réservé quoi. Ce n’est pas une promesse de discrétion : les réservations ne sont jamais chargées lorsque c’est lui qui consulte la page. Vos participations à une cagnotte ne sont visibles nominativement que par la personne qui déclare avoir acheté le cadeau, et uniquement à ce moment-là.',
