@@ -255,6 +255,8 @@ export const en: Dictionary = {
 
   // ── Lists and wishes, continued ──────────────────────────────────────────
   'lists.emptyListHint': 'Add a wish: a link, a price, or simply an idea.',
+  'lists.quickAddPlaceholder': 'Paste a link, or write a wish…',
+  'lists.quickAddCta': 'Quick add',
   'lists.newTitle': 'New list',
   'lists.newSubtitle': 'One list per occasion, or for what you fancy now.',
   'lists.create': 'Create the list',
