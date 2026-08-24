@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main id="app">
+      <p class="muted" id="loading">Lecture de la page…</p>
+
+      <section id="signin" hidden>
+        <p>Connectez-vous à Kadlio pour ajouter des envies depuis votre navigateur.</p>
+        <button id="open-login" class="primary">Ouvrir Kadlio</button>
+      </section>
+
+      <section id="unsupported" hidden>
+        <p class="muted">Ouvrez la page d’un produit, puis cliquez à nouveau sur l’icône Kadlio.</p>
+      </section>
+
+      <form id="form" hidden>
+        <img id="preview" alt="" hidden />
+        <label>
+          Envie
+          <input id="name" required maxlength="140" />
+        </label>
+        <label>
+          Prix (€)
+          <input id="price" inputmode="decimal" placeholder="Facultatif" />
+        </label>
+        <label>
+          Liste
+          <select id="list"></select>
+        </label>
+        <p class="error" id="error" role="alert" hidden></p>
+        <button type="submit" class="primary" id="submit">Ajouter à ma liste</button>
+      </form>
+
+      <section id="done" hidden>
+        <p>✓ Ajouté à votre liste.</p>
+        <button id="open-list" class="secondary">Voir la liste</button>
+      </section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
