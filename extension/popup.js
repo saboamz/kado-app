@@ -46,6 +46,11 @@ function readPage() {
   let priceCents = null;
   let imageUrl = null;
 
+  /*
+   * 1. JSON-LD. Offers nest in the wild — an AggregateOffer holding the real
+   * offers, a priceSpecification holding the real price — so both are walked
+   * rather than assuming the flat shape the schema.org examples show.
+   */
   for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
     let nodes = [];
     try {
@@ -59,29 +64,44 @@ function readPage() {
     } catch {
       continue;
     }
+    const imageOf = (image) => {
+      if (typeof image === 'string') return clean(image);
+      if (Array.isArray(image)) {
+        for (const entry of image) {
+          const found = imageOf(entry);
+          if (found) return found;
+        }
+        return null;
+      }
+      return image ? clean(image.url) ?? clean(image.contentUrl) : null;
+    };
     for (const node of nodes) {
       const type = node['@type'];
       const isProduct =
         type === 'Product' || (Array.isArray(type) && type.includes('Product'));
       if (!isProduct) continue;
       title = title ?? clean(node.name);
-      const offers = [node.offers].flat().filter(Boolean);
+      imageUrl = imageUrl ?? imageOf(node.image);
+
+      const offers = [];
+      const collectOffers = (offer) => {
+        if (!offer) return;
+        if (Array.isArray(offer)) return offer.forEach(collectOffers);
+        offers.push(offer);
+        collectOffers(offer.offers);
+      };
+      collectOffers(node.offers);
       for (const offer of offers) {
-        const raw = offer.price ?? offer.lowPrice;
-        if (priceCents == null && raw != null) {
-          priceCents = parsePrice(raw, offer.priceCurrency ?? null);
-        }
+        if (priceCents != null) break;
+        const spec = [offer.priceSpecification].flat().filter(Boolean)[0];
+        const raw = offer.price ?? offer.lowPrice ?? spec?.price;
+        const currency =
+          offer.priceCurrency ?? spec?.priceCurrency ?? null;
+        if (raw != null) priceCents = parsePrice(raw, currency);
       }
-      const image = node.image;
-      imageUrl =
-        imageUrl ??
-        clean(
-          typeof image === 'string'
-            ? image
-            : Array.isArray(image)
-              ? image.find((entry) => typeof entry === 'string')
-              : image && image.url,
-        );
+      if (priceCents == null && node.price != null) {
+        priceCents = parsePrice(node.price, node.priceCurrency ?? null);
+      }
     }
   }
 
@@ -91,14 +111,44 @@ function readPage() {
         ?.content,
     );
 
-  title = title ?? meta('og:title') ?? clean(document.title);
-  imageUrl = imageUrl ?? meta('og:image');
+  /* 2. Open Graph. */
+  title = title ?? meta('og:title');
+  imageUrl =
+    imageUrl ??
+    meta('og:image') ??
+    meta('og:image:secure_url') ??
+    meta('twitter:image');
   if (priceCents == null) {
     const amount = meta('product:price:amount') ?? meta('og:price:amount');
     const currency =
       meta('product:price:currency') ?? meta('og:price:currency');
     if (amount) priceCents = parsePrice(amount, currency);
   }
+
+  /*
+   * 3. Microdata — itemprop attributes woven into the markup, the layer the
+   * server's extractor also reads. A <meta itemprop> carries its value in
+   * content; a visible element carries it in its text or its src.
+   */
+  const itemprop = (name) => {
+    const element = document.querySelector(`[itemprop="${name}"]`);
+    if (!element) return null;
+    return (
+      clean(element.getAttribute('content')) ??
+      clean(element.getAttribute('src')) ??
+      clean(element.getAttribute('href')) ??
+      clean(element.textContent)
+    );
+  };
+  title = title ?? itemprop('name');
+  imageUrl = imageUrl ?? itemprop('image');
+  if (priceCents == null) {
+    const raw = itemprop('price');
+    if (raw != null) priceCents = parsePrice(raw, itemprop('priceCurrency'));
+  }
+
+  /* 4. The document itself, last. */
+  title = title ?? clean(document.title);
 
   const canonical = document.querySelector('link[rel="canonical"]')?.href;
   return { title, priceCents, imageUrl, url: clean(canonical) ?? location.href };
