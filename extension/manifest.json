@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Kadlio — Ajout rapide",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Ajoutez le produit que vous regardez à votre liste de cadeaux Kadlio, en un clic.",
   "action": {
     "default_popup": "popup.html",
