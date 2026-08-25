@@ -48,6 +48,28 @@ export const fr = {
   'auth.signIn': 'Se connecter',
   'auth.signUp': 'Créer mon compte',
   'auth.createAccount': 'Créer un compte',
+  'auth.forgotPassword': 'Mot de passe oublié ?',
+  'auth.forgotTitle': 'Mot de passe oublié.',
+  'auth.forgotLede':
+    'Indiquez votre adresse : si un compte existe, un lien pour en choisir un nouveau arrivera par e-mail.',
+  'auth.forgotSend': 'Envoyer le lien',
+  'auth.forgotSending': 'Envoi…',
+  'auth.forgotSent':
+    'Si un compte existe avec cette adresse, un e-mail vient de partir. Pensez à vérifier vos indésirables.',
+  'auth.resetTitle': 'Choisissez un nouveau mot de passe.',
+  'auth.resetLede': 'Il remplacera l’ancien sur tous vos appareils.',
+  'auth.resetAgain': 'Demander un nouveau lien',
+  'auth.backToLogin': 'Retour à la connexion',
+
+  // ── L'e-mail de réinitialisation ─────────────────────────────────────────
+  'email.resetSubject': 'Réinitialisation de votre mot de passe Kadlio',
+  'email.resetGreeting': 'Bonjour {name},',
+  'email.resetBody':
+    'Quelqu’un — vous, normalement — a demandé à réinitialiser le mot de passe de votre compte Kadlio. Ce lien est valable une heure et ne sert qu’une fois.',
+  'email.resetButton': 'Choisir un nouveau mot de passe',
+  'email.resetLinkFallback': 'Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :',
+  'email.resetIgnore':
+    'Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail : votre mot de passe reste inchangé.',
 
   // ── Home ─────────────────────────────────────────────────────────────────
   'home.greeting': 'Bonjour {name}',
@@ -295,6 +317,7 @@ export const fr = {
   'error.passwordLong': 'Le mot de passe est trop long.',
   'error.passwordRequired': 'Renseignez votre mot de passe.',
   'error.passwordUnchanged': 'Choisissez un mot de passe différent de l’actuel.',
+  'error.resetInvalid': 'Ce lien ne fonctionne plus. Demandez-en un nouveau.',
   'error.nameRequired': 'Renseignez votre nom.',
   'error.nameLong': 'Ce nom est trop long.',
   'error.textLong': 'Ce texte est trop long.',
@@ -590,7 +613,7 @@ export const fr = {
 
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Retour à l’accueil',
-  'legal.updated': 'Dernière mise à jour : 23 août 2026.',
+  'legal.updated': 'Dernière mise à jour : 25 août 2026.',
   'legal.noticeTitle': 'Mentions légales',
   'legal.publisher': 'Éditeur',
   'legal.publisherBody':
@@ -627,10 +650,10 @@ export const fr = {
     'Pour exécuter le service que vous avez demandé en créant un compte (article 6.1.b du RGPD) : sans ces données, il n’y a ni liste, ni ami, ni cadeau. Les réponses au questionnaire d’inscription reposent sur votre consentement (article 6.1.a), donné en répondant et retirable à tout moment en effaçant vos réponses depuis votre profil — le service fonctionne à l’identique sans elles. La limitation des tentatives de connexion repose sur l’intérêt légitime à protéger les comptes (article 6.1.f).',
   'legal.retention': 'Combien de temps',
   'legal.retentionBody':
-    'Vos données sont conservées tant que votre compte existe. Une session expire au bout de 30 jours. Les tentatives de connexion sont effacées au bout de 24 heures. À la suppression de votre compte, tout est effacé immédiatement : listes, envies, réservations, participations, messages, photos et journal d’activité. Rien n’est conservé sous forme anonymisée.',
+    'Vos données sont conservées tant que votre compte existe. Une session expire au bout de 30 jours. Les tentatives de connexion sont effacées au bout de 24 heures. Un lien de réinitialisation de mot de passe expire au bout d’une heure et ne sert qu’une fois. À la suppression de votre compte, tout est effacé immédiatement : listes, envies, réservations, participations, messages, photos et journal d’activité. Rien n’est conservé sous forme anonymisée.',
   'legal.thirdParties': 'Qui d’autre voit quelque chose',
   'legal.thirdPartiesBody':
-    'Vercel héberge l’application, stocke les photos que vous envoyez et en mesure l’audience et la vitesse — voir la section suivante. Neon héberge la base de données, dans l’Union européenne. Quand vous cherchez un GIF, la requête part chez GIPHY, et les GIFs affichés sur un profil sont chargés depuis leurs serveurs — GIPHY voit donc les visites sur ce profil. Quand vous collez un lien de boutique que le marchand nous refuse, l’adresse de la page est transmise à un service de lecture externe (r.jina.ai) pour en récupérer le titre et le prix. Aucune donnée n’est vendue, louée, ni transmise à des fins publicitaires.',
+    'Vercel héberge l’application, stocke les photos que vous envoyez et en mesure l’audience et la vitesse — voir la section suivante. Neon héberge la base de données, dans l’Union européenne. Quand vous cherchez un GIF, la requête part chez GIPHY, et les GIFs affichés sur un profil sont chargés depuis leurs serveurs — GIPHY voit donc les visites sur ce profil. Quand vous collez un lien de boutique que le marchand nous refuse, l’adresse de la page est transmise à un service de lecture externe (r.jina.ai) pour en récupérer le titre et le prix. L’e-mail de réinitialisation de mot de passe est acheminé par Resend, un prestataire américain certifié au titre du cadre de protection des données UE–États-Unis (Data Privacy Framework) : il voit votre adresse et le contenu de ce message, rien d’autre. Aucune donnée n’est vendue, louée, ni transmise à des fins publicitaires.',
   'legal.cookies': 'Cookies',
   'legal.cookiesBody':
     'Un seul cookie est déposé : celui qui vous maintient connecté. Il est strictement nécessaire au fonctionnement du service. Aucun cookie publicitaire, aucun cookie de réseau social, aucun traceur tiers. C’est pourquoi aucun bandeau ne vous est demandé.',

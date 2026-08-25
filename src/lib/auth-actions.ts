@@ -3,11 +3,16 @@
 import { z } from 'zod';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { db } from './db';
+import { sendPasswordResetEmail } from './email';
 import { dummyHash, hashPassword, needsRehash, verifyPassword } from './password';
+import { claimPasswordReset, issuePasswordReset } from './password-reset';
 import {
   LOGIN_PER_EMAIL,
   LOGIN_PER_IP,
+  RESET_PER_EMAIL,
+  RESET_PER_IP,
   SIGNUP_PER_IP,
   clearAttempts,
   rateLimit,
@@ -15,9 +20,11 @@ import {
   retryMessage,
 } from './rate-limit';
 import { acceptInvite } from './invite-actions';
+import { DEFAULT_LOCALE, isLocale } from './i18n/locales';
 import { getLocale, getT } from './i18n/server';
-import { createSession, destroySession, requireUser } from './session';
-import { fieldErrors, loginSchema, passwordSchema, signupSchema } from './validation';
+import { createSession, destroyAllSessions, destroySession, requireUser } from './session';
+import { siteUrl } from './site';
+import { emailSchema, fieldErrors, loginSchema, passwordSchema, signupSchema } from './validation';
 
 export type FormState = { errors?: Record<string, string>; done?: boolean };
 
@@ -222,15 +229,119 @@ export async function logout(): Promise<void> {
 }
 
 /**
+ * "Mot de passe oublié" — the half that only needs an address.
+ *
+ * The answer is the same whether or not an account exists, to the byte AND
+ * to the millisecond: the throttle charges every attempt, the user lookup
+ * runs in both cases, and everything that depends on the answer — minting
+ * the token, sending the e-mail — happens in after(), once the response has
+ * already left. The login action equalises its timings with dummyHash() for
+ * the same reason: this form must not be an oracle for which addresses have
+ * accounts.
+ */
+export async function requestPasswordReset(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const t = await getT();
+  const parsed = z.object({ email: emailSchema }).safeParse({
+    email: formData.get('email'),
+  });
+  if (!parsed.success) return { errors: fieldErrors(parsed.error) };
+  const email = parsed.data.email;
+
+  const ip = await clientIp();
+  const [byEmail, byIp] = await Promise.all([
+    rateLimit('reset:email', email, RESET_PER_EMAIL),
+    rateLimit('reset:ip', ip, RESET_PER_IP),
+  ]);
+  if (!byEmail.allowed || !byIp.allowed) {
+    const retryAfter = Math.max(
+      byEmail.allowed ? 0 : byEmail.retryAfter,
+      byIp.allowed ? 0 : byIp.retryAfter,
+    );
+    return { errors: { form: retryMessage(retryAfter, t) } };
+  }
+
+  // Recorded whether or not the address has an account: what is limited is
+  // the outbound e-mail, and charging only real accounts would let anybody
+  // read account existence off the throttle after three tries.
+  await Promise.all([
+    recordAttempt('reset:email', email),
+    recordAttempt('reset:ip', ip),
+  ]);
+
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, name: true, locale: true },
+  });
+
+  after(async () => {
+    if (!user) return;
+    const { token, id } = await issuePasswordReset(user.id);
+    await sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      locale: isLocale(user.locale) ? user.locale : DEFAULT_LOCALE,
+      url: `${siteUrl()}/reset-password?token=${token}`,
+      tokenId: id,
+    });
+  });
+
+  return { done: true };
+}
+
+/**
+ * The e-mailed half of a password change.
+ *
+ * The link stands in for the current password: claiming its token is the
+ * proof of control, spent atomically and exactly once (see
+ * claimPasswordReset). What follows mirrors changePassword — new hash and
+ * every session gone in one transaction — and ends signed in, because the
+ * person has just proven they own the mailbox the account answers to.
+ */
+export async function resetPassword(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const parsed = z
+    .object({
+      token: z.string().min(1, 'error.resetInvalid'),
+      password: passwordSchema,
+    })
+    .safeParse({
+      token: formData.get('token'),
+      password: formData.get('password'),
+    });
+  if (!parsed.success) return { errors: fieldErrors(parsed.error) };
+
+  const claimed = await claimPasswordReset(parsed.data.token);
+  // One answer for unknown, expired and already used: telling them apart
+  // tells a guesser which of its guesses were close.
+  if (!claimed) return { errors: { form: 'error.resetInvalid' } };
+
+  const hash = await hashPassword(parsed.data.password);
+  await db.$transaction([
+    db.user.update({ where: { id: claimed.userId }, data: { passwordHash: hash } }),
+    destroyAllSessions(claimed.userId),
+  ]);
+
+  // The link proved they are the owner; the failed guesses that drove them
+  // here must not refuse their brand-new password at the door.
+  await clearAttempts('login:email', claimed.email);
+
+  await createSession(claimed.userId);
+  redirect('/app');
+}
+
+/**
  * Changing a password from inside the account.
  *
- * There is no reset flow — that needs e-mail, which the app does not send.
- * This is the half that needs nothing: somebody who is signed in and suspects
- * their password is known can replace it. Before this, the only remedy the
- * product offered was deleting the account.
- *
- * The current password is required. A session left open on a shared machine
- * would otherwise be enough to lock its owner out of their own account.
+ * The signed-in half of the pair — resetPassword above is the e-mailed one.
+ * There, a claimed token proves control of the mailbox; here nothing has
+ * been proven, so the current password is required: a session left open on
+ * a shared machine would otherwise be enough to lock its owner out of their
+ * own account.
  */
 export async function changePassword(
   _prev: FormState,
@@ -265,16 +376,19 @@ export async function changePassword(
   const hash = await hashPassword(parsed.data.next);
 
   /*
-   * Every other session goes with it.
+   * Every other session goes with it — and every reset link still in flight.
    *
    * Changing a password because somebody else may have it is pointless if the
-   * session they are already holding keeps working. The current one is spared
-   * and reissued, so the person doing this is not signed out of the tab they
-   * are typing in.
+   * session they are already holding keeps working, or if a "choose a new
+   * password" e-mail sitting in some inbox still opens the account: an
+   * outstanding reset link is a second password. The current session is
+   * spared and reissued, so the person doing this is not signed out of the
+   * tab they are typing in.
    */
   await db.$transaction([
     db.user.update({ where: { id: user.id }, data: { passwordHash: hash } }),
-    db.session.deleteMany({ where: { userId: user.id } }),
+    destroyAllSessions(user.id),
+    db.passwordReset.deleteMany({ where: { userId: user.id } }),
   ]);
   await createSession(user.id);
 

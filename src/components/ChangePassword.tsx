@@ -10,9 +10,9 @@ import styles from './forms.module.css';
 /**
  * Changing a password from inside the account.
  *
- * The only remedy the product offered somebody who thought their password was
- * known was deleting the account. A reset flow needs e-mail and does not exist
- * yet; this is the half that needs nothing.
+ * The signed-in half of the pair — the e-mailed reset at /forgot-password is
+ * the other. Here nothing but the session vouches for the person, so the
+ * current password is asked for; there, the claimed link is the proof.
  */
 export function ChangePassword() {
   const t = useT();

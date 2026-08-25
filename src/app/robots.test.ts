@@ -57,6 +57,11 @@ describe('what a crawler may reach', () => {
     expect(indexable('/signup')).toBe(false);
   });
 
+  it('closes the password reset pages — the reset URL carries a credential', () => {
+    expect(indexable('/forgot-password')).toBe(false);
+    expect(indexable('/reset-password')).toBe(false);
+  });
+
   it('closes by prefix, so a route added later is closed the day it is written', () => {
     // /lists/abc/gifts/new did not exist when these rules were written.
     expect(indexable('/lists/abc/gifts/new')).toBe(false);
