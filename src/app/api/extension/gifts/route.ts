@@ -80,10 +80,14 @@ export async function POST(request: Request) {
     },
   });
 
+  // Reported back: when this fails — an image CDN that only answers real
+  // browsers — the extension can send the picture from the screen instead.
+  let imageStored = false;
   if (imageUrl) {
     const stored = await storeImageFrom(imageUrl, user.id);
     if (stored) {
       await db.gift.update({ where: { id: gift.id }, data: { imageUrl: stored } });
+      imageStored = true;
     }
   }
 
@@ -106,7 +110,7 @@ export async function POST(request: Request) {
   });
 
   revalidatePath(`/lists/${listId}`);
-  return NextResponse.json({ giftId: gift.id, listId });
+  return NextResponse.json({ giftId: gift.id, listId, imageStored });
 }
 
 /**
