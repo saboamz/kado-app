@@ -58,6 +58,7 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   sessions         Session[]
+  passwordResets   PasswordReset[]
   lists            GiftList[]
   interests        Interest[]
   reservations     Reservation[]
@@ -109,6 +110,29 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// One outstanding "choose a new password" link.
+///
+/// Same shape as Session, for the same reason: the id is the SHA-256 of the
+/// token the e-mail carries, so the row is useless to anyone who reads the
+/// database — see the comment on createSession() in src/lib/session.ts.
+///
+/// At most one lives per account: issuing a new link deletes the previous
+/// ones, because two valid links means the older e-mail — sitting in an
+/// inbox somebody may no longer control — still opens the account.
+model PasswordReset {
+  id        String    @id
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  /// Set atomically when the token is spent. A used token is kept until the
+  /// nightly purge rather than deleted, so a replayed link fails the same
+  /// way an expired one does instead of looking like it never existed.
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 
   @@index([userId])
 }

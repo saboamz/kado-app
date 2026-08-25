@@ -54,6 +54,10 @@ export default function robots(): MetadataRoute.Robots {
         '/api/',
         '/login',
         '/signup',
+        '/forgot-password',
+        // Above all this one: the link a reset e-mail carries puts its token
+        // in the query string, and an indexed URL is a leaked credential.
+        '/reset-password',
       ],
     },
     sitemap: `${siteUrl()}/sitemap.xml`,

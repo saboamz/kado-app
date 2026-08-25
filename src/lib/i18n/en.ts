@@ -50,6 +50,28 @@ export const en: Dictionary = {
   'auth.signIn': 'Sign in',
   'auth.signUp': 'Create my account',
   'auth.createAccount': 'Create an account',
+  'auth.forgotPassword': 'Forgot your password?',
+  'auth.forgotTitle': 'Forgot your password.',
+  'auth.forgotLede':
+    'Enter your address: if an account exists, a link to choose a new one will arrive by e-mail.',
+  'auth.forgotSend': 'Send the link',
+  'auth.forgotSending': 'Sending…',
+  'auth.forgotSent':
+    'If an account exists for this address, an e-mail is on its way. Remember to check your spam folder.',
+  'auth.resetTitle': 'Choose a new password.',
+  'auth.resetLede': 'It will replace the old one on all your devices.',
+  'auth.resetAgain': 'Request a new link',
+  'auth.backToLogin': 'Back to sign in',
+
+  // ── The reset e-mail ─────────────────────────────────────────────────────
+  'email.resetSubject': 'Reset your Kadlio password',
+  'email.resetGreeting': 'Hello {name},',
+  'email.resetBody':
+    'Someone — hopefully you — asked to reset the password of your Kadlio account. This link is valid for one hour and works only once.',
+  'email.resetButton': 'Choose a new password',
+  'email.resetLinkFallback': 'If the button does not work, copy this link into your browser:',
+  'email.resetIgnore':
+    'If you did not request this, ignore this e-mail: your password is unchanged.',
 
   // ── Home ─────────────────────────────────────────────────────────────────
   'home.greeting': 'Hello {name}',
@@ -286,6 +308,7 @@ export const en: Dictionary = {
   'error.passwordLong': 'That password is too long.',
   'error.passwordRequired': 'Enter your password.',
   'error.passwordUnchanged': 'Choose a password different from the current one.',
+  'error.resetInvalid': 'This link no longer works. Request a new one.',
   'error.nameRequired': 'Enter your name.',
   'error.nameLong': 'That name is too long.',
   'error.textLong': 'That text is too long.',
@@ -572,7 +595,7 @@ export const en: Dictionary = {
 
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Back to the home page',
-  'legal.updated': 'Last updated: 23 August 2026.',
+  'legal.updated': 'Last updated: 25 August 2026.',
   'legal.noticeTitle': 'Legal notice',
   'legal.publisher': 'Publisher',
   'legal.publisherBody':
@@ -609,10 +632,10 @@ export const en: Dictionary = {
     'To perform the service you asked for by creating an account (GDPR article 6.1.b): without this data there is no list, no friend and no gift. The sign-up questionnaire answers rest on your consent (article 6.1.a), given by answering and withdrawable at any time by clearing them from your profile — the service works identically without them. Rate-limiting sign-in attempts rests on the legitimate interest in protecting accounts (article 6.1.f).',
   'legal.retention': 'For how long',
   'legal.retentionBody':
-    'Your data is kept for as long as your account exists. A session expires after 30 days. Sign-in attempts are erased after 24 hours. When you delete your account, everything goes at once: lists, wishes, claims, contributions, messages, photos and activity log. Nothing is kept in anonymised form.',
+    'Your data is kept for as long as your account exists. A session expires after 30 days. Sign-in attempts are erased after 24 hours. A password reset link expires after one hour and works only once. When you delete your account, everything goes at once: lists, wishes, claims, contributions, messages, photos and activity log. Nothing is kept in anonymised form.',
   'legal.thirdParties': 'Who else sees anything',
   'legal.thirdPartiesBody':
-    'Vercel hosts the app, stores the photos you upload and measures its audience and speed — see the next section. Neon hosts the database, in the European Union. When you search for a GIF the query goes to GIPHY, and GIFs shown on a profile are loaded from their servers — so GIPHY sees visits to that profile. When you paste a shop link the merchant refuses us, the page address is passed to an external reading service (r.jina.ai) to retrieve its title and price. No data is sold, rented, or passed on for advertising.',
+    'Vercel hosts the app, stores the photos you upload and measures its audience and speed — see the next section. Neon hosts the database, in the European Union. When you search for a GIF the query goes to GIPHY, and GIFs shown on a profile are loaded from their servers — so GIPHY sees visits to that profile. When you paste a shop link the merchant refuses us, the page address is passed to an external reading service (r.jina.ai) to retrieve its title and price. The password reset e-mail is carried by Resend, a US provider certified under the EU–US Data Privacy Framework: it sees your address and the content of that message, nothing else. No data is sold, rented, or passed on for advertising.',
   'legal.cookies': 'Cookies',
   'legal.cookiesBody':
     'One cookie is set: the one that keeps you signed in. It is strictly necessary to the service. No advertising cookie, no social-network cookie, no third-party tracker. That is why you are not asked to accept a banner.',

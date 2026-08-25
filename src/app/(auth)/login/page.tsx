@@ -56,6 +56,10 @@ export default function LoginPage() {
       </form>
 
       <p className={styles.footer}>
+        <Link href="/forgot-password">{t('auth.forgotPassword')}</Link>
+      </p>
+
+      <p className={styles.footer}>
         Pas encore de compte ? <Link href="/signup">{t('auth.createAccount')}</Link>
       </p>
     </>

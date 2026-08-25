@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { buildItemSimilarity } from '@/lib/cf';
 import { promoteQuarantined, sweepUnlinkedGifts } from '@/lib/gift-product-link';
 import { backfillMerchants } from '@/lib/merchants';
+import { purgeExpiredResets } from '@/lib/password-reset';
 import { purgeOldAttempts } from '@/lib/rate-limit';
 import { refreshPopularity } from '@/lib/reco';
 
@@ -60,6 +61,7 @@ export async function GET(request: Request) {
   // Rate-limit rows are only read inside a window measured in minutes;
   // anything older than a day is dead weight.
   const attemptsPurged = await purgeOldAttempts();
+  const resetsPurged = await purgeExpiredResets();
 
   /*
    * Retry the links that never resolved.
@@ -93,6 +95,7 @@ export async function GET(request: Request) {
     popularityRowsUpdated: popularity,
     similarityPairsWritten: similarity,
     attemptsPurged,
+    resetsPurged,
     giftsRetried: sweep.attempted,
     giftsLinked: sweep.linked,
     quarantineRetried: promotion.attempted,

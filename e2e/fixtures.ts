@@ -139,6 +139,37 @@ export async function destroyScenario(scenario: Scenario): Promise<void> {
   await db.user.deleteMany({ where: { id: { in: scenario.userIds } } });
 }
 
+/**
+ * Mints a password reset token the way the server does.
+ *
+ * A spec cannot READ a token out of the database — only its SHA-256 is
+ * stored, which is the whole point — so the fixture has to WRITE one, with
+ * the same shape issuePasswordReset() produces.
+ */
+export async function createResetToken(email: string): Promise<string> {
+  const { randomBytes, createHash } = await import('node:crypto');
+  const user = await db.user.findUniqueOrThrow({ where: { email }, select: { id: true } });
+  const token = randomBytes(32).toString('base64url');
+  await db.passwordReset.create({
+    data: {
+      id: createHash('sha256').update(token).digest('hex'),
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    },
+  });
+  return token;
+}
+
+/**
+ * Empties the reset throttle between runs. Unlike the login limiter, every
+ * reset request is recorded — and locally they all share the IP bucket
+ * 'unknown', so repeated Playwright runs would starve each other within the
+ * hour without this.
+ */
+export async function clearResetAttempts(): Promise<void> {
+  await db.authAttempt.deleteMany({ where: { key: { startsWith: 'reset:' } } });
+}
+
 export async function disconnect(): Promise<void> {
   await db.$disconnect();
 }

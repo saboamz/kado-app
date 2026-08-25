@@ -41,6 +41,19 @@ export const LOGIN_PER_IP: Limit = { attempts: 30, windowSeconds: 15 * 60 };
 /** Sign-up is per IP only — there is no account yet to key on. */
 export const SIGNUP_PER_IP: Limit = { attempts: 10, windowSeconds: 60 * 60 };
 
+/*
+ * Password reset requests. What is being limited is the outbound e-mail —
+ * each request sends a real one, on our sending reputation — so every
+ * attempt counts, whether or not the address has an account: only charging
+ * the ones that do would turn this throttle into an oracle for which
+ * addresses are registered.
+ *
+ * Per e-mail is tight (three links an hour is plenty for a lost password);
+ * per IP is looser, because a household shares one address.
+ */
+export const RESET_PER_EMAIL: Limit = { attempts: 3, windowSeconds: 60 * 60 };
+export const RESET_PER_IP: Limit = { attempts: 10, windowSeconds: 60 * 60 };
+
 /**
  * Outbound page reads, per signed-in person.
  *

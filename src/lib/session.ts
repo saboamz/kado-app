@@ -151,4 +151,17 @@ export async function destroySession(): Promise<void> {
   store.delete(COOKIE);
 }
 
+/**
+ * Every session for one account, gone at once.
+ *
+ * For the moments a password changes because somebody else may know it —
+ * the signed-in change and the e-mailed reset both end every open session.
+ * Returns the un-awaited Prisma promise on purpose: both callers run it
+ * inside the $transaction that writes the new hash, so the sessions and the
+ * password can never disagree about which credential is current.
+ */
+export function destroyAllSessions(userId: string) {
+  return db.session.deleteMany({ where: { userId } });
+}
+
 export const SESSION_COOKIE = COOKIE;
