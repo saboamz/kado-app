@@ -704,6 +704,15 @@ export const fr = {
   'error.cannotReportYourself': 'Vous ne pouvez pas vous signaler vous-même.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
+  // The invitation landing is most newcomers' FIRST contact with Kadlio —
+  // they arrive from a group chat and never see the landing page. So this
+  // is where the concept gets its one sentence, and what the invitee gains
+  // for themselves its other one.
+  'invite.title': '{name} vous invite sur Kadlio',
+  'invite.concept':
+    'Kadlio est une liste de cadeaux entre proches, gratuite et sans publicité. {name} y note ses envies ; vous y réservez en secret ce que vous comptez offrir — {name} ne voit jamais qui a pris quoi.',
+  'invite.reciprocal': 'Et vos propres envies auront leur liste aussi.',
+  'invite.haveAccount': 'J’ai déjà un compte',
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',
   'invite.rotating': 'Un instant…',
