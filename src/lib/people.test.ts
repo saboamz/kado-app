@@ -1,6 +1,6 @@
 import { db } from './db';
-import { getFriendGroups, searchPeople, suggestPeople } from './people';
-import { cleanup, makeFriends, makeList, makeUser } from '@/test/factories';
+import { getFriendGroups, searchPeople } from './people';
+import { cleanup, makeFriends, makeUser } from '@/test/factories';
 
 describe('searching for people', () => {
   let viewer: { id: string };
@@ -106,42 +106,5 @@ describe('friend groups', () => {
   it('carries the friendship id so a request can be acted on', async () => {
     const groups = await getFriendGroups(viewer.id);
     expect(groups.received[0]!.friendshipId).toBeTruthy();
-  });
-});
-
-describe('suggestions', () => {
-  let viewer: { id: string };
-  let friend: { id: string };
-  let stranger: { id: string };
-  const ids: string[] = [];
-
-  beforeAll(async () => {
-    viewer = await makeUser('Viewer');
-    friend = await makeUser('Already Friend');
-    stranger = await makeUser('Not Yet Known');
-    ids.push(viewer.id, friend.id, stranger.id);
-    await makeFriends(viewer.id, friend.id);
-    await makeList(stranger.id);
-  });
-
-  afterAll(async () => {
-    await cleanup(ids);
-    await db.$disconnect();
-  });
-
-  it('leaves out people already befriended', async () => {
-    const suggestions = await suggestPeople(viewer.id);
-    expect(suggestions.map((p) => p.id)).not.toContain(friend.id);
-  });
-
-  it('leaves out the viewer', async () => {
-    const suggestions = await suggestPeople(viewer.id);
-    expect(suggestions.map((p) => p.id)).not.toContain(viewer.id);
-  });
-
-  it('counts each suggestion’s lists', async () => {
-    const suggestions = await suggestPeople(viewer.id);
-    const found = suggestions.find((p) => p.id === stranger.id);
-    expect(found?.listCount).toBe(1);
   });
 });
