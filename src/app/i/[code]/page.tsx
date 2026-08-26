@@ -81,12 +81,17 @@ export default async function InvitePage({
         <Avatar name={invite.owner.name} url={invite.owner.avatarUrl} size={72} />
 
         <h1 className={styles.title}>
-          {invite.owner.name} vous invite sur Kadlio
+          {t('invite.title', { name: invite.owner.name })}
         </h1>
-        <p className={styles.body}>
-          Vous verrez sa liste d’envies, et pourrez réserver un cadeau sans
-          qu’{firstName} ne le sache — c’est tout l’intérêt.
-        </p>
+        {/*
+          The one place the concept can reach the people invitations bring —
+          which is most people: they arrive from a group chat and never see
+          the landing page. What Kadlio is, the secret rule, and what is in
+          it for THEM, in that order. Translated, unlike the hardcoded French
+          it replaces: a signed-out visitor reads in their browser's language.
+        */}
+        <p className={styles.body}>{t('invite.concept', { name: firstName })}</p>
+        <p className={styles.body}>{t('invite.reciprocal')}</p>
 
         {viewer ? (
           // Signed in: one click and it is done.
@@ -106,7 +111,7 @@ export default async function InvitePage({
               variant="secondary"
               block
             >
-              J’ai déjà un compte
+              {t('invite.haveAccount')}
             </ButtonLink>
           </>
         )}

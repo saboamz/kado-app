@@ -686,6 +686,11 @@ export const en: Dictionary = {
   'error.cannotReportYourself': 'You cannot report yourself.',
 
   // ── Invitations, uploads, search ─────────────────────────────────────────
+  'invite.title': '{name} invites you to Kadlio',
+  'invite.concept':
+    'A gift list among friends and family, free: {name} writes down wishes, you claim in secret — and {name} never sees who took what.',
+  'invite.reciprocal': 'Your wishes will get their list too.',
+  'invite.haveAccount': 'I already have an account',
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',
   'invite.rotating': 'One moment…',
