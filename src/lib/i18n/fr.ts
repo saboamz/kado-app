@@ -709,9 +709,12 @@ export const fr = {
   // is where the concept gets its one sentence, and what the invitee gains
   // for themselves its other one.
   'invite.title': '{name} vous invite sur Kadlio',
+  // Tight on purpose: an invitee gives this card three seconds. The title
+  // already says "Kadlio", so the body spends no words repeating it — one
+  // sentence carries what it is, that it is free, and the secret rule.
   'invite.concept':
-    'Kadlio est une liste de cadeaux entre proches, gratuite et sans publicité. {name} y note ses envies ; vous y réservez en secret ce que vous comptez offrir — {name} ne voit jamais qui a pris quoi.',
-  'invite.reciprocal': 'Et vos propres envies auront leur liste aussi.',
+    'Une liste de cadeaux entre proches, gratuite : {name} y note ses envies, vous réservez en secret — et {name} ne voit jamais qui a pris quoi.',
+  'invite.reciprocal': 'Vos envies auront leur liste aussi.',
   'invite.haveAccount': 'J’ai déjà un compte',
   'invite.unused': 'Personne ne l’a encore utilisé.',
   'invite.rotate': 'Générer un nouveau lien',

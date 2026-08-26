@@ -688,8 +688,8 @@ export const en: Dictionary = {
   // ── Invitations, uploads, search ─────────────────────────────────────────
   'invite.title': '{name} invites you to Kadlio',
   'invite.concept':
-    'Kadlio is a gift list among friends and family, free and without ads. {name} writes down wishes; you secretly claim what you plan to give — {name} never sees who took what.',
-  'invite.reciprocal': 'And your own wishes will get their list too.',
+    'A gift list among friends and family, free: {name} writes down wishes, you claim in secret — and {name} never sees who took what.',
+  'invite.reciprocal': 'Your wishes will get their list too.',
   'invite.haveAccount': 'I already have an account',
   'invite.unused': 'Nobody has used it yet.',
   'invite.rotate': 'Generate a new link',
