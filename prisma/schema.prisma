@@ -23,7 +23,17 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   passwordHash  String
+  /// A username, not a label: unique across the app, and the one thing
+  /// somebody types to find exactly this person — like a handle on any
+  /// social network. Shown as written ("Sophie Marchand"); compared through
+  /// nameKey below, so "sophie marchand" is the same, taken, name.
   name          String
+  /// The comparable form of `name`: trimmed, spaces collapsed, lowercased.
+  /// Computed in TS by nameKey() before every write and enforced unique
+  /// here — the same "computed key" pattern as Product.titleKey. The
+  /// migration that introduced it derives it in SQL with the identical
+  /// rule, so a name written before and a name typed after always meet.
+  nameKey       String    @unique
   bio           String?
   /// Answers to the sign-up questionnaire. Both optional, and NULL is the
   /// answer "I would rather not say" — a refusal is not a category, so it is

@@ -3,9 +3,9 @@ import { getFriendGroups, searchPeople } from './people';
 import { cleanup, makeFriends, makeUser } from '@/test/factories';
 
 describe('searching for people', () => {
-  let viewer: { id: string };
-  let alice: { id: string; email: string };
-  let bob: { id: string };
+  let viewer: { id: string; name: string };
+  let alice: { id: string; name: string; email: string };
+  let bob: { id: string; name: string };
   const ids: string[] = [];
 
   beforeAll(async () => {
@@ -20,14 +20,21 @@ describe('searching for people', () => {
     await db.$disconnect();
   });
 
-  it('finds people by partial name, case-insensitively', async () => {
-    const results = await searchPeople('alice zap', viewer.id);
-    expect(results.map((r) => r.id)).toContain(alice.id);
+  it('finds a person by their exact username, whatever the case', async () => {
+    const results = await searchPeople(alice.name.toUpperCase(), viewer.id);
+    expect(results.map((r) => r.id)).toEqual([alice.id]);
+  });
+
+  it('refuses a partial name — a username is typed whole or not at all', async () => {
+    // Fragments would let anyone leaf through the members; the name is now a
+    // handle, and a handle is either somebody or nobody.
+    const results = await searchPeople(alice.name.slice(0, -3), viewer.id);
+    expect(results).toEqual([]);
   });
 
   it('never returns the searcher themselves', async () => {
-    const results = await searchPeople('Zaphod', viewer.id);
-    expect(results.map((r) => r.id)).not.toContain(viewer.id);
+    const results = await searchPeople(viewer.name, viewer.id);
+    expect(results).toEqual([]);
   });
 
   it('finds a person by their exact e-mail', async () => {
@@ -48,12 +55,11 @@ describe('searching for people', () => {
     expect(await searchPeople('  ', viewer.id)).toEqual([]);
   });
 
-  it('reports how the searcher relates to each result', async () => {
+  it('reports how the searcher relates to the result', async () => {
     await makeFriends(viewer.id, alice.id);
-    const results = await searchPeople('Zaphod', viewer.id);
 
-    expect(results.find((r) => r.id === alice.id)?.relation).toBe('friend');
-    expect(results.find((r) => r.id === bob.id)?.relation).toBe('none');
+    expect((await searchPeople(alice.name, viewer.id))[0]?.relation).toBe('friend');
+    expect((await searchPeople(bob.name, viewer.id))[0]?.relation).toBe('none');
   });
 });
 

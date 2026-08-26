@@ -12,3 +12,6 @@ playwright-report
 
 # Uploaded images; a Docker volume in production.
 .uploads/
+
+# Vercel CLI project link (created by `vercel link`)
+.vercel

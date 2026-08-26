@@ -131,23 +131,21 @@ test('a friend request can be declined', async ({ page }) => {
   await expect(page.getByRole('heading')).toBeVisible();
 });
 
-test('search finds a person by name', async ({ page }) => {
+test('search finds a person by their exact username, and only that', async ({ page }) => {
   await signIn(page, scenario.friendEmail);
   await page.goto('/search');
 
-  // The tag matches all three people in this scenario, minus the searcher
-  // themselves, who is never returned in their own results.
-  await page.getByLabel('Rechercher une personne').fill(scenario.tag);
-  await expect(page.getByText(/2 résultats/)).toBeVisible();
-  // Scoped to the page: the desktop nav carries a link to the signed-in
-  // user's own profile, whose name is "Ami <tag>" in this scenario.
-  const results = page.getByRole('main');
-  await expect(
-    results.getByRole('link', { name: new RegExp(`Ami ${scenario.tag}`) }),
-  ).toHaveCount(0);
+  // A username is typed whole: the owner's exact name finds exactly them.
+  await page.getByLabel('Rechercher une personne').fill(`Propriétaire ${scenario.tag}`);
+  await expect(page.getByText(/1 résultat/)).toBeVisible();
   await expect(
     page.getByRole('link', { name: new RegExp(`Propriétaire ${scenario.tag}`) }),
   ).toBeVisible();
+
+  // The bare tag is a fragment of three names and matches none of them —
+  // fragments would let anyone leaf through the members.
+  await page.getByLabel('Rechercher une personne').fill(scenario.tag);
+  await expect(page.getByText('Personne trouvée')).toBeVisible();
 });
 
 test('search will not match a partial e-mail address', async ({ page }) => {

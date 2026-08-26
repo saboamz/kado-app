@@ -41,7 +41,8 @@ export const fr = {
   // ── Sign in / sign up ────────────────────────────────────────────────────
   'auth.welcomeBack': 'Content de vous revoir.',
   'auth.createYours': 'Créez votre compte.',
-  'auth.name': 'Nom',
+  'auth.name': 'Nom d’utilisateur',
+  'auth.nameHint': 'Unique : c’est ainsi que vos proches vous trouvent.',
   'auth.email': 'Adresse e-mail',
   'auth.password': 'Mot de passe',
   'auth.passwordHint': 'Au moins 8 caractères.',
@@ -136,11 +137,11 @@ export const fr = {
   'friends.emptyBody': 'Ajoutez vos proches pour voir leurs listes et savoir quoi leur offrir.',
   'friends.find': 'Chercher des amis',
   'search.title': 'Rechercher',
-  'search.subtitle': 'Trouvez vos proches pour voir leurs listes.',
+  'search.subtitle': 'Trouvez un proche par son nom d’utilisateur exact, ou son adresse e-mail.',
   'search.nobodyTitle': 'Personne trouvée',
-  'search.nobodyBody': 'Essayez un autre nom, ou l’adresse e-mail exacte de la personne.',
+  'search.nobodyBody': 'Le nom d’utilisateur ou l’adresse e-mail doivent être exacts — demandez-les à la personne, ou son lien d’invitation.',
   'search.hintTitle': 'Qui cherchez-vous ?',
-  'search.hintBody': 'Cherchez vos proches par nom ou par adresse e-mail.',
+  'search.hintBody': 'Tapez le nom d’utilisateur exact d’un proche, ou son adresse e-mail.',
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
@@ -378,6 +379,7 @@ export const fr = {
   'settings.saved': 'Vos préférences ont été enregistrées.',
 
   'error.emailTaken': 'Un compte existe déjà avec cette adresse.',
+  'error.nameTaken': 'Ce nom d’utilisateur est déjà pris.',
   'error.badCredentials': 'E-mail ou mot de passe incorrect.',
   'error.tooManyAttempts': 'Trop de tentatives. Réessayez dans quelques minutes.',
   'error.tooManyUploads': 'Trop d’images envoyées d’affilée. Réessayez plus tard.',
@@ -719,7 +721,7 @@ export const fr = {
   'invite.rotate': 'Générer un nouveau lien',
   'invite.rotating': 'Un instant…',
   'upload.tooLarge': 'Cette image dépasse 4 Mo.',
-  'search.placeholder': 'Nom ou adresse e-mail',
+  'search.placeholder': 'Nom d’utilisateur ou adresse e-mail',
   'gif.placeholder': 'Chercher : chat, merci, bravo…',
   'gif.choose': 'Choisir ce GIF',
   'gif.chooseNamed': 'Choisir le GIF : {title}',

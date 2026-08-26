@@ -1,4 +1,5 @@
 import { PrismaClient, type Prisma } from '@prisma/client';
+import { nameKey } from '../src/lib/name-key';
 import { hashPassword } from '../src/lib/password';
 import { normalizeUrl, priceBand, titleKey, urlHash } from '../src/lib/catalogue';
 import { CF_READY_THRESHOLD } from '../src/lib/cf';
@@ -208,6 +209,7 @@ async function main() {
 
   // ── Users, with interests that the taxonomy can actually resolve ──
   const users: { id: string; categories: string[] }[] = [];
+  const usedNames = new Set<string>();
   for (let i = 0; i < 40; i++) {
     const first = FIRST[i % FIRST.length]!;
     const last = pick(LAST);
@@ -222,6 +224,12 @@ async function main() {
 
     const categories = [...new Set(labels.flatMap((l) => categoriesForInterest(l)))];
 
+    // Names are usernames: a second "Léa Martin" in the batch gets her index
+    // appended rather than a unique-index refusal.
+    const displayName = usedNames.has(nameKey(`${first} ${last}`))
+      ? `${first} ${last} ${i}`
+      : `${first} ${last}`;
+
     const user = await db.user.create({
       data: {
         // De-accented: the login validator rejects accented characters in an
@@ -230,7 +238,8 @@ async function main() {
         // before the password was ever checked.
         email: `${slugifyName(first)}${i}@synth.kadlio.app`,
         passwordHash,
-        name: `${first} ${last}`,
+        name: displayName,
+        nameKey: nameKey(displayName),
         bio: `${labels.join(', ')}.`,
         profilePublic: rnd() < 0.3,
         interests: { create: labels.map((label) => ({ label })) },
@@ -242,6 +251,7 @@ async function main() {
             : undefined,
       },
     });
+    usedNames.add(user.nameKey);
     users.push({ id: user.id, categories });
   }
   console.log(`${users.length} utilisateurs`);

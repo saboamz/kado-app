@@ -1,4 +1,5 @@
 import { db } from './db';
+import { nameKey } from './name-key';
 
 export type PersonResult = {
   id: string;
@@ -11,10 +12,14 @@ export type PersonResult = {
 };
 
 /**
- * Finds people by name or exact e-mail.
+ * Finds one person: by their exact username, or their exact e-mail.
  *
- * E-mail matches must be exact: a partial match would let anyone enumerate
- * addresses by typing prefixes, which is the same leak the login page avoids.
+ * Exact on purpose, both ways. A name is a username now — one per person —
+ * so the name typed either is somebody or is nobody, and a partial match
+ * would only let anyone leaf through the members by fragments. E-mail was
+ * always exact: a prefix match would let anyone enumerate addresses, the
+ * same leak the login page avoids. People reach each other by knowing a
+ * name, an address, or an invitation link — nothing else.
  */
 export async function searchPeople(
   query: string,
@@ -26,10 +31,7 @@ export async function searchPeople(
   const people = await db.user.findMany({
     where: {
       id: { not: viewerId },
-      OR: [
-        { name: { contains: trimmed, mode: 'insensitive' } },
-        { email: trimmed.toLowerCase() },
-      ],
+      OR: [{ nameKey: nameKey(trimmed) }, { email: trimmed.toLowerCase() }],
     },
     select: {
       id: true,
@@ -38,8 +40,7 @@ export async function searchPeople(
       bio: true,
       _count: { select: { lists: true } },
     },
-    take: 20,
-    orderBy: { name: 'asc' },
+    take: 2,
   });
 
   return withRelations(people, viewerId);

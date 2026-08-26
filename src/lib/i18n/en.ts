@@ -43,7 +43,8 @@ export const en: Dictionary = {
   // ── Sign in / sign up ────────────────────────────────────────────────────
   'auth.welcomeBack': 'Good to see you again.',
   'auth.createYours': 'Create your account.',
-  'auth.name': 'Name',
+  'auth.name': 'Username',
+  'auth.nameHint': 'Unique: it is how your friends find you.',
   'auth.email': 'Email address',
   'auth.password': 'Password',
   'auth.passwordHint': 'At least 8 characters.',
@@ -135,11 +136,11 @@ export const en: Dictionary = {
   'friends.emptyBody': 'Add your friends to see their lists and know what to give them.',
   'friends.find': 'Find friends',
   'search.title': 'Search',
-  'search.subtitle': 'Find your friends to see their lists.',
+  'search.subtitle': 'Find a friend by their exact username, or their email address.',
   'search.nobodyTitle': 'Nobody found',
-  'search.nobodyBody': 'Try another name, or the person’s exact email address.',
+  'search.nobodyBody': 'The username or the email address must be exact — ask the person, or use their invitation link.',
   'search.hintTitle': 'Who are you looking for?',
-  'search.hintBody': 'Look for your friends by name or by email address.',
+  'search.hintBody': 'Type a friend’s exact username, or their email address.',
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
@@ -369,6 +370,7 @@ export const en: Dictionary = {
   'settings.saved': 'Your preferences have been saved.',
 
   'error.emailTaken': 'An account already exists with that address.',
+  'error.nameTaken': 'That username is already taken.',
   'error.badCredentials': 'Wrong email address or password.',
   'error.tooManyAttempts': 'Too many attempts. Try again in a few minutes.',
   'error.tooManyUploads': 'Too many images in a row. Try again later.',
@@ -694,7 +696,7 @@ export const en: Dictionary = {
   'invite.rotate': 'Generate a new link',
   'invite.rotating': 'One moment…',
   'upload.tooLarge': 'This image is larger than 4 MB.',
-  'search.placeholder': 'Name or email address',
+  'search.placeholder': 'Username or email address',
   'gif.placeholder': 'Search: cat, thanks, well done…',
   'gif.choose': 'Choose this GIF',
   'gif.chooseNamed': 'Choose the GIF: {title}',

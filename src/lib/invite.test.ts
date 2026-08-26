@@ -48,7 +48,7 @@ describe('what an invitation link shows', () => {
     const view = await readInvite(invite.code, null);
     expect(view.state).toBe('open');
     if (view.state === 'invalid') return;
-    expect(view.owner.name).toBe('Camille Rey');
+    expect(view.owner.name).toBe(owner.name);
   });
 
   it('says a closed invitation is closed, not that it never existed', async () => {

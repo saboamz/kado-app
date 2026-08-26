@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { db } from './db';
 import { LOCALES } from './i18n/locales';
 import { rateLimit, recordAttempt, UPLOAD_PER_USER } from './rate-limit';
+import { nameKey } from './name-key';
 import { requireUser } from './session';
 import { SURVEY_CATEGORIES } from './taxonomy';
 import { deleteUpload, storeUpload } from './uploads';
@@ -55,6 +56,14 @@ export async function updateProfile(
 
   const { name, bio, gender, ageBracket } = parsed.data;
 
+  // A username is one per person: refuse a name somebody ELSE already holds,
+  // compared case-folded. Your own name, retyped in another case, is yours.
+  const key = nameKey(name);
+  const holder = await db.user.findUnique({ where: { nameKey: key }, select: { id: true } });
+  if (holder && holder.id !== user.id) {
+    return { errors: { name: 'error.nameTaken' } };
+  }
+
   const current = await db.user.findUniqueOrThrow({
     where: { id: user.id },
     select: { avatarUrl: true },
@@ -101,6 +110,7 @@ export async function updateProfile(
       where: { id: user.id },
       data: {
         name,
+        nameKey: key,
         bio: bio || null,
         gender: gender || null,
         ageBracket: ageBracket || null,

@@ -21,6 +21,7 @@ import {
 } from './rate-limit';
 import { acceptInvite } from './invite-actions';
 import { DEFAULT_LOCALE, isLocale } from './i18n/locales';
+import { nameKey } from './name-key';
 import { getLocale, getT } from './i18n/server';
 import { createSession, destroyAllSessions, destroySession, requireUser } from './session';
 import { siteUrl } from './site';
@@ -84,16 +85,37 @@ export async function signup(
     return { errors: { email: 'error.emailTaken' } };
   }
 
-  const user = await db.user.create({
-    data: {
-      name,
-      email,
-      passwordHash: await hashPassword(password),
-      locale,
-      // Everyone gets a default list, so the app is never empty on arrival.
-      lists: { create: { name: t('lists.defaultName'), isDefault: true } },
-    },
-  });
+  // The name is a username: one person per name, compared case-folded.
+  // Probing which names are taken is inherent to usernames everywhere, so it
+  // is not hidden — but it is throttled like the e-mail probe above.
+  const key = nameKey(name);
+  if (await db.user.findUnique({ where: { nameKey: key }, select: { id: true } })) {
+    await recordAttempt('signup:ip', ip);
+    return { errors: { name: 'error.nameTaken' } };
+  }
+
+  let user;
+  try {
+    user = await db.user.create({
+      data: {
+        name,
+        nameKey: key,
+        email,
+        passwordHash: await hashPassword(password),
+        locale,
+        // Everyone gets a default list, so the app is never empty on arrival.
+        lists: { create: { name: t('lists.defaultName'), isDefault: true } },
+      },
+    });
+  } catch (error) {
+    // Two sign-ups racing for one name or one address: the checks above both
+    // passed, the unique index refused the second. Same answer as if the
+    // check had caught it.
+    if (isUniqueViolation(error)) {
+      return { errors: { name: 'error.nameTaken' } };
+    }
+    throw error;
+  }
 
   await createSession(user.id);
 
@@ -393,4 +415,14 @@ export async function changePassword(
   await createSession(user.id);
 
   return { done: true };
+}
+
+/** Prisma's unique-index refusal, the one error a racing write may produce. */
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === 'P2002'
+  );
 }

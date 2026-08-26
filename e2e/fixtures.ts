@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { nameKey } from '../src/lib/name-key';
 import { hashPassword } from '../src/lib/password';
 
 /**
@@ -53,6 +54,7 @@ export async function createScenario(): Promise<Scenario> {
     data: {
       email: `owner-${tag}@example.com`,
       name: `Propriétaire ${tag}`,
+      nameKey: nameKey(`Propriétaire ${tag}`),
       passwordHash: hash,
     },
   });
@@ -60,6 +62,7 @@ export async function createScenario(): Promise<Scenario> {
     data: {
       email: `friend-${tag}@example.com`,
       name: `Ami ${tag}`,
+      nameKey: nameKey(`Ami ${tag}`),
       passwordHash: hash,
     },
   });
@@ -67,6 +70,7 @@ export async function createScenario(): Promise<Scenario> {
     data: {
       email: `other-${tag}@example.com`,
       name: `Autre ${tag}`,
+      nameKey: nameKey(`Autre ${tag}`),
       passwordHash: hash,
     },
   });

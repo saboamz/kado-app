@@ -40,6 +40,7 @@ export default function SignupPage() {
           id="name"
           name="name"
           label={t('auth.name')}
+        hint={t('auth.nameHint')}
           autoComplete="name"
           required
           error={state.errors?.name}
