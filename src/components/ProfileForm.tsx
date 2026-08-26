@@ -38,6 +38,7 @@ export function ProfileForm({
         id="name"
         name="name"
         label={t('auth.name')}
+        hint={t('auth.nameHint')}
         defaultValue={initial.name}
         required
         error={state.errors?.name}

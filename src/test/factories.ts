@@ -1,14 +1,23 @@
 import { db } from '@/lib/db';
+import { nameKey } from '@/lib/name-key';
 
 let seq = 0;
 const uniq = () => `${Date.now()}-${seq++}`;
 
+/**
+ * A user whose name is made unique here, not by the caller: names are
+ * usernames now, and test files run in parallel — two suites each asking
+ * for an "Owner" at the same moment must not fight over the index. A test
+ * that needs the exact name reads it back from the row.
+ */
 export async function makeUser(name = 'Test User') {
+  const unique = `${name} ${uniq()}`;
   return db.user.create({
     data: {
       email: `test-${uniq()}@example.com`,
       passwordHash: 'scrypt:00:00',
-      name,
+      name: unique,
+      nameKey: nameKey(unique),
     },
   });
 }

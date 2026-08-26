@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { nameKey } from '../src/lib/name-key';
 import { hashPassword } from '../src/lib/password';
 
 const db = new PrismaClient();
@@ -31,6 +32,8 @@ async function main() {
       email: 'sophie@kadlio.app',
       passwordHash,
       name: 'Sophie Marchand',
+      nameKey: nameKey('Sophie Marchand'),
+
       bio: 'Café filtre, céramique et randonnées.',
       interests: {
         create: [
@@ -48,6 +51,8 @@ async function main() {
       email: 'thomas@kadlio.app',
       passwordHash,
       name: 'Thomas Bel',
+      nameKey: nameKey('Thomas Bel'),
+
       bio: 'Vélo, cuisine et vieux synthés.',
       interests: { create: [{ label: 'Vélo' }, { label: 'Cuisine' }] },
     },
@@ -58,6 +63,8 @@ async function main() {
       email: 'emma@kadlio.app',
       passwordHash,
       name: 'Emma Roux',
+      nameKey: nameKey('Emma Roux'),
+
       bio: 'Jardinage et romans policiers.',
       interests: { create: [{ label: 'Jardinage' }, { label: 'Lecture' }] },
     },
@@ -68,6 +75,8 @@ async function main() {
       email: 'lucas@kadlio.app',
       passwordHash,
       name: 'Lucas Ferrand',
+      nameKey: nameKey('Lucas Ferrand'),
+
       bio: 'Jeux de société et photographie argentique.',
     },
   });

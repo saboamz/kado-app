@@ -35,7 +35,9 @@ test('the profile can be edited and the changes show on the profile page', async
   await signIn(page, scenario.ownerEmail);
   await page.goto('/profile/edit');
 
-  await page.getByLabel('Nom').fill('Nom Modifié');
+  // Usernames are unique: suffixed so two runs never fight over it.
+  const renamed = `Nom Modifié ${Date.now()}`;
+  await page.getByLabel('Nom').fill(renamed);
   await page.getByLabel('À propos').fill('J’aime le café filtre.');
   // Ticked, not typed — free text lives in "À propos" above.
   await page.getByText('Gourmandise', { exact: true }).click();
@@ -52,7 +54,7 @@ test('the profile can be edited and the changes show on the profile page', async
   await expect(page).toHaveURL(/\/profile$/, { timeout: 15_000 });
   // The name now also appears in the desktop nav, so target the heading.
   await expect(
-    page.getByRole('heading', { name: 'Nom Modifié' }),
+    page.getByRole('heading', { name: renamed }),
   ).toBeVisible();
   await expect(page.getByText('J’aime le café filtre.')).toBeVisible();
   await expect(

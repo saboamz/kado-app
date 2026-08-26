@@ -78,7 +78,7 @@ test('a wrong password is refused without revealing whether the account exists',
 test('signing up creates an account with a default list', async ({ page }) => {
   const email = `nouveau-${Date.now()}@example.com`;
   await page.goto('/signup');
-  await page.getByLabel('Nom').fill('Nouvelle Personne');
+  await page.getByLabel('Nom').fill(`Nouvelle Personne ${Date.now()}`);
   await page.getByLabel('Adresse e-mail').fill(email);
   await page.getByLabel('Mot de passe').fill('motdepasse123');
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
@@ -96,7 +96,7 @@ test('the sign-up questionnaire saves what is ticked, and skips cleanly', async 
 }) => {
   const email = `enquete-${Date.now()}@example.com`;
   await page.goto('/signup');
-  await page.getByLabel('Nom').fill('Personne Curieuse');
+  await page.getByLabel('Nom').fill(`Personne Curieuse ${Date.now()}`);
   await page.getByLabel('Adresse e-mail').fill(email);
   await page.getByLabel('Mot de passe').fill('motdepasse123');
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
@@ -122,7 +122,7 @@ test('the sign-up questionnaire saves what is ticked, and skips cleanly', async 
 test('not answering the questionnaire stores nothing', async ({ page }) => {
   const email = `muet-${Date.now()}@example.com`;
   await page.goto('/signup');
-  await page.getByLabel('Nom').fill('Personne Discrète');
+  await page.getByLabel('Nom').fill(`Personne Discrète ${Date.now()}`);
   await page.getByLabel('Adresse e-mail').fill(email);
   await page.getByLabel('Mot de passe').fill('motdepasse123');
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
@@ -140,7 +140,7 @@ test('not answering the questionnaire stores nothing', async ({ page }) => {
 
 test('signing up rejects a password under eight characters', async ({ page }) => {
   await page.goto('/signup');
-  await page.getByLabel('Nom').fill('Test');
+  await page.getByLabel('Nom').fill(`Test ${Date.now()}`);
   await page.getByLabel('Adresse e-mail').fill(`court-${Date.now()}@example.com`);
   await page.getByLabel('Mot de passe').fill('court');
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
