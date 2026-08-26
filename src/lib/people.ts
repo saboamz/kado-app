@@ -1,5 +1,4 @@
 import { db } from './db';
-import { friendIds } from './relations';
 
 export type PersonResult = {
   id: string;
@@ -41,28 +40,6 @@ export async function searchPeople(
     },
     take: 20,
     orderBy: { name: 'asc' },
-  });
-
-  return withRelations(people, viewerId);
-}
-
-/** People the viewer might know: friends of their friends, then anyone else. */
-export async function suggestPeople(
-  viewerId: string,
-): Promise<PersonResult[]> {
-  const friends = await friendIds(viewerId);
-
-  const people = await db.user.findMany({
-    where: { id: { not: viewerId, notIn: friends } },
-    select: {
-      id: true,
-      name: true,
-      avatarUrl: true,
-      bio: true,
-      _count: { select: { lists: true } },
-    },
-    take: 12,
-    orderBy: { createdAt: 'desc' },
   });
 
   return withRelations(people, viewerId);

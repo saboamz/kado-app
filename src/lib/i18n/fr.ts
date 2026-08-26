@@ -139,9 +139,8 @@ export const fr = {
   'search.subtitle': 'Trouvez vos proches pour voir leurs listes.',
   'search.nobodyTitle': 'Personne trouvée',
   'search.nobodyBody': 'Essayez un autre nom, ou l’adresse e-mail exacte de la personne.',
-  'search.suggestions': 'Suggestions',
-  'search.noSuggestionsTitle': 'Personne à suggérer',
-  'search.noSuggestionsBody': 'Cherchez vos proches par nom ou par adresse e-mail.',
+  'search.hintTitle': 'Qui cherchez-vous ?',
+  'search.hintBody': 'Cherchez vos proches par nom ou par adresse e-mail.',
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',

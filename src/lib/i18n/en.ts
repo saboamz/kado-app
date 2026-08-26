@@ -138,9 +138,8 @@ export const en: Dictionary = {
   'search.subtitle': 'Find your friends to see their lists.',
   'search.nobodyTitle': 'Nobody found',
   'search.nobodyBody': 'Try another name, or the person’s exact email address.',
-  'search.suggestions': 'Suggestions',
-  'search.noSuggestionsTitle': 'Nobody to suggest',
-  'search.noSuggestionsBody': 'Look for your friends by name or by email address.',
+  'search.hintTitle': 'Who are you looking for?',
+  'search.hintBody': 'Look for your friends by name or by email address.',
 
   // ── Notifications ────────────────────────────────────────────────────────
   'notifications.title': 'Notifications',
