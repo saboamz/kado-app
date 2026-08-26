@@ -62,6 +62,25 @@ it('claims exactly once — the second submission of one link is refused', async
   expect(await claimPasswordReset(token)).toBeNull();
 });
 
+it('lives exactly one hour, and the boundary is strict', async () => {
+  const owner = await user();
+
+  // What issue() writes: expiresAt sits one hour from now, not a minute more.
+  const before = Date.now();
+  const { token, id, expiresAt } = await issuePasswordReset(owner.id);
+  const lifetime = expiresAt.getTime() - before;
+  expect(lifetime).toBeGreaterThan(59 * 60 * 1000);
+  expect(lifetime).toBeLessThanOrEqual(60 * 60 * 1000 + 1000);
+
+  // Just inside the boundary the claim still works; refusal at one second
+  // past it is the previous test's job.
+  await db.passwordReset.update({
+    where: { id },
+    data: { expiresAt: new Date(Date.now() + 1500) },
+  });
+  expect(await claimPasswordReset(token)).not.toBeNull();
+});
+
 it('refuses expired and garbage tokens alike', async () => {
   const owner = await user();
   const { token, id } = await issuePasswordReset(owner.id);
