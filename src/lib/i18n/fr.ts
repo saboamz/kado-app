@@ -617,6 +617,83 @@ export const fr = {
   'seo.group.faq4a':
     'Chaque cadeau a sa conversation, invisible pour la personne concernée. On s’y répartit qui achète, qui emballe, qui apporte.',
 
+  // ── Cagnotte : l'angle de l'argent, distinct de /cadeau-commun qui est
+  //    celui de l'organisation. ────────────────────────────────────────────
+  'seo.pot.title': 'Cagnotte cadeau en ligne, sans commission ni frais',
+  'seo.pot.metaDescription':
+    'Une cagnotte pour un cadeau, sans commission et sans frais de retrait : l’argent ne passe jamais par la plateforme. Chacun promet sa part, un seul achète, les autres remboursent.',
+  'seo.pot.navLabel': 'Cagnotte sans commission',
+  'seo.pot.h1': 'Une cagnotte sans commission, parce que l’argent ne passe pas par nous',
+  'seo.pot.lede':
+    'Les cagnottes en ligne prélèvent leur part, ou la font payer au retrait. Kadlio ne touche jamais l’argent : il tient le compte de ce que chacun a promis, et rien d’autre.',
+  'seo.pot.s1Title': 'Zéro commission, parce qu’il n’y a rien à prélever',
+  'seo.pot.s1Body':
+    'Une plateforme qui encaisse doit se rémunérer sur ce qu’elle encaisse. Kadlio n’encaisse pas : une participation est une promesse entre proches, réglée entre eux, par virement ou de la main à la main. Ni frais d’ouverture, ni frais de retrait, ni pourcentage.',
+  'seo.pot.s2Title': 'Une personne avance, les autres la remboursent',
+  'seo.pot.s2Body':
+    'Quelqu’un achète le cadeau et le déclare. À ce moment-là, et seulement à ce moment-là, il voit qui lui doit quoi — parce qu’il est le seul à être de sa poche. Les autres continuent de voir un nombre de participants et un total.',
+  'seo.pot.s3Title': 'Personne n’annonce son montant au groupe',
+  'seo.pot.s3Body':
+    'Votre participation n’est jamais affichée à côté de votre nom pour le groupe. Un montant lu à côté d’un nom cesse d’être une somme qu’on pouvait mettre pour devenir une somme sur laquelle on sera jugé.',
+  'seo.pot.faq1q': 'Quels sont les frais ?',
+  'seo.pot.faq1a':
+    'Aucun. Pas de commission, pas de frais d’ouverture, pas de frais de retrait. Kadlio ne prend rien sur les cagnottes, puisque l’argent ne transite jamais par le service.',
+  'seo.pot.faq2q': 'Où va l’argent, alors ?',
+  'seo.pot.faq2a':
+    'Directement à la personne qui a acheté le cadeau, par le moyen dont vous convenez entre vous. Kadlio n’a ni compte de paiement ni portefeuille : il enregistre des promesses et fait les additions.',
+  'seo.pot.faq3q': 'Faut-il une carte bancaire pour participer ?',
+  'seo.pot.faq3a':
+    'Non. Vous n’entrez aucun moyen de paiement sur Kadlio : vous indiquez le montant que vous promettez, et vous le réglez ensuite à la personne qui a acheté.',
+  'seo.pot.faq4q': 'En quoi est-ce différent d’une cagnotte classique ?',
+  'seo.pot.faq4a':
+    'Une cagnotte classique détient l’argent et se rémunère dessus. Kadlio n’en détient aucun : c’est une feuille de comptes partagée, pas un compte. C’est ce qui permet de ne rien prélever, et cela suppose que vous vous fassiez confiance entre proches.',
+
+  // ── La page qui explique la règle que cette application existe pour tenir.
+  //    Chaque phrase se vérifie dans src/lib/secrecy.ts ; si le code change,
+  //    c'est ici qu'il faut revenir. ─────────────────────────────────────────
+  'secret.title': 'Comment le secret des réservations est garanti',
+  'secret.metaDescription':
+    'Le propriétaire d’une liste ne peut pas savoir qui a réservé quoi. Ce n’est pas une promesse de discrétion : les réservations ne sont jamais chargées quand c’est lui qui regarde.',
+  'secret.navLabel': 'Comment le secret tient',
+  'secret.h1': 'Le secret n’est pas une promesse, c’est une structure',
+  'secret.lede':
+    'Kadlio est construit autour d’une règle : celui qui écrit une liste ne peut pas apprendre ce qu’on lui réserve. Voici où cette règle vit, et pourquoi elle ne peut pas être oubliée en chemin.',
+  'secret.ruleTitle': 'La règle, en une phrase',
+  'secret.ruleBody':
+    'Le propriétaire d’une liste n’apprend jamais qu’un de ses cadeaux a été réservé, ni qu’une cagnotte s’est ouverte dessus. Pas qui, pas combien, pas même que quelque chose a eu lieu.',
+  'secret.interfaceTitle': 'Cacher à l’écran ne suffit pas',
+  'secret.interfaceBody':
+    'Une information retirée de l’affichage est toujours dans la réponse envoyée par le serveur : n’importe qui ouvrant les outils de développement de son navigateur l’y trouverait. Un secret qui tient à ce que personne ne regarde n’est pas un secret.',
+  'secret.boundaryTitle': 'Les réservations ne sont pas cachées : elles ne sont pas lues',
+  'secret.boundaryBody':
+    'La règle est appliquée à l’endroit où les lignes de la base de données deviennent une réponse. Quand c’est le propriétaire qui consulte sa liste, la requête ne va pas chercher les réservations : elles ne sont pas retirées après coup, elles ne sont jamais chargées. Une occultation qui repose sur le fait de penser à effacer une clé plus loin est à un remaniement de céder ; ne pas lire la donnée ne peut pas céder ainsi.',
+  'secret.provenTitle': 'Deux cadeaux, une seule réponse possible',
+  'secret.provenBody':
+    'La conséquence se vérifie. Pour un propriétaire, la réponse décrivant un cadeau réservé est identique, octet pour octet, à celle décrivant un cadeau libre : les clés de réservation et de cagnotte n’y sont pas vidées ni mises à zéro, elles sont absentes. Il ne peut pas faire la différence, parce qu’il n’y en a pas. Un test porte cette phrase, et échoue si elle cesse d’être vraie.',
+  'secret.friendsTitle': 'Ce que vos proches voient, et ce qu’ils ne voient pas',
+  'secret.friendsBody':
+    'Un proche sait si un cadeau est pris, et s’il est celui qui l’a pris. Jamais qui d’autre. Nommer celui qui a réservé n’apporterait rien à personne et donnerait un secret de plus à tenir : c’est par une parole en trop que ces choses se découvrent.',
+  'secret.moneyTitle': 'L’argent ne passe pas par Kadlio',
+  'secret.moneyBody':
+    'Une participation à une cagnotte est une promesse, pas un paiement : quelqu’un avance la somme, les autres le remboursent directement. Kadlio tient le compte, pas la caisse — et ne prélève donc aucune commission. Qui a promis combien n’est montré qu’à la personne qui a payé, une fois qu’elle a déclaré l’achat : elle est la seule à en avoir besoin, parce qu’elle est la seule à être de sa poche. Les autres voient un nombre de participants et un total.',
+  'secret.principlesTitle': 'Le reste des choix, pour les mêmes raisons',
+  'secret.principle1':
+    'Gratuit et sans publicité. Aucune donnée n’est vendue ni transmise à des fins publicitaires.',
+  'secret.principle2':
+    'Aucune commission sur les cagnottes : ce qui est promis va intégralement au cadeau.',
+  'secret.principle3':
+    'Kadlio est édité par un particulier, à titre non professionnel. Son identité n’est pas publiée ici, comme la loi le permet à un éditeur non professionnel ; elle est détenue par l’hébergeur.',
+  'secret.faq1q': 'Le propriétaire peut-il vraiment ne rien deviner ?',
+  'secret.faq1a':
+    'Il ne peut rien lire, parce qu’il n’y a rien à lire : sa réponse est la même dans les deux cas. Reste ce qu’aucun logiciel ne tient — un proche qui parle. Kadlio ne garantit que sa part, et c’est celle-là qu’il garantit entièrement.',
+  'secret.faq2q': 'Et si quelqu’un inspecte le code de la page ?',
+  'secret.faq2a':
+    'Il y trouvera exactement ce que l’écran affiche. C’est tout le sens de la règle : la donnée n’est pas masquée dans la réponse, elle n’y est pas.',
+  'secret.faq3q': 'Pourquoi faut-il un compte pour réserver ?',
+  'secret.faq3a':
+    'C’est ce qui permet de retenir qui a réservé quoi sans jamais le montrer au propriétaire, et de vous redonner vos propres réservations quand vous revenez.',
+  'secret.privacyLink': 'Ce qui est enregistré, et pourquoi',
+
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Retour à l’accueil',
   'legal.updated': 'Dernière mise à jour : 25 août 2026.',

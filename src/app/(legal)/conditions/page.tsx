@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getT } from '@/lib/i18n/server';
 import { pageMetadata } from '@/lib/site';
 import { TERMS } from '@/lib/public-pages';
+import { BreadcrumbSchema } from '@/components/BreadcrumbSchema';
 import styles from '../legal.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,6 +15,7 @@ export default async function TermsPage() {
 
   return (
     <article className={styles.article}>
+      <BreadcrumbSchema page={TERMS} name={t('legal.termsTitle')} />
       <h1 className={styles.title}>{t('legal.termsTitle')}</h1>
       <p className={styles.updated}>{t('legal.updated')}</p>
       <p className={styles.lede}>{t('legal.termsIntro')}</p>

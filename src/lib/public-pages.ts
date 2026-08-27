@@ -33,6 +33,7 @@ export const PATHNAME_HEADER = 'x-kadlio-pathname';
 export type PublicPage = { readonly fr: string; readonly en: string };
 
 export const LANDING: PublicPage = { fr: '/', en: EN_PREFIX };
+export const SECRET: PublicPage = { fr: '/le-secret', en: `${EN_PREFIX}/how-the-secret-works` };
 export const LEGAL_NOTICE: PublicPage = { fr: '/mentions-legales', en: `${EN_PREFIX}/legal-notice` };
 export const PRIVACY: PublicPage = { fr: '/confidentialite', en: `${EN_PREFIX}/privacy` };
 export const TERMS: PublicPage = { fr: '/conditions', en: `${EN_PREFIX}/terms` };
@@ -49,6 +50,7 @@ export function intentPage(key: IntentKey): PublicPage {
 export const PUBLIC_PAGES: readonly PublicPage[] = [
   LANDING,
   ...INTENT_PAGES.map((entry) => intentPage(entry.key)),
+  SECRET,
   LEGAL_NOTICE,
   PRIVACY,
   TERMS,

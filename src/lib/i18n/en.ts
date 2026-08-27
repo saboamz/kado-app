@@ -599,6 +599,83 @@ export const en: Dictionary = {
   'seo.group.faq4a':
     'Every gift has its own conversation, invisible to the person concerned. That is where you sort out who buys, who wraps, who brings it.',
 
+  // ── The pot: the money angle, distinct from /group-gift, which is the
+  //    organising one. ──────────────────────────────────────────────────────
+  'seo.pot.title': 'Online gift pot, no commission and no fees',
+  'seo.pot.metaDescription':
+    'A pot for a gift, with no commission and no withdrawal fee: the money never passes through the platform. Everyone pledges a share, one person buys, the others pay them back.',
+  'seo.pot.navLabel': 'Gift pot, no commission',
+  'seo.pot.h1': 'A gift pot with no commission, because the money never reaches us',
+  'seo.pot.lede':
+    'Online pots take their cut, or charge you for the withdrawal. Kadlio never touches the money: it keeps count of what each person pledged, and nothing else.',
+  'seo.pot.s1Title': 'No commission, because there is nothing to take it from',
+  'seo.pot.s1Body':
+    'A platform that holds the money has to make its living from the money it holds. Kadlio holds none: a contribution is a promise between friends, settled between them, by transfer or by hand. No opening fee, no withdrawal fee, no percentage.',
+  'seo.pot.s2Title': 'One person pays, the others pay them back',
+  'seo.pot.s2Body':
+    'Somebody buys the gift and says so. At that point, and only then, they see who owes them what — because they are the only one out of pocket. Everybody else goes on seeing a number of contributors and a total.',
+  'seo.pot.s3Title': 'Nobody announces their amount to the group',
+  'seo.pot.s3Body':
+    'What you put in is never shown next to your name for the group to read. An amount read next to a name stops being a sum somebody could afford and becomes one they will be judged on.',
+  'seo.pot.faq1q': 'What are the fees?',
+  'seo.pot.faq1a':
+    'There are none. No commission, no opening fee, no withdrawal fee. Kadlio takes nothing from the pots, because the money never passes through the service.',
+  'seo.pot.faq2q': 'Where does the money go, then?',
+  'seo.pot.faq2a':
+    'Straight to whoever bought the gift, by whatever means you agree between yourselves. Kadlio has no payment account and no wallet: it records promises and does the arithmetic.',
+  'seo.pot.faq3q': 'Do I need a bank card to chip in?',
+  'seo.pot.faq3a':
+    'No. You enter no payment details on Kadlio: you state the amount you are pledging, and you settle it afterwards with the person who bought the gift.',
+  'seo.pot.faq4q': 'How is this different from an ordinary money pot?',
+  'seo.pot.faq4a':
+    'An ordinary pot holds the money and earns its living from it. Kadlio holds none: it is a shared sheet of accounts, not an account. That is what makes taking nothing possible, and it assumes you trust the people you are doing this with.',
+
+  // ── The page that explains the rule this application exists to keep.
+  //    Every sentence is checkable in src/lib/secrecy.ts; if the code
+  //    changes, this is what has to come back into step. ────────────────────
+  'secret.title': 'How the secret of a gift list is kept',
+  'secret.metaDescription':
+    'A list owner cannot learn who claimed what. Not a promise of discretion: the reservations are never loaded when it is the owner looking at the page.',
+  'secret.navLabel': 'How the secret holds',
+  'secret.h1': 'The secret is not a promise, it is a structure',
+  'secret.lede':
+    'Kadlio is built around one rule: the person who writes a list cannot learn what is being bought for them. Here is where that rule lives, and why it cannot be forgotten along the way.',
+  'secret.ruleTitle': 'The rule, in one sentence',
+  'secret.ruleBody':
+    'A list owner never learns that one of their gifts has been claimed, or that a pot has opened on it. Not who, not how many, not that anything happened at all.',
+  'secret.interfaceTitle': 'Hiding it on screen is not enough',
+  'secret.interfaceBody':
+    'Anything taken out of the display is still in the response the server sent: anyone opening their browser’s developer tools would find it there. A secret that depends on nobody looking is not a secret.',
+  'secret.boundaryTitle': 'The reservations are not hidden — they are not read',
+  'secret.boundaryBody':
+    'The rule is enforced where database rows become a response. When it is the owner looking at their list, the query does not go and fetch the reservations: they are not stripped out afterwards, they are never loaded. Redaction that relies on remembering to delete a key further down is one refactor away from failing; not reading the data cannot fail that way.',
+  'secret.provenTitle': 'Two gifts, one possible answer',
+  'secret.provenBody':
+    'The consequence is checkable. For an owner, the response describing a claimed gift is identical, byte for byte, to the one describing a free gift: the reservation and pot keys are not emptied or zeroed, they are absent. They cannot tell the two apart, because there is no difference. A test carries that sentence, and fails if it stops being true.',
+  'secret.friendsTitle': 'What your friends see, and what they do not',
+  'secret.friendsBody':
+    'A friend knows whether a gift is taken, and whether they are the one who took it. Never who else did. Naming the person who claimed it would help nobody and would hand out one more secret to keep: it is through one word too many that these things get out.',
+  'secret.moneyTitle': 'The money does not pass through Kadlio',
+  'secret.moneyBody':
+    'A contribution to a pot is a promise, not a payment: one person advances the money, the others pay them back directly. Kadlio keeps the count, not the cash — and so takes no commission. Who promised what is shown only to the person who paid, once they have declared the purchase: they are the only one who needs it, because they are the only one out of pocket. Everybody else sees a number of contributors and a total.',
+  'secret.principlesTitle': 'The rest of the choices, for the same reasons',
+  'secret.principle1':
+    'Free, with no advertising. No data is sold or passed on for advertising purposes.',
+  'secret.principle2':
+    'No commission on the pots: what is promised goes to the gift, in full.',
+  'secret.principle3':
+    'Kadlio is published by a private individual, in a non-professional capacity. Their identity is not published here, as French law allows for a non-professional publisher; it is held by the host.',
+  'secret.faq1q': 'Can the owner really guess nothing?',
+  'secret.faq1a':
+    'They can read nothing, because there is nothing to read: their response is the same either way. What remains is what no software holds — a friend who talks. Kadlio guarantees only its own half, and that half it guarantees completely.',
+  'secret.faq2q': 'What if somebody inspects the page?',
+  'secret.faq2a':
+    'They will find exactly what the screen shows. That is the whole point of the rule: the data is not masked inside the response, it is not in it.',
+  'secret.faq3q': 'Why does claiming a gift need an account?',
+  'secret.faq3a':
+    'It is what makes it possible to remember who claimed what without ever showing it to the owner, and to give you your own reservations back when you return.',
+  'secret.privacyLink': 'What is recorded, and why',
+
   // ── Legal pages ──────────────────────────────────────────────────────────
   'legal.backHome': 'Back to the home page',
   'legal.updated': 'Last updated: 25 August 2026.',

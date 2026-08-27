@@ -84,8 +84,8 @@ describe('the sitemap', () => {
   });
 
   it('stays small, because everything else is somebody’s private list', () => {
-    // Landing, four intent pages, three legal pages.
-    expect(PUBLIC_PAGES).toHaveLength(8);
+    // Landing, five intent pages, the page explaining the rule, three legal.
+    expect(PUBLIC_PAGES).toHaveLength(10);
     // Each of them twice: once at its French address, once at its English one.
     expect(sitemap()).toHaveLength(PUBLIC_PAGES.length * 2);
   });

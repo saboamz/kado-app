@@ -3,6 +3,7 @@ import { ButtonLink } from '@/components/Button';
 import { getLocale, getT } from '@/lib/i18n/server';
 import { INTENT_PAGES, type IntentKey } from '@/lib/intent-pages';
 import { intentPage, pathFor } from '@/lib/public-pages';
+import { BreadcrumbSchema } from '@/components/BreadcrumbSchema';
 import styles from './marketing.module.css';
 
 /**
@@ -49,6 +50,7 @@ export async function IntentPage({ page }: { page: IntentKey }) {
 
   return (
     <article className={styles.article}>
+      <BreadcrumbSchema page={intentPage(page)} name={t(`seo.${page}.navLabel`)} />
       <script
         type="application/ld+json"
         // Built from our own dictionary strings; no user input reaches it.
