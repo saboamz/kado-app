@@ -17,6 +17,7 @@ export const INTENT_PAGES = [
   { slug: '/liste-de-naissance', en: '/baby-registry', key: 'birth' },
   { slug: '/liste-de-mariage', en: '/wedding-registry', key: 'wedding' },
   { slug: '/cadeau-commun', en: '/group-gift', key: 'group' },
+  { slug: '/cagnotte-sans-commission', en: '/free-gift-pot', key: 'pot' },
 ] as const;
 
 export type IntentKey = (typeof INTENT_PAGES)[number]['key'];

@@ -278,6 +278,13 @@
   text-wrap: pretty;
 }
 
+.secretLink {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--acc);
+}
+
 
 /* The way into the intent pages — one per occasion somebody searches for.
    Quiet links rather than cards: a visitor who wants the pitch has just read

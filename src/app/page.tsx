@@ -5,10 +5,10 @@ import { ButtonLink } from '@/components/Button';
 import { getCurrentUser } from '@/lib/session';
 import { LegalFooter } from '@/components/LegalFooter';
 import { LanguageLink } from '@/components/LanguageLink';
-import { getT } from '@/lib/i18n/server';
+import { getLocale, getT } from '@/lib/i18n/server';
 import { INTENT_PAGES } from '@/lib/intent-pages';
 import { pageMetadata, siteUrl } from '@/lib/site';
-import { LANDING } from '@/lib/public-pages';
+import { LANDING, SECRET, pathFor } from '@/lib/public-pages';
 import styles from './landing.module.css';
 
 // Declared here rather than in the root layout for two reasons: a canonical
@@ -50,6 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function LandingPage() {
   const t = await getT();
+  const locale = await getLocale();
   // Someone already signed in has no use for the pitch.
   if (await getCurrentUser()) redirect('/app');
 
@@ -170,6 +171,12 @@ export default async function LandingPage() {
         <section className={styles.secret}>
           <h2 className={styles.secretTitle}>{t('landing.secretTitle')}</h2>
           <p className={styles.secretBody}>{t('landing.secretBody')}</p>
+          {/* The paragraph makes the claim; this is where it is demonstrated.
+              Also the only link to that page — without it, it exists in the
+              sitemap and nowhere a reader or a crawler would walk. */}
+          <Link href={pathFor(SECRET, locale)} className={styles.secretLink}>
+            {t('secret.navLabel')}
+          </Link>
         </section>
 
         {/* The intent pages are only findable if something links to them:
