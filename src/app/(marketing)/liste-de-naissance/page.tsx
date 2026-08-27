@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import { getT } from '@/lib/i18n/server';
-import { pageAlternates } from '@/lib/site';
+import { pageMetadata } from '@/lib/site';
+import { intentPage } from '@/lib/public-pages';
 import { IntentPage } from '../IntentPage';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return {
-    title: t('seo.birth.title'),
-    description: t('seo.birth.metaDescription'),
-    alternates: pageAlternates('/liste-de-naissance'),
-  };
+  return pageMetadata(
+    intentPage('birth'),
+    t('seo.birth.title'),
+    t('seo.birth.metaDescription'),
+  );
 }
 
 export default function BirthPage() {

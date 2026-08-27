@@ -28,6 +28,30 @@
   color: var(--ink);
 }
 
+/* The back link and the language link share a line: both are ways out of
+   this page, and neither deserves a row of its own. */
+.topBar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.topBar .back {
+  margin-bottom: 0;
+}
+
+.language {
+  font-size: 13.5px;
+  color: var(--acc);
+  text-decoration: none;
+}
+
+.language:hover {
+  text-decoration: underline;
+}
+
 .article {
   color: var(--ink);
 }

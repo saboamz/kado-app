@@ -1,5 +1,6 @@
 import robots from './robots';
 import sitemap from './sitemap';
+import { PUBLIC_PAGES } from '@/lib/public-pages';
 
 /**
  * What a crawler is allowed to read.
@@ -84,6 +85,28 @@ describe('the sitemap', () => {
 
   it('stays small, because everything else is somebody’s private list', () => {
     // Landing, four intent pages, three legal pages.
-    expect(sitemap()).toHaveLength(8);
+    expect(PUBLIC_PAGES).toHaveLength(8);
+    // Each of them twice: once at its French address, once at its English one.
+    expect(sitemap()).toHaveLength(PUBLIC_PAGES.length * 2);
+  });
+
+  it('gives every page both of its addresses, each naming the other', () => {
+    /*
+     * The half of hreflang that is easy to get wrong. An annotation Google
+     * accepts has to be reciprocal — the English URL pointing back at the
+     * French one — and a sitemap that lists a page in one language only is a
+     * page whose translation cannot be found.
+     */
+    const urls = sitemap().map((entry) => new URL(entry.url).pathname || '/');
+
+    for (const page of PUBLIC_PAGES) {
+      expect(urls).toContain(page.fr);
+      expect(urls).toContain(page.en);
+    }
+
+    for (const entry of sitemap()) {
+      const languages = entry.alternates?.languages ?? {};
+      expect(Object.keys(languages).sort()).toEqual(['en', 'fr']);
+    }
   });
 });

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { PUBLIC_PAGES } from './src/lib/public-pages';
 
 /*
  * Security headers.
@@ -88,6 +89,26 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
+  },
+
+  /*
+   * The English address of each public page.
+   *
+   * A rewrite rather than a second copy of every route: the pages are already
+   * language-agnostic — they read their words through getT(), which takes the
+   * language from the URL — so the French route rendered at the English
+   * address IS the English page. Duplicating eight route files to change
+   * nothing but the folder they sit in would be eight files to keep in step.
+   *
+   * Middleware runs before this and sees the address the reader asked for,
+   * which is what makes it work: /en/wedding-registry reaches the
+   * /liste-de-mariage route with the pathname still saying English.
+   *
+   * The list is PUBLIC_PAGES itself, so an address cannot be added to the
+   * sitemap and forgotten here.
+   */
+  async rewrites() {
+    return PUBLIC_PAGES.map((page) => ({ source: page.en, destination: page.fr }));
   },
 };
 

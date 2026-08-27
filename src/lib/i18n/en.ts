@@ -475,6 +475,11 @@ export const en: Dictionary = {
   'landing.occasionsTitle': 'Kadlio for every occasion',
 
   // ── Intent pages, one per thing somebody searches for ────────────────────
+  'seo.landing.title': 'Kadlio — online gift list, among friends',
+  'seo.landing.metaDescription':
+    'Kadlio is a free online gift list, with no advertising. Your friends claim gifts in secret — you never see who took what.',
+  'seo.landing.shareTitle':
+    'Kadlio — say what would make you happy, your friends sort it out',
   'seo.faqTitle': 'Frequently asked questions',
   'seo.othersTitle': 'Kadlio for other occasions',
   'seo.ctaTitle': 'Create your list in minutes',
@@ -598,6 +603,8 @@ export const en: Dictionary = {
   'legal.backHome': 'Back to the home page',
   'legal.updated': 'Last updated: 25 August 2026.',
   'legal.noticeTitle': 'Legal notice',
+  'legal.noticeDescription':
+    'Publisher, publication director, host and contact details for Kadlio, under article 6-III of the French Confidence in the Digital Economy Act.',
   'legal.publisher': 'Publisher',
   'legal.publisherBody':
     'Kadlio is published by a private individual, in a non-professional capacity, with no advertising and no revenue. Under article 6-III-2 of the French law on confidence in the digital economy, their identity is not published here: it is held by the host, who will disclose it at the request of a judicial authority.',
@@ -609,6 +616,8 @@ export const en: Dictionary = {
   'legal.contact': 'Contact',
 
   'legal.privacyTitle': 'Privacy policy',
+  'legal.privacyDescription':
+    'What Kadlio records about you, why, for how long, and what you can demand. Written from the application’s code rather than from a template.',
   'legal.privacyIntro':
     'This page describes what Kadlio records about you, why, for how long, and what you can demand. It describes how the app actually works, not a template.',
   'legal.controller': 'Data controller',
@@ -651,6 +660,8 @@ export const en: Dictionary = {
     'Kadlio is built so that a list’s owner cannot learn who claimed what. This is not a promise of discretion: reservations are never loaded when it is the owner looking at the page. What you chip in to a pot is shown by name only to the person who declares they bought the gift, and only at that point.',
 
   'legal.termsTitle': 'Terms of use',
+  'legal.termsDescription':
+    'Kadlio’s terms of use: access to the service, what you publish, photos, reporting and availability. Free, and provided as is.',
   'legal.termsIntro':
     'By creating an account on Kadlio you accept the following. The service is free and provided as is.',
   'legal.termsAccess': 'Access to the service',

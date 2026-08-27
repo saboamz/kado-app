@@ -489,6 +489,11 @@ export const fr = {
   // Written like the landing: sober, factual, and only about what the app
   // actually does. A page that promises a feature we do not have ranks for a
   // week and disappoints forever.
+  'seo.landing.title': 'Kadlio — liste de cadeaux en ligne, entre proches',
+  'seo.landing.metaDescription':
+    'Kadlio est une liste de cadeaux en ligne, gratuite et sans publicité. Vos proches y réservent en secret — vous ne voyez jamais qui a pris quoi.',
+  'seo.landing.shareTitle':
+    'Kadlio — dites ce qui vous ferait plaisir, vos proches s’organisent',
   'seo.faqTitle': 'Questions fréquentes',
   'seo.othersTitle': 'Kadlio pour d’autres occasions',
   'seo.ctaTitle': 'Créez votre liste en quelques minutes',
@@ -616,6 +621,8 @@ export const fr = {
   'legal.backHome': 'Retour à l’accueil',
   'legal.updated': 'Dernière mise à jour : 25 août 2026.',
   'legal.noticeTitle': 'Mentions légales',
+  'legal.noticeDescription':
+    'Éditeur, directeur de la publication, hébergeur et contact de Kadlio, au titre de l’article 6-III de la loi pour la confiance dans l’économie numérique.',
   'legal.publisher': 'Éditeur',
   'legal.publisherBody':
     'Kadlio est édité par un particulier, à titre non professionnel, sans publicité et sans revenus. Conformément à l’article 6-III-2 de la loi pour la confiance dans l’économie numérique, son identité n’est pas publiée ici : elle est détenue par l’hébergeur, qui la communiquera sur réquisition de l’autorité judiciaire.',
@@ -627,6 +634,8 @@ export const fr = {
   'legal.contact': 'Contact',
 
   'legal.privacyTitle': 'Politique de confidentialité',
+  'legal.privacyDescription':
+    'Ce que Kadlio enregistre à votre sujet, pourquoi, combien de temps, et ce que vous pouvez exiger. Écrite à partir du code de l’application, pas d’un modèle.',
   'legal.privacyIntro':
     'Cette page décrit ce que Kadlio enregistre à votre sujet, pourquoi, combien de temps, et ce que vous pouvez exiger. Elle décrit le fonctionnement réel de l’application, pas un modèle.',
   'legal.controller': 'Responsable de traitement',
@@ -669,6 +678,8 @@ export const fr = {
     'Kadlio est conçu pour que le propriétaire d’une liste ne puisse pas savoir qui a réservé quoi. Ce n’est pas une promesse de discrétion : les réservations ne sont jamais chargées lorsque c’est lui qui consulte la page. Vos participations à une cagnotte ne sont visibles nominativement que par la personne qui déclare avoir acheté le cadeau, et uniquement à ce moment-là.',
 
   'legal.termsTitle': 'Conditions d’utilisation',
+  'legal.termsDescription':
+    'Les conditions d’utilisation de Kadlio : accès au service, ce que vous publiez, photos, signalement et disponibilité. Gratuit, et fourni tel quel.',
   'legal.termsIntro':
     'En créant un compte sur Kadlio, vous acceptez ce qui suit. Le service est gratuit et fourni tel quel.',
   'legal.termsAccess': 'Accès au service',

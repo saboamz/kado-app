@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import { getT } from '@/lib/i18n/server';
-import { pageAlternates } from '@/lib/site';
+import { pageMetadata } from '@/lib/site';
+import { intentPage } from '@/lib/public-pages';
 import { IntentPage } from '../IntentPage';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return {
-    title: t('seo.group.title'),
-    description: t('seo.group.metaDescription'),
-    alternates: pageAlternates('/cadeau-commun'),
-  };
+  return pageMetadata(
+    intentPage('group'),
+    t('seo.group.title'),
+    t('seo.group.metaDescription'),
+  );
 }
 
 export default function GroupGiftPage() {

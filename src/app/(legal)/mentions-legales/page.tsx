@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { getT } from '@/lib/i18n/server';
-import { pageAlternates } from '@/lib/site';
+import { pageMetadata } from '@/lib/site';
+import { LEGAL_NOTICE } from '@/lib/public-pages';
 import styles from '../legal.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t('legal.noticeTitle'), alternates: pageAlternates('/mentions-legales') };
+  return pageMetadata(LEGAL_NOTICE, t('legal.noticeTitle'), t('legal.noticeDescription'));
 }
 
 /**

@@ -28,6 +28,18 @@
   margin-bottom: 4px;
 }
 
+/* Pushed to the end of the header row, away from the name it is not part of. */
+.language {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--acc);
+  text-decoration: none;
+}
+
+.language:hover {
+  text-decoration: underline;
+}
+
 /* Says what kind of product this is before the headline has to. */
 .tagline {
   font-size: 13px;

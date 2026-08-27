@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { getT } from '@/lib/i18n/server';
+import { getLocale, getT } from '@/lib/i18n/server';
+import { LANDING, pathFor } from '@/lib/public-pages';
+import { LanguageLink } from '@/components/LanguageLink';
 import styles from './legal.module.css';
 
 /**
@@ -11,13 +13,17 @@ import styles from './legal.module.css';
  */
 export default async function LegalLayout({ children }: { children: ReactNode }) {
   const t = await getT();
+  const locale = await getLocale();
 
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.back}>
-          ← {t('legal.backHome')}
-        </Link>
+        <div className={styles.topBar}>
+          <Link href={pathFor(LANDING, locale)} className={styles.back}>
+            ← {t('legal.backHome')}
+          </Link>
+          <LanguageLink className={styles.language} />
+        </div>
         {children}
       </div>
     </div>
