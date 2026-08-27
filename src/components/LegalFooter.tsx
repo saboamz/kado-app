@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getT } from '@/lib/i18n/server';
+import { getLocale, getT } from '@/lib/i18n/server';
+import { LEGAL_NOTICE, PRIVACY, TERMS, pathFor } from '@/lib/public-pages';
 import styles from './legalFooter.module.css';
 
 /**
@@ -11,16 +12,19 @@ import styles from './legalFooter.module.css';
  */
 export async function LegalFooter() {
   const t = await getT();
+  // Each of these has two addresses; a French footer on an English page would
+  // hand the reader back a language they just left.
+  const locale = await getLocale();
 
   return (
     <footer className={styles.footer}>
-      <Link href="/mentions-legales" className={styles.link}>
+      <Link href={pathFor(LEGAL_NOTICE, locale)} className={styles.link}>
         {t('legal.footerNotice')}
       </Link>
-      <Link href="/confidentialite" className={styles.link}>
+      <Link href={pathFor(PRIVACY, locale)} className={styles.link}>
         {t('legal.footerPrivacy')}
       </Link>
-      <Link href="/conditions" className={styles.link}>
+      <Link href={pathFor(TERMS, locale)} className={styles.link}>
         {t('legal.footerTerms')}
       </Link>
     </footer>

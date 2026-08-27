@@ -117,6 +117,30 @@ export default async function RootLayout({
   const theme = user?.theme === 'SYSTEM' ? undefined : user?.theme.toLowerCase();
   const locale = await getLocale();
 
+  /*
+   * Who publishes this, as an entity rather than as a product.
+   *
+   * The landing page already declares a WebApplication, which describes the
+   * thing you use; nothing described the thing that publishes it. That is the
+   * node a search engine resolves a brand name against, and the one an
+   * assistant reaches for when it decides whether it can name a source.
+   *
+   * Deliberately four true fields and no more. No founder, no foundingDate,
+   * no sameAs: the editor is anonymous on purpose and by law (see the legal
+   * notice), and there is no social profile to point at. An entity that
+   * claims less than it can prove is worth more than one padded to look
+   * established.
+   */
+  const organisation = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Kadlio',
+    url: siteUrl(),
+    logo: `${siteUrl()}/icon.svg`,
+    email: 'contact@kadlio.com',
+    description: DESCRIPTION,
+  };
+
   return (
     <html
       /* Follows the reader, not the app's origin: a screen reader uses this
@@ -127,6 +151,11 @@ export default async function RootLayout({
       className={`${libreFranklin.variable} ${lora.variable}`}
     >
       <body>
+        <script
+          type="application/ld+json"
+          // Four constants and one env-derived URL; no user input reaches it.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
+        />
         <I18nProvider locale={locale} dict={locale === 'en' ? en : fr}>
           {children}
         </I18nProvider>

@@ -4,16 +4,26 @@ import { redirect } from 'next/navigation';
 import { ButtonLink } from '@/components/Button';
 import { getCurrentUser } from '@/lib/session';
 import { LegalFooter } from '@/components/LegalFooter';
+import { LanguageLink } from '@/components/LanguageLink';
 import { getT } from '@/lib/i18n/server';
 import { INTENT_PAGES } from '@/lib/intent-pages';
-import { pageAlternates, siteUrl } from '@/lib/site';
+import { pageMetadata, siteUrl } from '@/lib/site';
+import { LANDING } from '@/lib/public-pages';
 import styles from './landing.module.css';
 
-// The canonical lives here rather than in the root layout: set there, every
-// page inherited it and declared itself a duplicate of the homepage.
-export const metadata: Metadata = {
-  alternates: pageAlternates('/'),
-};
+// Declared here rather than in the root layout for two reasons: a canonical
+// set there is inherited by every page under it, each then claiming to be a
+// copy of the homepage; and the words have to come from the dictionary, or
+// /en would be an English page wearing a French title.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return pageMetadata(
+    LANDING,
+    t('seo.landing.title'),
+    t('seo.landing.metaDescription'),
+    t('seo.landing.shareTitle'),
+  );
+}
 
 /**
  * The page for somebody who has never heard of this.
@@ -57,6 +67,11 @@ export default async function LandingPage() {
    * rating, a review count or an author — the fields that tempt people to
    * invent, and that Google drops the whole block for when it catches one.
    *
+   * inLanguage names both because both are now addresses a crawler can go and
+   * read — /en and the paths under it. It described one entity, the
+   * application, so it says the same thing on either of them; what changes
+   * between the two is the description, which is this page's own words.
+   *
    * The description is the same sentence a visitor reads, not a second one
    * written for robots.
    */
@@ -89,6 +104,8 @@ export default async function LandingPage() {
           </span>
           {/* Says what kind of thing this is before the pitch does. */}
           <span className={styles.tagline}>{t('landing.tagline')}</span>
+          {/* The only way to reach /en without knowing the address. */}
+          <LanguageLink className={styles.language} />
         </header>
 
         <h1 className={styles.title}>{t('landing.h1')}</h1>

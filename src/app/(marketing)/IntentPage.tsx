@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { ButtonLink } from '@/components/Button';
-import { getT } from '@/lib/i18n/server';
+import { getLocale, getT } from '@/lib/i18n/server';
 import { INTENT_PAGES, type IntentKey } from '@/lib/intent-pages';
+import { intentPage, pathFor } from '@/lib/public-pages';
 import styles from './marketing.module.css';
 
 /**
@@ -19,6 +20,7 @@ import styles from './marketing.module.css';
  */
 export async function IntentPage({ page }: { page: IntentKey }) {
   const t = await getT();
+  const locale = await getLocale();
 
   const sections = [
     { title: t(`seo.${page}.s1Title`), body: t(`seo.${page}.s1Body`) },
@@ -56,6 +58,20 @@ export async function IntentPage({ page }: { page: IntentKey }) {
       <h1 className={styles.title}>{t(`seo.${page}.h1`)}</h1>
       <p className={styles.lede}>{t(`seo.${page}.lede`)}</p>
 
+      {/*
+        The same invitation as the one at the foot of the page, said early.
+
+        These four pages exist to be landed on from a search, and the closing
+        call to action sits below every section and the whole FAQ — around
+        four screens down on a phone. Somebody who arrives already convinced
+        had nothing to click until they had scrolled past everything meant to
+        convince them. One button, primary only: the pair belongs at the end,
+        where a reader who got that far has a reason to weigh the two.
+      */}
+      <p className={styles.leadAction}>
+        <ButtonLink href="/signup">{t('landing.createAccount')}</ButtonLink>
+      </p>
+
       {sections.map((section) => (
         <section key={section.title}>
           <h2 className={styles.heading}>{section.title}</h2>
@@ -89,7 +105,8 @@ export async function IntentPage({ page }: { page: IntentKey }) {
         <ul className={styles.othersList}>
           {others.map((entry) => (
             <li key={entry.slug}>
-              <Link href={entry.slug} className={styles.othersLink}>
+              {/* The sibling in the language of the page pointing at it. */}
+              <Link href={pathFor(intentPage(entry.key), locale)} className={styles.othersLink}>
                 {t(`seo.${entry.key}.navLabel`)}
               </Link>
             </li>
